@@ -8,9 +8,14 @@ class TopicService {
   /**
    * Get all topics with question count and user progress
    */
-  async getAll(userId = null) {
+  async getAll(userId = null, oppositionId = null) {
+    const where = { isActive: true };
+    if (oppositionId) {
+      where.oppositionId = oppositionId;
+    }
+
     const topics = await prisma.topic.findMany({
-      where: { isActive: true },
+      where,
       orderBy: { order: 'asc' },
       include: {
         _count: {

@@ -6,7 +6,8 @@ const { asyncHandler } = require('../utils/asyncHandler');
 
 const getAll = asyncHandler(async (req, res) => {
   const userId = req.user?.id || null;
-  const topics = await topicService.getAll(userId);
+  const oppositionId = req.user?.oppositionId || null;
+  const topics = await topicService.getAll(userId, oppositionId);
 
   res.json({ success: true, data: topics });
 });
@@ -18,7 +19,12 @@ const getById = asyncHandler(async (req, res) => {
 });
 
 const create = asyncHandler(async (req, res) => {
-  const topic = await topicService.create(req.body);
+  const data = {
+    ...req.body,
+    creatorId: req.user?.id,
+    oppositionId: req.user?.oppositionId || req.body.oppositionId
+  };
+  const topic = await topicService.create(data);
 
   res.status(201).json({
     success: true,

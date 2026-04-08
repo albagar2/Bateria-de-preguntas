@@ -13,6 +13,7 @@ export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -75,16 +76,26 @@ export default function Login() {
 
           <div className="input-group">
             <label className="input-label" htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              className={`input ${errors.password ? 'input-error' : ''}`}
-              placeholder="••••••••"
-              value={form.password}
-              onChange={handleChange}
-              autoComplete="current-password"
-            />
+            <div className="password-wrapper">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                className={`input password-field ${errors.password ? 'input-error' : ''}`}
+                placeholder="••••••••"
+                value={form.password}
+                onChange={handleChange}
+                autoComplete="current-password"
+              />
+              <button 
+                type="button" 
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
             {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
 
@@ -100,6 +111,10 @@ export default function Login() {
 
         <div className="auth-demo">
           <p>Demo: <strong>demo@bateriapreguntas.com</strong> / <strong>User@2024!</strong></p>
+        </div>
+
+        <div className="copyright-footer">
+          &copy; {new Date().getFullYear()} BateriaQ. Todos los derechos reservados.
         </div>
       </div>
     </div>

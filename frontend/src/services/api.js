@@ -86,6 +86,9 @@ class ApiService {
   login(data) { return this.request('POST', '/auth/login', data); }
   logout() { return this.request('POST', '/auth/logout', { refreshToken: this.refreshToken }); }
 
+  // ─── Oppositions ───────────────────────
+  getOppositions() { return this.request('GET', '/oppositions'); }
+
   // ─── User ────────────────────────────
   getProfile() { return this.request('GET', '/users/profile'); }
   updateProfile(data) { return this.request('PATCH', '/users/profile', data); }
@@ -95,6 +98,7 @@ class ApiService {
   // ─── Topics ──────────────────────────
   getTopics() { return this.request('GET', '/topics'); }
   getTopic(id) { return this.request('GET', `/topics/${id}`); }
+  createTopic(data) { return this.request('POST', '/topics', data); }
 
   // ─── Questions ───────────────────────
   getQuestions(params = {}) {

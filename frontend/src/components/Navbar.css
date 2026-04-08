@@ -107,6 +107,32 @@
   transform: scale(1.1);
 }
 
+.btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-logout:hover {
+  background: #ef4444;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+}
+
+.logout-icon {
+  font-size: 1.1em;
+}
+
 .navbar-hamburger {
   display: none;
   flex-direction: column;
@@ -152,5 +178,13 @@
   .navbar-link {
     width: 100%;
     padding: 0.75rem;
+  }
+
+  .btn-logout span:not(.logout-icon) {
+    display: none;
+  }
+  
+  .btn-logout {
+    padding: 0.4rem;
   }
 }

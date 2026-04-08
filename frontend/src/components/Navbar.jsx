@@ -54,8 +54,9 @@ export default function Navbar() {
               <Link to="/profile" className="navbar-avatar" title="Mi perfil">
                 {user.name.charAt(0).toUpperCase()}
               </Link>
-              <button onClick={handleLogout} className="btn btn-ghost btn-sm" title="Cerrar sesión">
-                🚪
+              <button onClick={handleLogout} className="btn-logout" title="Cerrar sesión">
+                <span>Cerrar sesión</span>
+                <span className="logout-icon">🚪</span>
               </button>
             </div>
           )}

@@ -3,7 +3,7 @@
 // All route definitions with middleware
 // ============================================
 const { Router } = require('express');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, optionalAuth } = require('../middleware/auth');
 const { authorize } = require('../middleware/authorize');
 const { validate } = require('../middleware/validate');
 const { authLimiter } = require('../middleware/security');
@@ -30,6 +30,7 @@ const testController = require('../controllers/testController');
 const statsController = require('../controllers/statsController');
 const studyPlanController = require('../controllers/studyPlanController');
 const userController = require('../controllers/userController');
+const oppositionController = require('../controllers/oppositionController');
 
 const router = Router();
 
@@ -55,11 +56,16 @@ router.patch('/users/profile', authenticate, validate(updateProfileSchema), user
 router.post('/users/change-password', authenticate, validate(changePasswordSchema), userController.changePassword);
 router.delete('/users/account', authenticate, userController.deleteAccount);
 
+// ─── Opposition Routes ───────────────────────
+router.get('/oppositions', optionalAuth, oppositionController.getAll);
+router.get('/oppositions/:id', optionalAuth, oppositionController.getById);
+router.post('/oppositions', authenticate, authorize('ADMIN'), oppositionController.create);
+
 // ─── Topic Routes ────────────────────────────
 router.get('/topics', authenticate, topicController.getAll);
 router.get('/topics/:id', authenticate, topicController.getById);
-router.post('/topics', authenticate, authorize('ADMIN'), validate(createTopicSchema), topicController.create);
-router.put('/topics/:id', authenticate, authorize('ADMIN'), validate(updateTopicSchema), topicController.update);
+router.post('/topics', authenticate, validate(createTopicSchema), topicController.create);
+router.put('/topics/:id', authenticate, validate(updateTopicSchema), topicController.update);
 router.delete('/topics/:id', authenticate, authorize('ADMIN'), topicController.remove);
 
 // ─── Question Routes ─────────────────────────

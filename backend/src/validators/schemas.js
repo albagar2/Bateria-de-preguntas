@@ -22,6 +22,7 @@ const registerSchema = z.object({
     .regex(/[a-z]/, 'Debe contener al menos una minúscula')
     .regex(/[0-9]/, 'Debe contener al menos un número')
     .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un carácter especial'),
+  oppositionId: z.string().uuid('Oposición inválida').optional(),
 });
 
 const loginSchema = z.object({
@@ -55,6 +56,7 @@ const createTopicSchema = z.object({
   order: z.number().int().min(0).default(0),
   icon: z.string().max(50).optional(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color inválido (formato: #RRGGBB)').optional(),
+  oppositionId: z.string().uuid().optional(),
 });
 
 const updateTopicSchema = createTopicSchema.partial();
@@ -94,7 +96,7 @@ const createTestSchema = z.object({
   type: z.enum(['QUICK', 'TOPIC', 'EXAM_SIMULATION', 'ERROR_REVIEW', 'CUSTOM']).default('QUICK'),
   topicIds: z.array(z.string().uuid()).optional(),
   totalQuestions: z.number().int().min(5).max(200).default(20),
-  timeLimit: z.number().int().min(60).max(14400).optional(), // seconds (1m to 4h)
+  timeLimit: z.number().int().min(60).max(14400).optional().nullable(), // seconds (1m to 4h)
   penalizeErrors: z.boolean().default(false),
   difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']).optional(),
 });

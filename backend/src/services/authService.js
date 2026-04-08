@@ -15,7 +15,7 @@ class AuthService {
   /**
    * Register a new user
    */
-  async register({ name, email, password }) {
+  async register({ name, email, password, oppositionId }) {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -32,12 +32,14 @@ class AuthService {
           name,
           email,
           passwordHash,
+          oppositionId,
         },
         select: {
           id: true,
           name: true,
           email: true,
           role: true,
+          oppositionId: true,
           createdAt: true,
         },
       });
@@ -76,6 +78,7 @@ class AuthService {
         name: true,
         email: true,
         role: true,
+        oppositionId: true,
         passwordHash: true,
         createdAt: true,
       },

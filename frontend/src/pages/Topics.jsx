@@ -9,13 +9,32 @@ import './Topics.css';
 export default function Topics() {
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [newTopic, setNewTopic] = useState({ title: '', description: '', icon: '📖' });
 
-  useEffect(() => {
+  const loadTopics = () => {
+    setLoading(true);
     api.getTopics()
       .then((res) => setTopics(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadTopics();
   }, []);
+
+  const handleCreateTopic = async (e) => {
+    e.preventDefault();
+    try {
+      await api.createTopic(newTopic);
+      setNewTopic({ title: '', description: '', icon: '📖' });
+      setShowForm(false);
+      loadTopics();
+    } catch (err) {
+      alert(err.message || 'Error al crear tema');
+    }
+  };
 
   if (loading) {
     return <div className="loading-screen"><div className="spinner"></div><p>Cargando temas...</p></div>;
@@ -23,10 +42,30 @@ export default function Topics() {
 
   return (
     <div className="container animate-slide-up">
-      <div className="page-header">
-        <h1 className="page-title">📚 Temas</h1>
-        <p className="page-subtitle">Selecciona un tema para empezar a estudiar</p>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1 className="page-title">📚 Temas</h1>
+          <p className="page-subtitle">Selecciona un tema para empezar a estudiar</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          {showForm ? 'Cancelar' : '+ Añadir Tema'}
+        </button>
       </div>
+
+      {showForm && (
+        <form className="card animate-slide-up" onSubmit={handleCreateTopic} style={{ marginBottom: 'var(--space-xl)' }}>
+          <h3 style={{ marginBottom: 'var(--space-md)' }}>Añadir Nuevo Tema</h3>
+          <div className="input-group">
+            <label className="input-label">Título</label>
+            <input required type="text" className="input" value={newTopic.title} onChange={e => setNewTopic({ ...newTopic, title: e.target.value })} placeholder="Ej: Constitución Española" />
+          </div>
+          <div className="input-group">
+            <label className="input-label">Descripción</label>
+            <input type="text" className="input" value={newTopic.description} onChange={e => setNewTopic({ ...newTopic, description: e.target.value })} placeholder="Breve descripción del temario..." />
+          </div>
+          <button type="submit" className="btn btn-success">Guardar Tema</button>
+        </form>
+      )}
 
       <div className="topics-grid">
         {topics.map((topic, i) => (

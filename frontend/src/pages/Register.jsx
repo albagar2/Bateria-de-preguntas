@@ -1,7 +1,7 @@
 // ============================================
 // Register Page
 // ============================================
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -10,9 +10,20 @@ import './Auth.css';
 export default function Register() {
   const { register } = useAuth();
   const toast = useToast();
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', oppositionId: '' });
+  const [oppositions, setOppositions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  useEffect(() => {
+    import('../services/api').then(({ api }) => {
+      api.getOppositions()
+        .then(res => setOppositions(res.data))
+        .catch(console.error);
+    });
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -27,6 +38,7 @@ export default function Register() {
     if (!/[A-Z]/.test(form.password)) errs.password = 'Debe contener una mayúscula';
     if (!/[0-9]/.test(form.password)) errs.password = 'Debe contener un número';
     if (!/[^A-Za-z0-9]/.test(form.password)) errs.password = 'Debe contener un carácter especial';
+    if (!form.oppositionId) errs.oppositionId = 'Debes seleccionar una oposición';
     if (form.password !== form.confirmPassword) errs.confirmPassword = 'Las contraseñas no coinciden';
     return errs;
   };
@@ -41,7 +53,7 @@ export default function Register() {
 
     setLoading(true);
     try {
-      await register(form.name, form.email, form.password);
+      await register(form.name, form.email, form.password, form.oppositionId);
       toast.success('¡Cuenta creada correctamente!');
     } catch (err) {
       toast.error(err.message || 'Error al crear la cuenta');
@@ -95,30 +107,78 @@ export default function Register() {
           </div>
 
           <div className="input-group">
-            <label className="input-label" htmlFor="reg-password">Contraseña</label>
-            <input
-              id="reg-password"
-              name="password"
-              type="password"
-              className={`input ${errors.password ? 'input-error' : ''}`}
-              placeholder="Min. 8 caracteres, mayúscula, número, especial"
-              value={form.password}
+            <label className="input-label" htmlFor="reg-opposition">Oposición a preparar</label>
+            <select
+              id="reg-opposition"
+              name="oppositionId"
+              className={`input ${errors.oppositionId ? 'input-error' : ''}`}
+              value={form.oppositionId}
               onChange={handleChange}
-            />
+            >
+              <option value="">Selecciona tu oposición...</option>
+              {Object.entries(
+                oppositions.reduce((acc, opp) => {
+                  const cat = opp.description || 'Otras';
+                  if (!acc[cat]) acc[cat] = [];
+                  acc[cat].push(opp);
+                  return acc;
+                }, {})
+              ).map(([category, opps]) => (
+                <optgroup key={category} label={category}>
+                  {opps.map(opp => (
+                    <option key={opp.id} value={opp.id}>{opp.icon} {opp.name}</option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+            {errors.oppositionId && <span className="error-text">{errors.oppositionId}</span>}
+          </div>
+
+          <div className="input-group">
+            <label className="input-label" htmlFor="reg-password">Contraseña</label>
+            <div className="password-wrapper">
+              <input
+                id="reg-password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                className={`input password-field ${errors.password ? 'input-error' : ''}`}
+                placeholder="Min. 8 caracteres, mayúscula, número, especial"
+                value={form.password}
+                onChange={handleChange}
+              />
+              <button 
+                type="button" 
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
             {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
 
           <div className="input-group">
             <label className="input-label" htmlFor="reg-confirm">Confirmar contraseña</label>
-            <input
-              id="reg-confirm"
-              name="confirmPassword"
-              type="password"
-              className={`input ${errors.confirmPassword ? 'input-error' : ''}`}
-              placeholder="Repite la contraseña"
-              value={form.confirmPassword}
-              onChange={handleChange}
-            />
+            <div className="password-wrapper">
+              <input
+                id="reg-confirm"
+                name="confirmPassword"
+                type={showConfirm ? "text" : "password"}
+                className={`input password-field ${errors.confirmPassword ? 'input-error' : ''}`}
+                placeholder="Repite la contraseña"
+                value={form.confirmPassword}
+                onChange={handleChange}
+              />
+              <button 
+                type="button" 
+                className="password-toggle"
+                onClick={() => setShowConfirm(!showConfirm)}
+                title={showConfirm ? "Ocultar contraseña" : "Mostrar contraseña"}
+              >
+                {showConfirm ? '🙈' : '👁️'}
+              </button>
+            </div>
             {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
           </div>
 
@@ -130,6 +190,10 @@ export default function Register() {
 
         <div className="auth-footer">
           <p>¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link></p>
+        </div>
+
+        <div className="copyright-footer">
+          &copy; {new Date().getFullYear()} BateriaQ. Todos los derechos reservados.
         </div>
       </div>
     </div>
