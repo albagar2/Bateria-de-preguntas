@@ -1,0 +1,218 @@
+/* ─── No-Fail Mode Styles ──────────────────── */
+.nofail-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.nofail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.nofail-progress-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.nofail-question-counter {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.nofail-streak {
+  font-size: var(--font-lg);
+  font-weight: 700;
+}
+
+.nofail-question-card {
+  margin-bottom: var(--space-xl);
+}
+
+.nofail-difficulty {
+  margin-bottom: var(--space-lg);
+}
+
+.nofail-question-text {
+  font-size: var(--font-xl);
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: var(--space-xl);
+}
+
+/* Options */
+.nofail-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.nofail-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-elevated);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  font-size: var(--font-base);
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.nofail-option:hover:not(:disabled) {
+  border-color: var(--primary-400);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.nofail-option.selected {
+  border-color: var(--primary-500);
+  background: rgba(99, 102, 241, 0.1);
+  box-shadow: var(--shadow-glow);
+}
+
+.nofail-option.correct {
+  border-color: var(--success-500);
+  background: rgba(16, 185, 129, 0.1);
+  box-shadow: var(--shadow-glow-success);
+}
+
+.nofail-option.incorrect {
+  border-color: var(--error-500);
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: var(--shadow-glow-error);
+}
+
+.nofail-option:disabled {
+  cursor: default;
+}
+
+.nofail-option-letter {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: var(--font-sm);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.nofail-option.selected .nofail-option-letter {
+  background: var(--primary-500);
+  color: white;
+}
+
+.nofail-option.correct .nofail-option-letter {
+  background: var(--success-500);
+  color: white;
+}
+
+.nofail-option.incorrect .nofail-option-letter {
+  background: var(--error-500);
+  color: white;
+}
+
+.nofail-option-text {
+  flex: 1;
+}
+
+.nofail-option-check {
+  font-size: var(--font-xl);
+  font-weight: 700;
+}
+
+/* Explanation */
+.nofail-explanation {
+  margin-top: var(--space-xl);
+  padding: var(--space-lg);
+  background: rgba(99, 102, 241, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Actions */
+.nofail-actions {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Failed screen */
+.nofail-failed, .nofail-completed {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  padding: var(--space-3xl) 0;
+}
+
+.nofail-failed-icon, .nofail-completed-icon {
+  font-size: 5rem;
+  margin-bottom: var(--space-lg);
+}
+
+.nofail-failed-title, .nofail-completed-title {
+  font-size: var(--font-4xl);
+  font-weight: 800;
+  margin-bottom: var(--space-sm);
+}
+
+.nofail-failed-subtitle, .nofail-completed-subtitle {
+  font-size: var(--font-lg);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2xl);
+}
+
+.nofail-failed-explanation {
+  text-align: left;
+  margin-bottom: var(--space-2xl);
+}
+
+.nofail-failed-question {
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+}
+
+.nofail-failed-answer {
+  color: var(--success-400);
+  margin-bottom: var(--space-sm);
+}
+
+.nofail-failed-explain {
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+}
+
+.nofail-failed-actions, .nofail-completed-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.nofail-failed-stats {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2xl);
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+}
+
+.nofail-completed-stats {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}

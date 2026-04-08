@@ -1,0 +1,194 @@
+/* ─── Dashboard Styles ──────────────────────── */
+.dashboard-welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2xl);
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+}
+
+.dashboard-continue-btn {
+  text-decoration: none;
+}
+
+.dashboard-stats {
+  margin-bottom: var(--space-2xl);
+}
+
+.section-title {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-lg);
+}
+
+.dashboard-actions {
+  margin-bottom: var(--space-2xl);
+}
+
+.dashboard-action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: all var(--transition-base);
+  text-align: center;
+}
+
+.dashboard-action-card:hover {
+  border-color: var(--primary-500);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-4px);
+}
+
+.dashboard-action-icon {
+  font-size: 2.5rem;
+}
+
+.dashboard-action-label {
+  font-size: var(--font-lg);
+  font-weight: 700;
+}
+
+.dashboard-action-desc {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+/* Plan */
+.dashboard-plan {
+  margin-bottom: var(--space-2xl);
+}
+
+.dashboard-plan-desc {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.dashboard-plan-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* Activity Chart */
+.dashboard-activity {
+  margin-bottom: var(--space-2xl);
+}
+
+.dashboard-activity-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-md);
+  height: 150px;
+  padding-top: var(--space-md);
+}
+
+.dashboard-activity-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  height: 100%;
+}
+
+.dashboard-activity-bar-fill-wrapper {
+  flex: 1;
+  width: 100%;
+  max-width: 40px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.dashboard-activity-bar-fill {
+  width: 100%;
+  min-height: 4px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dashboard-activity-label {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.dashboard-activity-count {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* Topics Progress */
+.dashboard-topics {
+  margin-bottom: var(--space-2xl);
+}
+
+.dashboard-topic-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.dashboard-topic-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: background var(--transition-fast);
+}
+
+.dashboard-topic-item:hover {
+  background: var(--bg-hover);
+}
+
+.dashboard-topic-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-topic-name {
+  display: block;
+  font-weight: 600;
+  font-size: var(--font-sm);
+}
+
+.dashboard-topic-stats {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+}
+
+.dashboard-topic-percent {
+  font-weight: 700;
+  font-size: var(--font-sm);
+  color: var(--primary-400);
+  min-width: 40px;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .dashboard-welcome {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-activity-chart {
+    height: 100px;
+  }
+
+  .dashboard-topic-item {
+    flex-wrap: wrap;
+  }
+}
