@@ -139,6 +139,9 @@ class ApiService {
   }
   getTodayPlan() { return this.request('GET', '/study-plans/today'); }
   completePlan(id) { return this.request('PATCH', `/study-plans/${id}/complete`); }
+
+  // ─── AI Integration ──────────────────────
+  askAIExplanation(data) { return this.request('POST', '/ai/explain', data); }
 }
 
 export const api = new ApiService();

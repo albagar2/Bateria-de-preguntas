@@ -52,9 +52,21 @@ class StatsService {
       ? Math.round((correctCount / totalAnswered) * 100)
       : 0;
 
-    // Total questions available
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { oppositionId: true }
+    });
+
+    // Total questions available for the user's opposition
+    const questionsWhere = { isActive: true };
+    if (user && user.oppositionId) {
+      questionsWhere.topic = { oppositionId: user.oppositionId };
+    } else {
+      questionsWhere.topic = { oppositionId: null };
+    }
+
     const totalQuestions = await prisma.question.count({
-      where: { isActive: true },
+      where: questionsWhere,
     });
 
     const masteredCount = await prisma.userProgress.count({
@@ -293,8 +305,27 @@ class StatsService {
   // ─── Private Methods ────────────────────────
 
   async _getTopicStats(userId) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { oppositionId: true }
+    });
+
+    const whereClause = { isActive: true };
+    
+    // Si el usuario pertenece a una oposición, solo mostramos sus temas.
+    // Si la opo no tiene temas, topics será un array vacío.
+    if (user && user.oppositionId) {
+      whereClause.oppositionId = user.oppositionId;
+    } else {
+      // Si el usuario no tiene ninguna oposición asignada, podríamos
+      // decidir no mostrar ningún progreso de temas o mostrar los que
+      // no tienen oposición asignada. Por consistencia, mostraremos 
+      // los temas generales (sin oposición).
+      whereClause.oppositionId = null;
+    }
+
     const topics = await prisma.topic.findMany({
-      where: { isActive: true },
+      where: whereClause,
       orderBy: { order: 'asc' },
       select: {
         id: true,

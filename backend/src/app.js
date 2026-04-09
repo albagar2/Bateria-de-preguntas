@@ -17,6 +17,9 @@ const { env } = require('./config/env');
 
 const app = express();
 
+// Trust proxy (required for rate limiting behind Nginx)
+app.set('trust proxy', 1);
+
 // ─── Security Middleware ─────────────────────
 app.use(helmetConfig);
 app.use(corsOptions);

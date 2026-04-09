@@ -37,6 +37,7 @@ services:
       RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-900000}
       RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-100}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      AI_SERVICE_URL: http://ai-microservice:4001/api/v1
     ports:
       - "4000:4000"
     depends_on:
@@ -52,6 +53,16 @@ services:
       - "80:80"
     depends_on:
       - backend
+
+  # ─── AI Microservice ────────────────────────
+  ai-microservice:
+    build: ./ai-microservice
+    container_name: bateria-ai
+    restart: unless-stopped
+    env_file:
+      - ./ai-microservice/.env
+    ports:
+      - "4001:4001"
 
 volumes:
   postgres_data:

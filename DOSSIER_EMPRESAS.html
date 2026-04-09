@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dossier Ejecutivo - Batería de Preguntas</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --text-main: #334155;
+            --bg-light: #f8fafc;
+        }
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-light);
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        h2 {
+            color: var(--primary);
+            margin-top: 2.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+        h3 {
+            color: var(--accent);
+            margin-top: 1.5rem;
+        }
+        .highlight {
+            background-color: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--primary);
+        }
+        ul { margin-bottom: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dossier Ejecutivo - Batería de Preguntas 🏢</h1>
+        <p><strong>Documento Comercial y Propuesta de Valor para Academias, Instituciones y Formadores Profesionales.</strong></p>
+
+        <h2>1. Resumen Ejecutivo (El Problema y la Solución)</h2>
+        <p>Las academias de preparación para oposiciones y procesos selectivos se enfrentan al reto de <strong>retener a sus alumnos</strong>, <strong>evaluar su progreso real</strong> y <strong>mantener alta la motivación</strong> en ciclos de estudio que duran meses o incluso años. Los métodos tradicionales basados únicamente en papel o en plataformas anticuadas no proporcionan la analítica de datos necesaria ni el engagement que espera el estudiante actual.</p>
+        
+        <div class="highlight">
+            <strong>Nuestra solución:</strong> Una plataforma moderna, escalable y gamificada de testing y entrenamiento de preguntas. Diseñada para aumentar la tasa de aprobados facilitando el refuerzo constante e inteligente mediante algoritmos de repetición espaciada.
+        </div>
+
+        <h2>2. Ventajas Competitivas para su Academia</h2>
+        
+        <h3>🏢 2.1. Arquitectura Multi-Oposición y Multi-Categoría (Multi-Tenant)</h3>
+        <p>La plataforma no está limitada a un único temario. Puede gestionar <strong>decenas de oposiciones o cursos simultáneamente</strong>. Cada alumno, al registrarse, se puede adscribir a <strong>múltiples oposiciones de distintas categorías</strong> con una experiencia de usuario totalmente parametrizada y aislada en los temas correspondientes a su selección. Podrá ofertar a sus clientes todo su catálogo de preparaciones desde un único panel centralizado.</p>
+
+        <h3>🧠 2.2. Algoritmo de Repetición Espaciada y Banco de Errores</h3>
+        <p>El principal valor pedagógico de la plataforma es su motor de aprendizaje inteligente.</p>
+        <ul>
+            <li>El sistema detecta automáticamente los puntos débiles de cada estudiante (preguntas falladas, tiempos de respuesta lentos).</li>
+            <li>Genera un <strong>Banco de Errores</strong> dinámico personalizado.</li>
+            <li>Potencia la retención forzando la revisión de conceptos no dominados mediante tests generados específicamente para cubrir carencias.</li>
+            <li><strong>Microservicio de IA Integrado:</strong> Incluye un motor de Inteligencia Artificial propio que provee explicaciones adaptativas para cada pregunta fallada (nivel básico, intermedio o avanzado).</li>
+        </ul>
+
+        <h3>📊 2.3. Analítica de Datos Integral (Métricas de Éxito)</h3>
+        <p><em>Los datos no mienten.</em> La aplicación provee métricas clave tanto para el alumno como para facilitar el soporte académico de sus preparadores:</p>
+        <ul>
+            <li>Precisión porcentual de aciertos y tiempo medio por pregunta.</li>
+            <li>Trazabilidad de progreso segmentada por temas.</li>
+            <li>Visualización de la constancia (rachas de estudio) y "heatmaps" de actividad semanal.</li>
+        </ul>
+
+        <h3>🎮 2.4. Gamificación Integrada (Engagement)</h3>
+        <p>Sabemos que la motivación decae con el tiempo. Hemos implementado características de fidelización para que los alumnos integren el uso de la app en su rutina diaria:</p>
+        <ul>
+            <li><strong>Racha Diaria (Streak)</strong> para promover la constancia en el estudio.</li>
+            <li><strong>Logros desbloqueables</strong> que premian la tenacidad computando volumetría, eficacia y velocidad.</li>
+            <li>Metas de estudio ("Planes del día").</li>
+        </ul>
+
+        <h2>3. Características Técnicas Destacadas</h2>
+        <p>Nuestra plataforma está construida bajo los mayores estándares de la ingeniería de software actual (stack totalmente JavaScript/TypeScript):</p>
+        <ul>
+            <li><strong>Experiencia Instantánea (React.js):</strong> El frontend está desarrollado con tecnología puntera. Ausencia total de recargas de página molestas y una experiencia ultra rápida (SPA). Todo con una interfaz "premium", cuidada al milímetro y adaptada al 100% para su uso en teléfonos móviles (Mobile First).</li>
+            <li><strong>Backend Escalable e Independiente:</strong> Construido sobre NodeJS, Express y Prisma ORM con bases de datos PostgreSQL. Soporta miles de concurrencias y permite ser balanceado sin fricción, ideal para simulacros simultáneos.</li>
+            <li><strong>Seguridad y Accesibilidad:</strong> Implementamos tokens seguros, cifrado completo de contraseñas y rate-limiting de protección anti-ataques desde el día cero. Incorpora también Modo Oscuro nativo.</li>
+        </ul>
+
+        <h2>4. Oportunidad de Negocio y Adopción</h2>
+        <p>Integrar <strong>Batería de Preguntas</strong> en la oferta de su academia supone:</p>
+        <ol>
+            <li><strong>Modernizar su imagen de marca</strong> aportando tecnología avanzada como valor añadido a las cuotas mensuales de sus alumnos.</li>
+            <li><strong>Atraer al alumno digital-nativo</strong>, aquel que exige poder repasar en el trayecto en autobús a través de su móvil.</li>
+            <li><strong>Analizar el rendimiento de sus usuarios</strong> para centrar sus tutorías o clases en los temas estadísticamente más fallados del temario.</li>
+        </ol>
+
+        <p style="text-align: center; margin-top: 3rem; font-weight: bold; font-size: 1.2rem; color: var(--primary);">
+            ¿Listo para llevar la preparación de sus opositores al siguiente nivel tecnológico?
+        </p>
+    </div>
+</body>
+</html>

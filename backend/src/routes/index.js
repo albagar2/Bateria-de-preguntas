@@ -31,6 +31,7 @@ const statsController = require('../controllers/statsController');
 const studyPlanController = require('../controllers/studyPlanController');
 const userController = require('../controllers/userController');
 const oppositionController = require('../controllers/oppositionController');
+const aiController = require('../controllers/aiController');
 
 const router = Router();
 
@@ -99,5 +100,8 @@ router.post('/study-plans/generate', authenticate, validate(createStudyPlanSchem
 router.get('/study-plans', authenticate, studyPlanController.getPlans);
 router.get('/study-plans/today', authenticate, studyPlanController.getTodayPlan);
 router.patch('/study-plans/:id/complete', authenticate, studyPlanController.completePlan);
+
+// ─── AI Routes ───────────────────────────────
+router.post('/ai/explain', authenticate, aiController.generateExplanation);
 
 module.exports = router;

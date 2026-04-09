@@ -9,6 +9,7 @@ export default function TestResult() {
   const { testId } = useParams();
   const [test, setTest] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [explanations, setExplanations] = useState({});
 
   useEffect(() => {
     api.getTestResult(testId)
@@ -22,6 +23,30 @@ export default function TestResult() {
 
   const percentage = Math.round((test.correctAnswers / test.totalQuestions) * 100);
   const wrong = test.totalQuestions - test.correctAnswers;
+
+  const handleAIExplain = async (answer) => {
+    const q = answer.question;
+    if (!q) return;
+    setExplanations(prev => ({ ...prev, [q.id]: { loading: true } }));
+    try {
+      const res = await api.askAIExplanation({
+        question_id: q.id,
+        question_text: q.questionText,
+        correct_answer: q.options[q.correctIndex],
+        selected_answer: q.options[answer.selectedIndex],
+        difficulty: q.difficulty || 'intermediate'
+      });
+      setExplanations(prev => ({ 
+        ...prev, 
+        [q.id]: { loading: false, text: res.data.explanation, model: res.data.model_used } 
+      }));
+    } catch (err) {
+      setExplanations(prev => ({ 
+        ...prev, 
+        [q.id]: { loading: false, error: 'No se pudo cargar la explicación.' } 
+      }));
+    }
+  };
 
   return (
     <div className="container animate-slide-up">
@@ -87,6 +112,39 @@ export default function TestResult() {
                   <p>Tu respuesta: <strong>{answer.question.options?.[answer.selectedIndex]}</strong></p>
                   <p style={{ color: 'var(--success-400)' }}>Correcta: <strong>{answer.question.options?.[answer.question.correctIndex]}</strong></p>
                   {answer.question.explanation && <p style={{ marginTop: '4px' }}>{answer.question.explanation}</p>}
+
+                  <div style={{ marginTop: '1rem' }}>
+                    {explanations[answer.question.id] ? (
+                      <div style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                        <h4 style={{ color: 'var(--primary-400)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <span>✨</span> Explicación IA 
+                          {explanations[answer.question.id].model && (
+                            <span style={{ fontSize: '0.75em', padding: '2px 8px', background: 'var(--primary-600)', color: 'white', borderRadius: '12px' }}>
+                              {explanations[answer.question.id].model}
+                            </span>
+                          )}
+                        </h4>
+                        {explanations[answer.question.id].loading ? (
+                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <div className="spinner" style={{ width: '16px', height: '16px', borderWidth: '2px' }}></div>
+                            <p style={{ margin: 0 }}>Generando explicación inteligente...</p>
+                          </div>
+                        ) : explanations[answer.question.id].error ? (
+                          <p style={{ color: 'var(--error-400)', margin: 0 }}>{explanations[answer.question.id].error}</p>
+                        ) : (
+                          <p style={{ color: 'var(--text-primary)', lineHeight: '1.5', margin: 0 }}>{explanations[answer.question.id].text}</p>
+                        )}
+                      </div>
+                    ) : (
+                      <button 
+                        className="btn btn-sm" 
+                        style={{ background: 'var(--primary-600)', color: 'white', border: 'none', display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+                        onClick={() => handleAIExplain(answer)}
+                      >
+                        <span>✨</span> Explicar con IA
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

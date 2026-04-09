@@ -44,6 +44,13 @@ Plataforma web completa para estudiantes de oposiciones con **modo sin fallos**,
 - ⚡ **Racha sin fallos** — Preguntas seguidas correctas
 - 🏆 **17 logros** — Volumen, precisión, rachas, tests
 
+### Multi-Oposición
+- 📂 **Multi-categoría** — Los opositores pueden apuntarse y cambiar entre **varias oposiciones** de distintas categorías desde un mismo perfil.
+
+### Novedad: AI Microservice Integrado
+- 🤖 **Generación de Explicaciones** — Inteligencia Artificial (Gemini Pro/Flash) explica por qué fallaste, adaptado por nivel (básico, intermedio, avanzado).
+- 🔄 **Alta Disponibilidad** — Arquitectura de Fallback multimodelo y Caché SQLite independiente para que la app no sufra caídas ni demoras.
+
 ### Seguridad
 - 🔐 JWT (access + refresh tokens)
 - 🔒 Contraseñas con **bcrypt** (12 rounds)
