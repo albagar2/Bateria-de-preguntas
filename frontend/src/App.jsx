@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import Navbar from './components/Navbar';
+import AIChatAssistant from './components/AIChatAssistant';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -18,6 +19,7 @@ import Mistakes from './pages/Mistakes';
 import Stats from './pages/Stats';
 import Planner from './pages/Planner';
 import Profile from './pages/Profile';
+import AdminPanel from './pages/AdminPanel';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -42,12 +44,20 @@ function GuestRoute({ children }) {
   return children;
 }
 
+function AdminRoute({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user || user.role !== 'ADMIN') return <Navigate to="/" replace />;
+  return children;
+}
+
 function AppRoutes() {
   const { user } = useAuth();
 
   return (
     <>
       {user && <Navbar />}
+      {user && <AIChatAssistant />}
       <main className="page">
         <Routes>
           {/* Guest Routes */}
@@ -66,6 +76,9 @@ function AppRoutes() {
           <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
           <Route path="/planner" element={<ProtectedRoute><Planner /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

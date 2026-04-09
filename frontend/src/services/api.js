@@ -142,6 +142,13 @@ class ApiService {
 
   // ─── AI Integration ──────────────────────
   askAIExplanation(data) { return this.request('POST', '/ai/explain', data); }
+  askAIChat(question, topic = 'General') { return this.request('POST', '/ai/ask', { question, topic }); }
+
+  // ─── Admin Integration ───────────────────
+  getAdminStats() { return this.request('GET', '/admin/stats'); }
+  getAdminUsers() { return this.request('GET', '/admin/users'); }
+  deleteAdminUser(id) { return this.request('DELETE', `/admin/users/${id}`); }
+  updateAdminUserRole(id, role) { return this.request('PATCH', `/admin/users/${id}/role`, { role }); }
 }
 
 export const api = new ApiService();

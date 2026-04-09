@@ -32,6 +32,7 @@ const studyPlanController = require('../controllers/studyPlanController');
 const userController = require('../controllers/userController');
 const oppositionController = require('../controllers/oppositionController');
 const aiController = require('../controllers/aiController');
+const adminController = require('../controllers/adminController');
 
 const router = Router();
 
@@ -103,5 +104,22 @@ router.patch('/study-plans/:id/complete', authenticate, studyPlanController.comp
 
 // ─── AI Routes ───────────────────────────────
 router.post('/ai/explain', authenticate, aiController.generateExplanation);
+router.post('/ai/ask', authenticate, aiController.askQuestion);
+
+// ─── Admin Routes ───────────────────────────
+router.get('/admin/stats', authenticate, authorize('ADMIN'), adminController.getSystemStats);
+router.get('/admin/users', authenticate, authorize('ADMIN'), adminController.getAllUsers);
+router.delete('/admin/users/:id', authenticate, authorize('ADMIN'), adminController.deleteUser);
+router.patch('/admin/users/:id/role', authenticate, authorize('ADMIN'), adminController.updateUserRole);
+
+// Admin Content Management
+router.get('/admin/questions', authenticate, authorize('ADMIN'), adminController.getAllQuestions);
+router.post('/admin/questions', authenticate, authorize('ADMIN'), adminController.createQuestion);
+router.patch('/admin/questions/:id', authenticate, authorize('ADMIN'), adminController.updateQuestion);
+router.delete('/admin/questions/:id', authenticate, authorize('ADMIN'), adminController.deleteQuestion);
+
+router.post('/admin/topics', authenticate, authorize('ADMIN'), adminController.createTopic);
+router.patch('/admin/topics/:id', authenticate, authorize('ADMIN'), adminController.updateTopic);
+router.delete('/admin/topics/:id', authenticate, authorize('ADMIN'), adminController.deleteTopic);
 
 module.exports = router;

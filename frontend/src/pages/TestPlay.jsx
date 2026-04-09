@@ -21,6 +21,36 @@ export default function TestPlay() {
   const [startTime, setStartTime] = useState(Date.now());
   const [elapsed, setElapsed] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [marked, setMarked] = useState(new Set());
+
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (answered) {
+        if (e.key === 'Enter') handleNext();
+        return;
+      }
+      
+      const key = e.key.toLowerCase();
+      if (['a', 'b', 'c', 'd'].includes(key)) {
+        const idx = key.charCodeAt(0) - 97;
+        if (test?.answers[currentIndex]?.question?.options[idx]) {
+          setSelectedIndex(idx);
+        }
+      }
+      
+      if (e.key === 'Enter' && selectedIndex !== null) {
+        handleAnswer();
+      }
+
+      if (e.key === 'm' || e.key === 'M') {
+        toggleMarked();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [answered, selectedIndex, currentIndex, test]);
 
   useEffect(() => {
     api.getTestResult(testId)
@@ -106,6 +136,15 @@ export default function TestPlay() {
     return <div className="loading-screen"><div className="spinner"></div><p>Finalizando test...</p></div>;
   }
 
+  const toggleMarked = () => {
+    setMarked((prev) => {
+      const next = new Set(prev);
+      if (next.has(currentIndex)) next.delete(currentIndex);
+      else next.add(currentIndex);
+      return next;
+    });
+  };
+
   return (
     <div className="container">
       <div className="nofail-container animate-slide-up">
@@ -115,7 +154,13 @@ export default function TestPlay() {
             <span className="nofail-question-counter">
               Pregunta {currentIndex + 1} / {test.answers.length}
             </span>
-            <span className="badge badge-primary">{totalAnswered} respondidas</span>
+            <button 
+                onClick={toggleMarked} 
+                className={`btn btn-icon ${marked.has(currentIndex) ? 'btn-primary' : 'btn-ghost'}`}
+                title="Marcar para revisión (M)"
+            >
+              {marked.has(currentIndex) ? '🚩' : '🏳️'}
+            </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
             <span className={`badge ${timeLimit && elapsed > timeLimit * 0.8 ? 'badge-error' : 'badge-warning'}`}>
@@ -204,14 +249,20 @@ export default function TestPlay() {
               style={{
                 width: '12px', height: '12px',
                 borderRadius: '50%',
-                border: 'none',
+                border: marked.has(idx) ? '2px solid white' : 'none',
+                boxShadow: marked.has(idx) ? '0 0 8px white' : 'none',
                 cursor: idx <= currentIndex ? 'pointer' : 'default',
                 background: answers[test.answers[idx]?.question?.id]
                   ? answers[test.answers[idx]?.question?.id].isCorrect ? 'var(--success-500)' : 'var(--error-500)'
                   : idx === currentIndex ? 'var(--primary-500)' : 'var(--border-color)',
                 transition: 'all var(--transition-fast)',
+                position: 'relative',
               }}
-            />
+            >
+              {marked.has(idx) && (
+                <span style={{ position: 'absolute', top: '-15px', fontSize: '10px' }}>🚩</span>
+              )}
+            </button>
           ))}
         </div>
       </div>

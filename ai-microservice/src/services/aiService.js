@@ -101,14 +101,20 @@ async function generateExplanation({ question_id, user_id, question_text, correc
     }
 
     const prompt = `
-    Eres un tutor experto en oposiciones. 
-    Pregunta: "${question_text}"
-    Respuesta correcta: "${correct_answer}"
-    ${selected_answer ? `El alumno respondió incorrectamente: "${selected_answer}"` : ''}
+    ROL: Eres un tutor experto en preparación de oposiciones de élite. Tu objetivo es que el alumno no vuelva a fallar nunca esta pregunta.
     
-    Por favor, genera una explicación breve (máximo 4 líneas) de por qué la respuesta correcta es esa.
-    ${toneInstruction}
-    No repitas la pregunta, ve al grano.
+    CONTEXTO:
+    Pregunta: "${question_text}"
+    Respuesta Correcta: "${correct_answer}"
+    ${selected_answer ? `El alumno marcó INCORRECTAMENTE: "${selected_answer}"` : 'El alumno solicitó una explicación.'}
+    
+    INSTRUCCIONES DE RESPUESTA:
+    1. EXPLICACIÓN: Explica la base legal o lógica de forma cristalinamente clara. Si el alumno falló, dile sutilmente por qué su opción era una "trampa" común. (Máx 3 frases).
+    2. TRUCO MNEMOTÉCNICO: Si es posible, aporta una regla corta o acrónimo para memorizar esto.
+    3. CITA LEGAL: Si aplica, indica el Artículo o Ley relacionado.
+    
+    ESTILO: ${toneInstruction}
+    SÉ DIRECTO. No saludes. No digas "Claro, aquí tienes". Ve al grano con el conocimiento puro.
     `.trim();
 
     // 3. Consult Model Pool
@@ -136,7 +142,34 @@ async function generateExplanation({ question_id, user_id, question_text, correc
     };
 }
 
+async function askQuestion({ question, topic, user_name }) {
+    const prompt = `
+    ROL: Eres el Tutor IA de BateriaQ, un asistente experto en oposiciones.
+    USUARIO: ${user_name || 'Estudiante'}
+    CONTEXTO: El usuario está estudiando ${topic || 'temario general de oposiciones'} y tiene la siguiente duda.
+    
+    DUDA del alumno: "${question}"
+    
+    INSTRUCCIONES:
+    1. Responde de forma clara, motivadora y pedagógica.
+    2. Si es un concepto complejo, usa una analogía.
+    3. Si la duda es sobre plazos o leyes, intenta ser preciso.
+    4. Mantén la respuesta concisa pero completa (máximo 250 palabras).
+    
+    SÉ DIRECTO. No saludes. No digas "Claro, aquí tienes". Ve directo a la ayuda pedagógica.
+    `.trim();
+
+    const { text, modelUsed } = await callGeminiWithFallback(prompt);
+    
+    return {
+        answer: text,
+        model_used: modelUsed,
+        created_at: new Date().toISOString()
+    };
+}
+
 module.exports = {
     generateExplanation,
-    callGeminiWithFallback
+    callGeminiWithFallback,
+    askQuestion
 };

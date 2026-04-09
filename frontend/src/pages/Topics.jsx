@@ -4,9 +4,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import './Topics.css';
 
 export default function Topics() {
+  const { user } = useAuth();
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -47,9 +49,11 @@ export default function Topics() {
           <h1 className="page-title">📚 Temas</h1>
           <p className="page-subtitle">Selecciona un tema para empezar a estudiar</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancelar' : '+ Añadir Tema'}
-        </button>
+        {user?.role === 'ADMIN' && (
+          <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+            {showForm ? 'Cancelar' : '+ Añadir Tema'}
+          </button>
+        )}
       </div>
 
       {showForm && (

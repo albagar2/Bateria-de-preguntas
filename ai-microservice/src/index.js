@@ -42,6 +42,20 @@ app.post('/api/v1/generate-explanation', async (req, res) => {
     }
 });
 
+// Endpoint: Chat / General Questions
+app.post('/api/v1/ask', async (req, res) => {
+    try {
+        const { question, topic, user_name } = req.body;
+        if (!question) return res.status(400).json({ error: 'Falta la pregunta' });
+
+        const result = await askQuestion({ question, topic, user_name });
+        return res.json(result);
+    } catch (error) {
+        console.error('[AI Chat Error]', error);
+        return res.status(500).json({ error: 'Error interno en el chat de IA.' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`🤖 AI Microservice running on http://localhost:${PORT}`);
 });
