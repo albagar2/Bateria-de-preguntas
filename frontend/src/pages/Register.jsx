@@ -10,20 +10,13 @@ import './Auth.css';
 export default function Register() {
   const { register } = useAuth();
   const toast = useToast();
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', oppositionId: '' });
-  const [oppositions, setOppositions] = useState([]);
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  useEffect(() => {
-    import('../services/api').then(({ api }) => {
-      api.getOppositions()
-        .then(res => setOppositions(res.data))
-        .catch(console.error);
-    });
-  }, []);
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -36,9 +29,10 @@ export default function Register() {
     if (!form.email) errs.email = 'Email requerido';
     if (form.password.length < 8) errs.password = 'Mínimo 8 caracteres';
     if (!/[A-Z]/.test(form.password)) errs.password = 'Debe contener una mayúscula';
+    if (!/[a-z]/.test(form.password)) errs.password = 'Debe contener una minúscula';
     if (!/[0-9]/.test(form.password)) errs.password = 'Debe contener un número';
     if (!/[^A-Za-z0-9]/.test(form.password)) errs.password = 'Debe contener un carácter especial';
-    if (!form.oppositionId) errs.oppositionId = 'Debes seleccionar una oposición';
+
     if (form.password !== form.confirmPassword) errs.confirmPassword = 'Las contraseñas no coinciden';
     return errs;
   };
@@ -53,7 +47,7 @@ export default function Register() {
 
     setLoading(true);
     try {
-      await register(form.name, form.email, form.password, form.oppositionId);
+      await register(form.name, form.email, form.password);
       toast.success('¡Cuenta creada correctamente!');
     } catch (err) {
       toast.error(err.message || 'Error al crear la cuenta');
@@ -106,33 +100,7 @@ export default function Register() {
             {errors.email && <span className="error-text">{errors.email}</span>}
           </div>
 
-          <div className="input-group">
-            <label className="input-label" htmlFor="reg-opposition">Oposición a preparar</label>
-            <select
-              id="reg-opposition"
-              name="oppositionId"
-              className={`input ${errors.oppositionId ? 'input-error' : ''}`}
-              value={form.oppositionId}
-              onChange={handleChange}
-            >
-              <option value="">Selecciona tu oposición...</option>
-              {Object.entries(
-                oppositions.reduce((acc, opp) => {
-                  const cat = opp.description || 'Otras';
-                  if (!acc[cat]) acc[cat] = [];
-                  acc[cat].push(opp);
-                  return acc;
-                }, {})
-              ).map(([category, opps]) => (
-                <optgroup key={category} label={category}>
-                  {opps.map(opp => (
-                    <option key={opp.id} value={opp.id}>{opp.icon} {opp.name}</option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-            {errors.oppositionId && <span className="error-text">{errors.oppositionId}</span>}
-          </div>
+
 
           <div className="input-group">
             <label className="input-label" htmlFor="reg-password">Contraseña</label>

@@ -61,7 +61,7 @@ router.delete('/users/account', authenticate, userController.deleteAccount);
 // ─── Opposition Routes ───────────────────────
 router.get('/oppositions', optionalAuth, oppositionController.getAll);
 router.get('/oppositions/:id', optionalAuth, oppositionController.getById);
-router.post('/oppositions', authenticate, authorize('ADMIN'), oppositionController.create);
+router.post('/oppositions', authenticate, oppositionController.create);
 
 // ─── Topic Routes ────────────────────────────
 router.get('/topics', authenticate, topicController.getAll);
@@ -75,7 +75,7 @@ router.get('/questions', authenticate, questionController.getAll);
 router.get('/questions/review', authenticate, questionController.getReviewQuestions);
 router.get('/questions/no-fail/:topicId', authenticate, questionController.getNoFailMode);
 router.get('/questions/:id', authenticate, authorize('ADMIN'), questionController.getById);
-router.post('/questions', authenticate, authorize('ADMIN'), validate(createQuestionSchema), questionController.create);
+router.post('/questions', authenticate, validate(createQuestionSchema), questionController.create);
 router.put('/questions/:id', authenticate, authorize('ADMIN'), validate(updateQuestionSchema), questionController.update);
 router.delete('/questions/:id', authenticate, authorize('ADMIN'), questionController.remove);
 router.post('/questions/answer', authenticate, validate(answerQuestionSchema), questionController.answer);

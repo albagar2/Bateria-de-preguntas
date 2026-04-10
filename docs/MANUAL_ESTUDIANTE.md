@@ -4,6 +4,31 @@
 
 ---
 
+## 🏗️ 0. Configuración Inicial (Oposiciones)
+
+Al iniciar sesión por primera vez, deberás configurar tu objetivo de estudio:
+- **Selección**: Elige una de las oposiciones oficiales disponibles.
+- **Creación Personalizada**: Si no encuentras tu oposición, pulsa en **"Abrir nueva..."**. Podrás darle un nombre y empezar a crear tu propio temario desde cero.
+- **Cambio de Plan**: Puedes cambiar tu oposición en cualquier momento desde tu **Perfil**.
+
+---
+
+## 🛠️ 1. Crea tu propio Contenido
+
+BateriaQ no es solo para estudiar lo que ya existe, ¡puedes crear tu propio banco de preguntas!
+
+### A. Añadir Temas
+Dentro de la sección de **Temas**, usa el botón **"+ Añadir Tema"**. Al guardarlo, entrarás directamente al tema para empezar a meter contenido.
+
+### B. Añadir Preguntas
+Entra en cualquier tema (oficial o creado por ti) y baja hasta el final. Verás un formulario para **"Añadir Pregunta"**:
+1. Escribe el enunciado.
+2. Define las 4 opciones de respuesta.
+3. Marca la **correcta** con el selector circular.
+4. (Recomendado) Añade una **explicación** para que el sistema te ayude cuando falles.
+
+---
+
 ## 🚀 1. Modos de Estudio
 
 ### 🔁 Modo Sin Fallos (El Reto)

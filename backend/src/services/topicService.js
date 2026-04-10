@@ -9,10 +9,10 @@ class TopicService {
    * Get all topics with question count and user progress
    */
   async getAll(userId = null, oppositionId = null) {
-    const where = { isActive: true };
-    if (oppositionId) {
-      where.oppositionId = oppositionId;
-    }
+    const where = { 
+      isActive: true,
+      oppositionId: oppositionId // Si es null, solo devuelve temas generales
+    };
 
     const topics = await prisma.topic.findMany({
       where,

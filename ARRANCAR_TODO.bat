@@ -16,7 +16,7 @@ echo [*] Iniciando Frontend en nueva ventana...
 start "FRONTEND - Puerto 5173" cmd /k "cd frontend && npm install && npm run dev"
 
 echo.
-echo ✅ Todas las peticiones de arranque enviadas.
+echo Todas las peticiones de arranque enviadas.
 echo Manten estas ventanas abiertas mientras uses la app.
 echo Una vez esten listas, entra en http://localhost:5173
 echo ==========================================

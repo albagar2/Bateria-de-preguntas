@@ -52,6 +52,9 @@ model Opposition {
   users   User[]
   topics  Topic[]
 
+  creatorId     String?  @map("creator_id")
+  creator       User?    @relation("UserOppositions", fields: [creatorId], references: [id])
+
   @@map("oppositions")
 }
 
@@ -81,7 +84,8 @@ model User {
   achievements   UserAchievement[]
   bookmarks      Bookmark[]
   sessions       Session[]
-  createdTopics  Topic[]     @relation("TopicCreator")
+  createdTopics       Topic[]     @relation("TopicCreator")
+  createdOppositions  Opposition[] @relation("UserOppositions")
 
   @@index([oppositionId])
   @@map("users")

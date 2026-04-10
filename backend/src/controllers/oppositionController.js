@@ -15,7 +15,7 @@ const getById = asyncHandler(async (req, res) => {
 });
 
 const create = asyncHandler(async (req, res) => {
-  const opp = await oppositionService.create(req.body);
+  const opp = await oppositionService.create({ ...req.body, creatorId: req.user.id });
   res.status(201).json({
     success: true,
     message: 'Oposición creada correctamente',

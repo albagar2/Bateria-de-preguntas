@@ -15,7 +15,8 @@ Al entrar como administrador, tu vista principal muestra el estado vital del sis
 Desde la pestaña **"Usuarios"** puedes:
 - **Cambiar Roles**: Ascender a un usuario a Administrador o revocar permisos.
 - **Eliminar Usuarios**: Acción definitiva para limpiar cuentas inactivas o problemáticas.
-- **Monitorizar Oposiciones**: Ver en qué oposición está registrado cada usuario.
+- **Monitorizar Oposiciones**: Ver en qué oposición está registrado cada usuario, incluyendo las creadas por ellos mismos.
+- **Auditoría de Contenido**: Ten en cuenta que los estudiantes ahora pueden crear sus propias oposiciones y temas. Puedes supervisarlos desde el panel de administración global.
 
 ---
 

@@ -33,7 +33,7 @@ export function AuthProvider({ children }) {
     return res.data.user;
   }, []);
 
-  const register = useCallback(async (name, email, password, oppositionId) => {
+  const register = useCallback(async (name, email, password, oppositionId = null) => {
     const res = await api.register({ name, email, password, oppositionId });
     api.setTokens(res.data.accessToken, res.data.refreshToken);
     setUser(res.data.user);

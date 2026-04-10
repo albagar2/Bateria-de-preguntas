@@ -8,10 +8,12 @@ import api from '../services/api';
 import './Dashboard.css';
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [stats, setStats] = useState(null);
   const [todayPlan, setTodayPlan] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [oppositions, setOppositions] = useState([]);
+  const [selectingOpposition, setSelectingOpposition] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -28,14 +30,91 @@ export default function Dashboard() {
         setLoading(false);
       }
     };
-    loadData();
-  }, []);
+    if (user?.oppositionId) {
+      loadData();
+    } else {
+      setLoading(false);
+    }
+  }, [user?.oppositionId]);
+
+  useEffect(() => {
+    if (user && !user.oppositionId) {
+      api.getOppositions().then(res => setOppositions(res.data)).catch(console.error);
+    }
+  }, [user]);
+
+  const handleSelectOpposition = async (oppId) => {
+    setSelectingOpposition(true);
+    try {
+      const res = await api.updateProfile({ oppositionId: oppId });
+      updateUser(res.data);
+    } catch (err) {
+      console.error('Error selecting opposition:', err);
+    } finally {
+      setSelectingOpposition(false);
+    }
+  };
 
   if (loading) {
     return (
       <div className="loading-screen">
         <div className="spinner"></div>
         <p>Cargando tu progreso...</p>
+      </div>
+    );
+  }
+
+  if (user && !user.oppositionId) {
+    return (
+      <div className="container animate-slide-up">
+        <div className="card text-center" style={{ padding: 'var(--space-xl)', maxWidth: '800px', margin: 'var(--space-xl) auto' }}>
+          <div style={{ fontSize: '4rem', marginBottom: 'var(--space-md)' }}>🎯</div>
+          <h1 className="page-title">¡Bienvenido a BateriaQ!</h1>
+          <p className="page-subtitle" style={{ marginBottom: 'var(--space-lg)' }}>
+            Para empezar, cuéntanos qué oposición estás preparando. Así podremos mostrarte el temario y las preguntas adecuadas.
+          </p>
+
+          <div className="grid grid-2" style={{ textAlign: 'left', gap: 'var(--space-md)' }}>
+            {oppositions.map(opp => (
+              <button
+                key={opp.id}
+                className="dashboard-action-card"
+                onClick={() => handleSelectOpposition(opp.id)}
+                style={{ width: '100%', border: '1px solid var(--border-color)', background: 'none' }}
+                disabled={selectingOpposition}
+              >
+                <span className="dashboard-action-icon">{opp.icon}</span>
+                <span className="dashboard-action-label" style={{ display: 'block' }}>{opp.name}</span>
+                <span className="dashboard-action-desc">{opp.description || 'Prepárate con nosotros'}</span>
+              </button>
+            ))}
+
+            <button
+              className="dashboard-action-card"
+              onClick={() => {
+                const name = prompt('Nombre de la oposición:');
+                if (name) {
+                  const description = prompt('Breve descripción:');
+                  api.createOpposition({ name, description, icon: '🎯' })
+                    .then(res => handleSelectOpposition(res.data.id))
+                    .catch(err => alert('Error al crear oposición: ' + err.message));
+                }
+              }}
+              style={{ width: '100%', border: '1px dashed var(--primary-500)', background: 'rgba(99, 102, 241, 0.05)' }}
+              disabled={selectingOpposition}
+            >
+              <span className="dashboard-action-icon">➕</span>
+              <span className="dashboard-action-label" style={{ display: 'block' }}>Abrir nueva...</span>
+              <span className="dashboard-action-desc">Crea tu propio temario personalizado</span>
+            </button>
+          </div>
+
+          {selectingOpposition && (
+            <div style={{ marginTop: 'var(--space-lg)' }}>
+              <span className="spinner spinner-sm"></span> Configurando tu plan...
+            </div>
+          )}
+        </div>
       </div>
     );
   }

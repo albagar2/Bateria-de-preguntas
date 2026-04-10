@@ -1,7 +1,7 @@
 // ============================================
 // Profile Page — Settings & user management
 // ============================================
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
@@ -12,7 +12,13 @@ export default function Profile() {
   const [name, setName] = useState(user?.name || '');
   const [darkMode, setDarkMode] = useState(user?.darkMode || false);
   const [notifications, setNotifications] = useState(user?.notifications ?? true);
+  const [oppositionId, setOppositionId] = useState(user?.oppositionId || '');
+  const [oppositions, setOppositions] = useState([]);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    api.getOppositions().then(res => setOppositions(res.data)).catch(console.error);
+  }, []);
 
   const [passwords, setPasswords] = useState({ currentPassword: '', newPassword: '', confirm: '' });
   const [changingPass, setChangingPass] = useState(false);
@@ -23,7 +29,7 @@ export default function Profile() {
   const handleSaveProfile = async () => {
     setSaving(true);
     try {
-      const res = await api.updateProfile({ name, darkMode, notifications });
+      const res = await api.updateProfile({ name, darkMode, notifications, oppositionId });
       updateUser(res.data);
 
       // Apply dark/light mode
@@ -99,6 +105,31 @@ export default function Profile() {
           <div className="input-group" style={{ marginBottom: 'var(--space-md)' }}>
             <label className="input-label">Rol</label>
             <input className="input" value={user?.role === 'ADMIN' ? 'Administrador' : 'Estudiante'} disabled />
+          </div>
+
+          <div className="input-group" style={{ marginBottom: 'var(--space-md)' }}>
+            <label className="input-label">Oposición</label>
+            <select 
+              className="input" 
+              value={oppositionId} 
+              onChange={(e) => setOppositionId(e.target.value)}
+            >
+              <option value="">Selecciona tu oposición...</option>
+              {Object.entries(
+                oppositions.reduce((acc, opp) => {
+                  const cat = opp.description || 'Otras';
+                  if (!acc[cat]) acc[cat] = [];
+                  acc[cat].push(opp);
+                  return acc;
+                }, {})
+              ).map(([category, opps]) => (
+                <optgroup key={category} label={category}>
+                  {opps.map(opp => (
+                    <option key={opp.id} value={opp.id}>{opp.icon} {opp.name}</option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>

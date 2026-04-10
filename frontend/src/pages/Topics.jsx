@@ -2,13 +2,14 @@
 // Topics Page — List of all study topics
 // ============================================
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './Topics.css';
 
 export default function Topics() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -29,10 +30,10 @@ export default function Topics() {
   const handleCreateTopic = async (e) => {
     e.preventDefault();
     try {
-      await api.createTopic(newTopic);
+      const res = await api.createTopic(newTopic);
       setNewTopic({ title: '', description: '', icon: '📖' });
       setShowForm(false);
-      loadTopics();
+      navigate(`/topics/${res.data.id}`);
     } catch (err) {
       alert(err.message || 'Error al crear tema');
     }
@@ -49,11 +50,9 @@ export default function Topics() {
           <h1 className="page-title">📚 Temas</h1>
           <p className="page-subtitle">Selecciona un tema para empezar a estudiar</p>
         </div>
-        {user?.role === 'ADMIN' && (
-          <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-            {showForm ? 'Cancelar' : '+ Añadir Tema'}
-          </button>
-        )}
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          {showForm ? 'Cancelar' : '+ Añadir Tema'}
+        </button>
       </div>
 
       {showForm && (
