@@ -14,6 +14,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [oppositions, setOppositions] = useState([]);
   const [selectingOpposition, setSelectingOpposition] = useState(false);
+  const [selectedOpps, setSelectedOpps] = useState([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -30,26 +31,33 @@ export default function Dashboard() {
         setLoading(false);
       }
     };
-    if (user?.oppositionId) {
+    if (user?.oppositions?.length > 0) {
       loadData();
     } else {
       setLoading(false);
     }
-  }, [user?.oppositionId]);
+  }, [user?.oppositions]);
 
   useEffect(() => {
-    if (user && !user.oppositionId) {
+    if (user && user.oppositions?.length === 0) {
       api.getOppositions().then(res => setOppositions(res.data)).catch(console.error);
     }
   }, [user]);
 
-  const handleSelectOpposition = async (oppId) => {
+  const toggleOpposition = (oppId) => {
+    setSelectedOpps(prev => 
+      prev.includes(oppId) ? prev.filter(id => id !== oppId) : [...prev, oppId]
+    );
+  };
+
+  const handleConfirmOppositions = async () => {
+    if (selectedOpps.length === 0) return;
     setSelectingOpposition(true);
     try {
-      const res = await api.updateProfile({ oppositionId: oppId });
+      const res = await api.updateProfile({ oppositionId: selectedOpps });
       updateUser(res.data);
     } catch (err) {
-      console.error('Error selecting opposition:', err);
+      console.error('Error selecting oppositions:', err);
     } finally {
       setSelectingOpposition(false);
     }
@@ -64,30 +72,41 @@ export default function Dashboard() {
     );
   }
 
-  if (user && !user.oppositionId) {
+  if (user && user.oppositions?.length === 0) {
     return (
       <div className="container animate-slide-up">
-        <div className="card text-center" style={{ padding: 'var(--space-xl)', maxWidth: '800px', margin: 'var(--space-xl) auto' }}>
+        <div className="card text-center" style={{ padding: 'var(--space-2xl)', maxWidth: '900px', margin: 'var(--space-xl) auto' }}>
           <div style={{ fontSize: '4rem', marginBottom: 'var(--space-md)' }}>🎯</div>
           <h1 className="page-title">¡Bienvenido a BateriaQ!</h1>
-          <p className="page-subtitle" style={{ marginBottom: 'var(--space-lg)' }}>
-            Para empezar, cuéntanos qué oposición estás preparando. Así podremos mostrarte el temario y las preguntas adecuadas.
+          <p className="page-subtitle" style={{ marginBottom: 'var(--space-xl)', fontSize: '1.2rem' }}>
+            Selecciona <b>una o varias</b> oposiciones que estés preparando. Adaptaremos todo el temario para ti.
           </p>
 
-          <div className="grid grid-2" style={{ textAlign: 'left', gap: 'var(--space-md)' }}>
-            {oppositions.map(opp => (
-              <button
-                key={opp.id}
-                className="dashboard-action-card"
-                onClick={() => handleSelectOpposition(opp.id)}
-                style={{ width: '100%', border: '1px solid var(--border-color)', background: 'none' }}
-                disabled={selectingOpposition}
-              >
-                <span className="dashboard-action-icon">{opp.icon}</span>
-                <span className="dashboard-action-label" style={{ display: 'block' }}>{opp.name}</span>
-                <span className="dashboard-action-desc">{opp.description || 'Prepárate con nosotros'}</span>
-              </button>
-            ))}
+          <div className="grid grid-2" style={{ textAlign: 'left', gap: 'var(--space-md)', marginBottom: 'var(--space-2xl)' }}>
+            {oppositions.map(opp => {
+              const isSelected = selectedOpps.includes(opp.id);
+              return (
+                <button
+                  key={opp.id}
+                  className={`dashboard-action-card ${isSelected ? 'active' : ''}`}
+                  onClick={() => toggleOpposition(opp.id)}
+                  style={{ 
+                    width: '100%', 
+                    border: isSelected ? '2px solid var(--primary-500)' : '1px solid var(--border-color)', 
+                    background: isSelected ? 'rgba(99, 102, 241, 0.08)' : 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                  disabled={selectingOpposition}
+                >
+                  <span className="dashboard-action-icon">{opp.icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <span className="dashboard-action-label" style={{ display: 'block', fontWeight: isSelected ? '700' : '600' }}>{opp.name}</span>
+                    <span className="dashboard-action-desc">{opp.description || 'Prepárate con nosotros'}</span>
+                  </div>
+                  {isSelected && <span style={{ color: 'var(--primary-400)', fontWeight: 800 }}>✓</span>}
+                </button>
+              );
+            })}
 
             <button
               className="dashboard-action-card"
@@ -96,7 +115,10 @@ export default function Dashboard() {
                 if (name) {
                   const description = prompt('Breve descripción:');
                   api.createOpposition({ name, description, icon: '🎯' })
-                    .then(res => handleSelectOpposition(res.data.id))
+                    .then(res => {
+                        setOppositions(prev => [...prev, res.data]);
+                        toggleOpposition(res.data.id);
+                    })
                     .catch(err => alert('Error al crear oposición: ' + err.message));
                 }
               }}
@@ -104,16 +126,26 @@ export default function Dashboard() {
               disabled={selectingOpposition}
             >
               <span className="dashboard-action-icon">➕</span>
-              <span className="dashboard-action-label" style={{ display: 'block' }}>Abrir nueva...</span>
-              <span className="dashboard-action-desc">Crea tu propio temario personalizado</span>
+              <div style={{ flex: 1 }}>
+                <span className="dashboard-action-label" style={{ display: 'block' }}>Abrir nueva...</span>
+                <span className="dashboard-action-desc">Crea tu propio temario personalizado</span>
+              </div>
             </button>
           </div>
 
-          {selectingOpposition && (
-            <div style={{ marginTop: 'var(--space-lg)' }}>
-              <span className="spinner spinner-sm"></span> Configurando tu plan...
-            </div>
-          )}
+          <div style={{ textAlign: 'center' }}>
+            <button 
+                className="btn btn-primary btn-lg" 
+                style={{ minWidth: '300px' }}
+                onClick={handleConfirmOppositions}
+                disabled={selectedOpps.length === 0 || selectingOpposition}
+            >
+                {selectingOpposition ? 'Configurando...' : 'Comenzar mi preparación'}
+            </button>
+            <p style={{ marginTop: 'var(--space-md)', fontSize: 'var(--font-xs)', color: 'var(--text-muted)' }}>
+                Podrás cambiar tu selección más adelante desde tu perfil.
+            </p>
+          </div>
         </div>
       </div>
     );

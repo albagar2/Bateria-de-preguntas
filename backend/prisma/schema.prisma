@@ -49,11 +49,11 @@ model Opposition {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  users   User[]
+  users   User[] @relation("EnrolledOppositions")
   topics  Topic[]
 
   creatorId     String?  @map("creator_id")
-  creator       User?    @relation("UserOppositions", fields: [creatorId], references: [id])
+  creator       User?    @relation("UserCreator", fields: [creatorId], references: [id])
 
   @@map("oppositions")
 }
@@ -72,8 +72,7 @@ model User {
   updatedAt     DateTime @updatedAt @map("updated_at")
 
   // Relations
-  oppositionId  String?  @map("opposition_id")
-  opposition    Opposition? @relation(fields: [oppositionId], references: [id], onDelete: SetNull)
+  oppositions    Opposition[] @relation("EnrolledOppositions")
   
   progress       UserProgress[]
   mistakes       Mistake[]
@@ -84,10 +83,9 @@ model User {
   achievements   UserAchievement[]
   bookmarks      Bookmark[]
   sessions       Session[]
-  createdTopics       Topic[]     @relation("TopicCreator")
-  createdOppositions  Opposition[] @relation("UserOppositions")
+  createdTopics  Topic[]     @relation("TopicCreator")
+  createdOppositions  Opposition[] @relation("UserCreator")
 
-  @@index([oppositionId])
   @@map("users")
 }
 

@@ -32,14 +32,14 @@ class AuthService {
           name,
           email,
           passwordHash,
-          oppositionId,
+          oppositions: oppositionId ? { connect: [{ id: oppositionId }] } : undefined,
         },
         select: {
           id: true,
           name: true,
           email: true,
           role: true,
-          oppositionId: true,
+          oppositions: { select: { id: true, name: true } },
           createdAt: true,
         },
       });
@@ -78,7 +78,7 @@ class AuthService {
         name: true,
         email: true,
         role: true,
-        oppositionId: true,
+        oppositions: { select: { id: true, name: true, icon: true } },
         passwordHash: true,
         createdAt: true,
       },
@@ -127,7 +127,7 @@ class AuthService {
       where: { refreshToken },
       include: {
         user: {
-          select: { id: true, name: true, email: true, role: true, oppositionId: true },
+          select: { id: true, name: true, email: true, role: true, oppositions: { select: { id: true, name: true } } },
         },
       },
     });

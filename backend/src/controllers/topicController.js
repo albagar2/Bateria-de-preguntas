@@ -6,8 +6,9 @@ const { asyncHandler } = require('../utils/asyncHandler');
 
 const getAll = asyncHandler(async (req, res) => {
   const userId = req.user?.id || null;
-  const oppositionId = req.user?.oppositionId || null;
-  const topics = await topicService.getAll(userId, oppositionId);
+  const oppositionIds = req.user?.oppositions?.map(o => o.id) || [];
+  const ignoreOpposition = req.query.all === 'true' && req.user?.role === 'ADMIN';
+  const topics = await topicService.getAll(userId, oppositionIds.length > 0 ? oppositionIds : null, ignoreOpposition);
 
   res.json({ success: true, data: topics });
 });

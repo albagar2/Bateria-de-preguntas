@@ -12,7 +12,7 @@ export default function Profile() {
   const [name, setName] = useState(user?.name || '');
   const [darkMode, setDarkMode] = useState(user?.darkMode || false);
   const [notifications, setNotifications] = useState(user?.notifications ?? true);
-  const [oppositionId, setOppositionId] = useState(user?.oppositionId || '');
+  const [oppositionId, setOppositionId] = useState(user?.oppositions?.map(o => o.id) || []);
   const [oppositions, setOppositions] = useState([]);
   const [saving, setSaving] = useState(false);
 
@@ -108,33 +108,39 @@ export default function Profile() {
           </div>
 
           <div className="input-group" style={{ marginBottom: 'var(--space-md)' }}>
-            <label className="input-label">Oposición</label>
-            <select 
-              className="input" 
-              value={oppositionId} 
-              onChange={(e) => setOppositionId(e.target.value)}
-            >
-              <option value="">Selecciona tu oposición...</option>
-              {Object.entries(
-                oppositions.reduce((acc, opp) => {
-                  const cat = opp.description || 'Otras';
-                  if (!acc[cat]) acc[cat] = [];
-                  acc[cat].push(opp);
-                  return acc;
-                }, {})
-              ).map(([category, opps]) => (
-                <optgroup key={category} label={category}>
-                  {opps.map(opp => (
-                    <option key={opp.id} value={opp.id}>{opp.icon} {opp.name}</option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+            <label className="input-label">Oposiciones inscritas</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', padding: 'var(--space-md)', background: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)', maxHeight: '200px', overflowY: 'auto' }}>
+              {oppositions.map(opp => {
+                const isSelected = Array.isArray(oppositionId) ? oppositionId.includes(opp.id) : oppositionId === opp.id;
+                return (
+                  <label key={opp.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', cursor: 'pointer', padding: 'var(--space-xs) 0' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={isSelected} 
+                      onChange={(e) => {
+                        const current = Array.isArray(oppositionId) ? [...oppositionId] : (oppositionId ? [oppositionId] : []);
+                        if (e.target.checked) {
+                          setOppositionId([...current, opp.id]);
+                        } else {
+                          setOppositionId(current.filter(id => id !== opp.id));
+                        }
+                      }} 
+                    />
+                    <span>{opp.icon} {opp.name}</span>
+                  </label>
+                );
+              })}
+            </div>
+            <p style={{ fontSize: 'var(--font-xs)', color: 'var(--text-muted)' }}>Puedes preparar varias oposiciones a la vez.</p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', cursor: 'pointer' }}>
-              <input type="checkbox" checked={darkMode} onChange={(e) => setDarkMode(e.target.checked)} />
+              <input type="checkbox" checked={darkMode} onChange={(e) => {
+                setDarkMode(e.target.checked);
+                // Apply immediately
+                document.documentElement.setAttribute('data-theme', e.target.checked ? '' : 'light');
+              }} />
               🌙 Modo oscuro
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', cursor: 'pointer' }}>

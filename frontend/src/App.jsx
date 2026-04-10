@@ -2,6 +2,7 @@
 // App — Root component with routing
 // ============================================
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import Navbar from './components/Navbar';
@@ -54,6 +55,15 @@ function AdminRoute({ children }) {
 
 function AppRoutes() {
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      document.documentElement.setAttribute('data-theme', user.darkMode ? '' : 'light');
+    } else {
+      // Default to dark mode for guests
+      document.documentElement.setAttribute('data-theme', '');
+    }
+  }, [user?.darkMode]);
 
   return (
     <>

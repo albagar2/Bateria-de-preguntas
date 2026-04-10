@@ -88,6 +88,7 @@ class ApiService {
 
   // ─── Oppositions ───────────────────────
   getOppositions() { return this.request('GET', '/oppositions'); }
+  createOpposition(data) { return this.request('POST', '/oppositions', data); }
 
   // ─── User ────────────────────────────
   getProfile() { return this.request('GET', '/users/profile'); }
@@ -96,9 +97,13 @@ class ApiService {
   deleteAccount(password) { return this.request('DELETE', '/users/account', { password }); }
 
   // ─── Topics ──────────────────────────
-  getTopics() { return this.request('GET', '/topics'); }
+  getTopics(params = {}) { 
+    const qs = new URLSearchParams(params).toString();
+    return this.request('GET', `/topics${qs ? `?${qs}` : ''}`); 
+  }
   getTopic(id) { return this.request('GET', `/topics/${id}`); }
   createTopic(data) { return this.request('POST', '/topics', data); }
+  createQuestion(data) { return this.request('POST', '/questions', data); }
 
   // ─── Questions ───────────────────────
   getQuestions(params = {}) {

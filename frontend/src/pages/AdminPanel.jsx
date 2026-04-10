@@ -26,7 +26,7 @@ export default function AdminPanel() {
         const res = await api.getAdminUsers();
         setUsers(res.data);
       } else if (activeTab === 'topics') {
-        const res = await api.getTopics(); // Reuse existing topic list for now
+        const res = await api.getTopics({ all: 'true' }); // Fetch all topics regardless of oppositionId
         setTopics(res.data);
       }
     } catch (err) {
@@ -57,6 +57,19 @@ export default function AdminPanel() {
     }
   };
 
+  const viewQuestions = async (topic) => {
+    setSelectedTopic(topic);
+    setLoading(true);
+    try {
+      const res = await api.getQuestions({ topicId: topic.id });
+      setTopicQuestions(res.data.questions);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) return <div className="loading-screen"><div className="spinner"></div></div>;
 
   return (
@@ -70,13 +83,38 @@ export default function AdminPanel() {
       <div className="tab-container" style={{ marginBottom: 'var(--space-xl)', display: 'flex', gap: 'var(--space-md)', borderBottom: '1px solid var(--border-color)', paddingBottom: 'var(--space-sm)' }}>
         <button className={`btn ${activeTab === 'overview' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActiveTab('overview')}>📊 Resumen</button>
         <button className={`btn ${activeTab === 'users' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActiveTab('users')}>👥 Usuarios</button>
-        <button className={`btn ${activeTab === 'topics' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActiveTab('topics')}>📚 Temas y Preguntas</button>
+        <button className={`btn ${activeTab === 'topics' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => { setActiveTab('topics'); setSelectedTopic(null); }}>📚 Temas y Preguntas</button>
       </div>
 
       {message && (
         <div className={`alert alert-${message.type}`} style={{ marginBottom: 'var(--space-lg)' }}>
           {message.text}
         </div>
+      )}
+
+      {/* Selected Topic Detail (Questions View) */}
+      {activeTab === 'topics' && selectedTopic && (
+        <Card title={`Preguntas: ${selectedTopic.title}`}>
+          <div style={{ marginBottom: 'var(--space-lg)' }}>
+            <Button size="sm" variant="ghost" onClick={() => setSelectedTopic(null)}>← Volver a Temas</Button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            {topicQuestions.map(q => (
+              <div key={q.id} className="card" style={{ padding: 'var(--space-md)', background: 'rgba(255,255,255,0.03)' }}>
+                <p style={{ fontWeight: 600, marginBottom: 'var(--space-sm)' }}>{q.questionText}</p>
+                <div style={{ display: 'flex', gap: 'var(--space-sm)', fontSize: 'var(--font-xs)', color: 'var(--text-secondary)' }}>
+                  <span>Dificultad: {q.difficulty}</span>
+                  <span>ID: {q.id.split('-')[0]}...</span>
+                </div>
+                <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)' }}>
+                  <Button size="sm" variant="secondary" onClick={() => window.open(`/api/v1/questions/${q.id}`, '_blank')}>Ver JSON</Button>
+                  <Button size="sm" variant="danger">Eliminar</Button>
+                </div>
+              </div>
+            ))}
+            {topicQuestions.length === 0 && <p>Este tema no tiene preguntas.</p>}
+          </div>
+        </Card>
       )}
 
       {/* OVERVIEW TAB */}
@@ -114,7 +152,7 @@ export default function AdminPanel() {
       )}
 
       {/* USERS TAB */}
-      {activeTab === 'users' && (
+      {activeTab === 'users' && !selectedTopic && (
         <Card title="Gestión de Usuarios">
             <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -149,8 +187,8 @@ export default function AdminPanel() {
       )}
 
       {/* TOPICS TAB */}
-      {activeTab === 'topics' && (
-        <Card title="Listado de Temas">
+      {activeTab === 'topics' && !selectedTopic && (
+        <Card title="Listado Global de Temas">
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 'var(--space-md)' }}>
                 <Button size="sm">+ Nuevo Tema</Button>
             </div>
@@ -164,7 +202,7 @@ export default function AdminPanel() {
                         <p style={{ fontSize: 'var(--font-xs)', color: 'var(--text-secondary)', marginBottom: 'var(--space-md)' }}>{t.description}</p>
                         <div style={{ display: 'flex', gap: 'var(--space-xs)' }}>
                             <Button size="sm" variant="secondary" fullWidth>Editar</Button>
-                            <Button size="sm" variant="secondary" fullWidth>Preguntas</Button>
+                            <Button size="sm" variant="secondary" fullWidth onClick={() => viewQuestions(t)}>Preguntas</Button>
                         </div>
                     </Card>
                 ))}
@@ -174,5 +212,3 @@ export default function AdminPanel() {
     </div>
   );
 }
-
-

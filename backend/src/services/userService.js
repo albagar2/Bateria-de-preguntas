@@ -20,7 +20,7 @@ class UserService {
         name: true,
         email: true,
         role: true,
-        oppositionId: true,
+        oppositions: { select: { id: true, name: true, icon: true } },
         examDate: true,
         darkMode: true,
         notifications: true,
@@ -36,15 +36,27 @@ class UserService {
    * Update user profile
    */
   async updateProfile(userId, data) {
+    const { oppositionId, ...otherData } = data;
+    const updateData = { ...otherData };
+    
+    if (oppositionId !== undefined) {
+      // Logic for multi-selection: if it's a string (backwards compatibility or single selection), 
+      // we wrap it in an array. If it's already an array, use it.
+      const oppArray = Array.isArray(oppositionId) ? oppositionId : (oppositionId ? [oppositionId] : []);
+      updateData.oppositions = {
+        set: oppArray.map(id => ({ id }))
+      };
+    }
+
     return prisma.user.update({
       where: { id: userId },
-      data,
+      data: updateData,
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
-        oppositionId: true,
+        oppositions: { select: { id: true, name: true, icon: true } },
         examDate: true,
         darkMode: true,
         notifications: true,
