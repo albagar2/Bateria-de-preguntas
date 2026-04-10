@@ -22,7 +22,7 @@ const registerSchema = z.object({
     .regex(/[a-z]/, 'Debe contener al menos una minúscula')
     .regex(/[0-9]/, 'Debe contener al menos un número')
     .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un carácter especial'),
-  oppositionId: z.string().uuid('Oposición inválida').optional().nullable(),
+  oppositionId: z.union([z.string().uuid(), z.array(z.string().uuid())]).optional().nullable(),
 });
 
 const loginSchema = z.object({
@@ -36,7 +36,7 @@ const updateProfileSchema = z.object({
   examDate: z.string().datetime().optional().nullable(),
   darkMode: z.boolean().optional(),
   notifications: z.boolean().optional(),
-  oppositionId: z.string().uuid().optional().nullable(),
+  oppositionId: z.union([z.string().uuid(), z.array(z.string().uuid())]).optional().nullable(),
 });
 
 const changePasswordSchema = z.object({

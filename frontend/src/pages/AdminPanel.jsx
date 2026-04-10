@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
+import Modal from '../components/common/Modal';
 import './Dashboard.css';
 
 export default function AdminPanel() {
@@ -9,8 +10,17 @@ export default function AdminPanel() {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [topics, setTopics] = useState([]);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [topicQuestions, setTopicQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
+  
+  // Modal states
+  const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
+  const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
+  const [editingTopic, setEditingTopic] = useState(null);
+  const [editingQuestion, setEditingQuestion] = useState(null);
+  const [isModeEdit, setIsModeEdit] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -26,7 +36,7 @@ export default function AdminPanel() {
         const res = await api.getAdminUsers();
         setUsers(res.data);
       } else if (activeTab === 'topics') {
-        const res = await api.getTopics({ all: 'true' }); // Fetch all topics regardless of oppositionId
+        const res = await api.getTopics({ all: 'true' });
         setTopics(res.data);
       }
     } catch (err) {
@@ -70,6 +80,94 @@ export default function AdminPanel() {
     }
   };
 
+  // --- Topic CRUD ---
+  const handleCreateTopic = () => {
+    setEditingTopic({ title: '', description: '', icon: '📚', color: '#6366f1' });
+    setIsModeEdit(false);
+    setIsTopicModalOpen(true);
+  };
+
+  const handleEditTopic = (topic) => {
+    setEditingTopic({ ...topic });
+    setIsModeEdit(true);
+    setIsTopicModalOpen(true);
+  };
+
+  const handleDeleteTopic = async (id) => {
+    if (!window.confirm('¿Eliminar este tema? Se perderán todas las preguntas asociadas.')) return;
+    try {
+      await api.deleteAdminTopic(id);
+      setTopics(topics.filter(t => t.id !== id));
+      setMessage({ type: 'success', text: 'Tema eliminado' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+    }
+  };
+
+  const handleSaveTopic = async () => {
+    try {
+      if (isModeEdit) {
+        const { id, ...data } = editingTopic;
+        await api.updateAdminTopic(id, data);
+        setTopics(topics.map(t => t.id === id ? editingTopic : t));
+      } else {
+        const res = await api.createTopic(editingTopic);
+        setTopics([res.data, ...topics]);
+      }
+      setIsTopicModalOpen(false);
+      setMessage({ type: 'success', text: `Tema ${isModeEdit ? 'actualizado' : 'creado'} correctamente` });
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Error al procesar el tema' });
+    }
+  };
+
+  // --- Question CRUD ---
+  const handleCreateQuestion = () => {
+    setEditingQuestion({
+      topicId: selectedTopic.id,
+      questionText: '',
+      options: ['', '', '', ''],
+      correctIndex: 0,
+      explanation: '',
+      difficulty: 'MEDIUM'
+    });
+    setIsModeEdit(false);
+    setIsQuestionModalOpen(true);
+  };
+
+  const handleEditQuestion = (question) => {
+    setEditingQuestion({ ...question });
+    setIsModeEdit(true);
+    setIsQuestionModalOpen(true);
+  };
+
+  const handleDeleteQuestion = async (id) => {
+    if (!window.confirm('¿Eliminar esta pregunta?')) return;
+    try {
+      await api.deleteAdminQuestion(id);
+      setTopicQuestions(topicQuestions.filter(q => q.id !== id));
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Error al eliminar pregunta' });
+    }
+  };
+
+  const handleSaveQuestion = async () => {
+    try {
+      if (isModeEdit) {
+        const { id, ...data } = editingQuestion;
+        await api.updateAdminQuestion(id, data);
+        setTopicQuestions(topicQuestions.map(q => q.id === id ? editingQuestion : q));
+      } else {
+        const res = await api.createQuestion(editingQuestion);
+        setTopicQuestions([res.data, ...topicQuestions]);
+      }
+      setIsQuestionModalOpen(false);
+      setMessage({ type: 'success', text: `Pregunta ${isModeEdit ? 'actualizada' : 'creada'} correctamente` });
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Error al procesar la pregunta' });
+    }
+  };
+
   if (loading) return <div className="loading-screen"><div className="spinner"></div></div>;
 
   return (
@@ -95,24 +193,25 @@ export default function AdminPanel() {
       {/* Selected Topic Detail (Questions View) */}
       {activeTab === 'topics' && selectedTopic && (
         <Card title={`Preguntas: ${selectedTopic.title}`}>
-          <div style={{ marginBottom: 'var(--space-lg)' }}>
+          <div style={{ marginBottom: 'var(--space-lg)', display: 'flex', justifyContent: 'space-between' }}>
             <Button size="sm" variant="ghost" onClick={() => setSelectedTopic(null)}>← Volver a Temas</Button>
+            <Button size="sm" onClick={handleCreateQuestion}>+ Nueva Pregunta</Button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
             {topicQuestions.map(q => (
               <div key={q.id} className="card" style={{ padding: 'var(--space-md)', background: 'rgba(255,255,255,0.03)' }}>
                 <p style={{ fontWeight: 600, marginBottom: 'var(--space-sm)' }}>{q.questionText}</p>
                 <div style={{ display: 'flex', gap: 'var(--space-sm)', fontSize: 'var(--font-xs)', color: 'var(--text-secondary)' }}>
-                  <span>Dificultad: {q.difficulty}</span>
-                  <span>ID: {q.id.split('-')[0]}...</span>
+                   <span className="badge badge-secondary">{q.difficulty}</span>
+                   <span>{q.options.length} opciones</span>
                 </div>
                 <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)' }}>
-                  <Button size="sm" variant="secondary" onClick={() => window.open(`/api/v1/questions/${q.id}`, '_blank')}>Ver JSON</Button>
-                  <Button size="sm" variant="danger">Eliminar</Button>
+                  <Button size="sm" variant="secondary" onClick={() => handleEditQuestion(q)}>Editar</Button>
+                  <Button size="sm" variant="danger" onClick={() => handleDeleteQuestion(q.id)}>Eliminar</Button>
                 </div>
               </div>
             ))}
-            {topicQuestions.length === 0 && <p>Este tema no tiene preguntas.</p>}
+            {topicQuestions.length === 0 && <p style={{ textAlign: 'center', padding: 'var(--space-xl)', color: 'var(--text-muted)' }}>Este tema no tiene preguntas todavía.</p>}
           </div>
         </Card>
       )}
@@ -190,25 +289,147 @@ export default function AdminPanel() {
       {activeTab === 'topics' && !selectedTopic && (
         <Card title="Listado Global de Temas">
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 'var(--space-md)' }}>
-                <Button size="sm">+ Nuevo Tema</Button>
+                <Button size="sm" onClick={handleCreateTopic}>+ Nuevo Tema</Button>
             </div>
             <div className="grid grid-3">
                 {topics.map(t => (
                     <Card key={t.id} style={{ padding: 'var(--space-md)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', marginBottom: 'var(--space-sm)' }}>
                             <span style={{ fontSize: '1.5rem' }}>{t.icon || '📚'}</span>
-                            <h4 style={{ margin: 0 }}>{t.title}</h4>
+                            <div style={{ flex: 1 }}>
+                                <h4 style={{ margin: 0 }}>{t.title}</h4>
+                                <span style={{ fontSize: 'var(--font-xs)', color: 'var(--text-muted)' }}>Opo ID: {t.oppositionId?.split('-')[0] || 'Gral'}</span>
+                            </div>
                         </div>
-                        <p style={{ fontSize: 'var(--font-xs)', color: 'var(--text-secondary)', marginBottom: 'var(--space-md)' }}>{t.description}</p>
+                        <p style={{ fontSize: 'var(--font-xs)', color: 'var(--text-secondary)', marginBottom: 'var(--space-md)', height: '40px', overflow: 'hidden' }}>{t.description}</p>
                         <div style={{ display: 'flex', gap: 'var(--space-xs)' }}>
-                            <Button size="sm" variant="secondary" fullWidth>Editar</Button>
+                            <Button size="sm" variant="secondary" fullWidth onClick={() => handleEditTopic(t)}>Editar</Button>
                             <Button size="sm" variant="secondary" fullWidth onClick={() => viewQuestions(t)}>Preguntas</Button>
+                            <Button size="sm" variant="danger" onClick={() => handleDeleteTopic(t.id)}>🗑️</Button>
                         </div>
                     </Card>
                 ))}
             </div>
         </Card>
       )}
+      {/* Edit Topic Modal */}
+      <Modal 
+        isOpen={isTopicModalOpen} 
+        onClose={() => setIsTopicModalOpen(false)} 
+        title={isModeEdit ? "Editar Tema" : "Nuevo Tema"}
+        footer={(
+          <>
+            <Button variant="ghost" onClick={() => setIsTopicModalOpen(false)}>Cancelar</Button>
+            <Button variant="primary" onClick={handleSaveTopic}>Guardar</Button>
+          </>
+        )}
+      >
+        {editingTopic && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div className="input-group">
+              <label className="input-label">Título</label>
+              <input 
+                className="input" 
+                value={editingTopic.title} 
+                onChange={(e) => setEditingTopic({...editingTopic, title: e.target.value})}
+              />
+            </div>
+            <div className="input-group">
+              <label className="input-label">Descripción</label>
+              <textarea 
+                className="input" 
+                rows="3"
+                value={editingTopic.description} 
+                onChange={(e) => setEditingTopic({...editingTopic, description: e.target.value})}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
+              <div className="input-group" style={{ flex: 1 }}>
+                <label className="input-label">Icono</label>
+                <input className="input" value={editingTopic.icon} onChange={(e) => setEditingTopic({...editingTopic, icon: e.target.value})}/>
+              </div>
+              <div className="input-group" style={{ flex: 1 }}>
+                <label className="input-label">Color</label>
+                <input type="color" className="input" style={{ padding: 0 }} value={editingTopic.color || '#6366f1'} onChange={(e) => setEditingTopic({...editingTopic, color: e.target.value})}/>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Edit Question Modal */}
+      <Modal 
+        isOpen={isQuestionModalOpen} 
+        onClose={() => setIsQuestionModalOpen(false)} 
+        title={isModeEdit ? "Editar Pregunta" : "Nueva Pregunta"}
+        footer={(
+          <>
+            <Button variant="ghost" onClick={() => setIsQuestionModalOpen(false)}>Cancelar</Button>
+            <Button variant="primary" onClick={handleSaveQuestion}>Guardar</Button>
+          </>
+        )}
+      >
+        {editingQuestion && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div className="input-group">
+              <label className="input-label">Enunciado</label>
+              <textarea 
+                className="input" 
+                rows="3"
+                value={editingQuestion.questionText} 
+                onChange={(e) => setEditingQuestion({...editingQuestion, questionText: e.target.value})}
+              />
+            </div>
+            
+            <div className="input-group">
+              <label className="input-label">Opciones (Marca la correcta)</label>
+              {editingQuestion.options.map((opt, i) => (
+                <div key={i} style={{ display: 'flex', gap: 'var(--space-sm)', marginBottom: 'var(--space-xs)' }}>
+                  <input 
+                    type="radio" 
+                    name="correct-idx" 
+                    checked={editingQuestion.correctIndex === i} 
+                    onChange={() => setEditingQuestion({...editingQuestion, correctIndex: i})}
+                  />
+                  <input 
+                    className="input" 
+                    placeholder={`Opción ${i+1}`}
+                    value={opt} 
+                    onChange={(e) => {
+                      const newOpts = [...editingQuestion.options];
+                      newOpts[i] = e.target.value;
+                      setEditingQuestion({...editingQuestion, options: newOpts});
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Explicación</label>
+              <textarea 
+                className="input" 
+                rows="2"
+                value={editingQuestion.explanation} 
+                onChange={(e) => setEditingQuestion({...editingQuestion, explanation: e.target.value})}
+              />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Dificultad</label>
+              <select 
+                className="input"
+                value={editingQuestion.difficulty}
+                onChange={(e) => setEditingQuestion({...editingQuestion, difficulty: e.target.value})}
+              >
+                <option value="EASY">Fácil</option>
+                <option value="MEDIUM">Media</option>
+                <option value="HARD">Difícil</option>
+              </select>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

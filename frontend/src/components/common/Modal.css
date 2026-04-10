@@ -1,0 +1,141 @@
+/* ============================================
+   Modal Component Styles
+   ============================================
+   ARQUITECTURA DE DOS CAPAS:
+     .modal-backdrop → z-index 2000, cubre toda la pantalla, cierra al clickar
+     .modal-content  → z-index 2001, encima del backdrop, recibe todos los clicks
+   
+   Ambos son elementos hermanos FIXED, NO padre-hijo.
+   Esto garantiza que nunca haya conflicto de eventos entre capas.
+   ============================================ */
+
+/* ─── Capa 1: Fondo oscuro ─── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0; /* Equivale a top:0 right:0 bottom:0 left:0 */
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 2000;
+  cursor: pointer; /* Indica que se puede clickar para cerrar */
+}
+
+/* ─── Capa 2: Contenido del modal ─── */
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2001; /* Por encima del backdrop */
+
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2xl);
+
+  width: calc(100% - 2rem); /* Con margen lateral en móvil */
+  max-width: 580px;
+  max-height: 90vh;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* El scroll lo maneja .modal-body */
+
+  cursor: default; /* Resetear cursor dentro del modal */
+}
+
+/* ─── Cabecera ─── */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0; /* No se comprime nunca */
+}
+
+.modal-title {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.modal-close:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-hover);
+}
+
+/* ─── Cuerpo con scroll ─── */
+.modal-body {
+  padding: var(--space-lg);
+  overflow-y: auto;
+  flex: 1;
+  max-height: 60vh;
+}
+
+/* ─── Pie de página con botones ─── */
+.modal-footer {
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  flex-shrink: 0; /* Siempre visible, no se comprime */
+  background-color: var(--bg-card); /* Fondo explícito por si el body tiene scroll */
+}
+
+/* ─── Animación de entrada ─── */
+@keyframes slide-up-modal {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.modal-content.animate-slide-up {
+  animation: slide-up-modal 0.25s ease-out forwards;
+}
+
+/* ─── Responsive: mobile ─── */
+@media (max-width: 640px) {
+  .modal-content {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    max-height: 85vh;
+  }
+
+  @keyframes slide-up-modal {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

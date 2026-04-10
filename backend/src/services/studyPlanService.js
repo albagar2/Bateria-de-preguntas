@@ -1,15 +1,48 @@
 // ============================================
-// Study Plan Service - Application Layer
-// Auto-generates study plans based on exam date
+// Study Plan Service — Capa de lógica de negocio
 // ============================================
+// Genera y gestiona planes de estudio personalizados.
+//
+// LÓGICA DE GENERACIÓN (generate):
+//   El algoritmo distribuye los temas entre los días hasta el examen,
+//   priorizando los temas donde el usuario tiene menos progreso.
+//
+//   Estrategia de distribución:
+//     1. Calcula la prioridad de cada tema (1 - porcentaje_correcto)
+//        → Los temas con menos aciertos tienen mayor prioridad
+//     2. Ordena los temas de mayor a menor prioridad
+//     3. Distribuye los temas rotando por los días del ciclo
+//     4. Los últimos 3 días antes del examen son siempre "Repaso General"
+//        con TODOS los temas
+//
+//   Para cambiar la estrategia de distribución: modificar el bucle
+//   `for (let day = 0; day < daysUntilExam; day++)` y la lógica de dayTopics.
+//
+// LÍMITES:
+//   - La fecha de examen debe ser futura
+//   - Genera un plan por día (1 registro StudyPlan por fecha)
+//   - Elimina los planes futuros no completados antes de generar nuevos
+//     (evita duplicados si el usuario regenera el plan)
+// ============================================
+
 const { prisma } = require('../config/database');
 const { AppError } = require('../utils/AppError');
 
 class StudyPlanService {
+
   /**
-   * Auto-generate a study plan from today to exam date
+   * Genera automáticamente un plan de estudio desde hoy hasta la fecha de examen.
+   *
+   * @param {string} userId  - UUID del usuario
+   * @param {object} params  - { examDate: string (ISO), topicIds: string[] }
+   * @returns {{
+   *   totalDays: number,   // Días totales hasta el examen
+   *   plansCreated: number, // Número de planes creados
+   *   plans: Array         // Primeros 14 días del plan (2 semanas para mostrar en UI)
+   * }}
    */
   async generate(userId, { examDate, topicIds }) {
+    // Normalizar fechas a medianoche para comparar solo por fecha (sin hora)
     const exam = new Date(examDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -25,7 +58,7 @@ class StudyPlanService {
       throw new AppError('Necesitas al menos 1 día para el plan de estudio', 400);
     }
 
-    // Get topic progress
+    // Cargar los temas seleccionados con su conteo de preguntas activas
     const topics = await prisma.topic.findMany({
       where: { id: { in: topicIds }, isActive: true },
       include: {
@@ -38,13 +71,14 @@ class StudyPlanService {
       throw new AppError('No se encontraron los temas seleccionados', 404);
     }
 
-    // Get user's weakest topics first
+    // Cargar el progreso del usuario en los temas seleccionados (1 query para todos)
     const progress = await prisma.userProgress.findMany({
       where: { userId, question: { topicId: { in: topicIds } } },
       include: { question: { select: { topicId: true } } },
     });
 
-    // Calculate priority per topic (lower progress = higher priority)
+    // Calcular prioridad: temas con menos % correcto tienen más prioridad
+    // topicPriority queda ordenado de mayor a menor prioridad
     const topicPriority = topics.map((topic) => {
       const topicProgress = progress.filter(
         (p) => p.question.topicId === topic.id
@@ -57,11 +91,11 @@ class StudyPlanService {
         topicId: topic.id,
         title: topic.title,
         progressPercent,
-        priority: 1 - progressPercent, // Lower progress = higher priority
+        priority: 1 - progressPercent, // 0 progreso = prioridad máxima (1)
       };
     }).sort((a, b) => b.priority - a.priority);
 
-    // Delete existing future plans
+    // Eliminar planes futuros no completados para evitar duplicados al regenerar
     await prisma.studyPlan.deleteMany({
       where: {
         userId,
@@ -70,23 +104,20 @@ class StudyPlanService {
       },
     });
 
-    // Distribute topics across days
-    // Strategy: cycle through topics, weighted by priority
+    // Calcular cuántos temas estudiar por día
+    // Máximo: todos los temas si los días son suficientes, mínimo 1
+    const topicsPerDay = Math.max(
+      1,
+      Math.ceil(topicPriority.length / Math.min(daysUntilExam, 7))
+    );
+
     const plans = [];
-    const topicsPerDay = Math.max(1, Math.ceil(topicPriority.length / Math.min(daysUntilExam, 7)));
 
     for (let day = 0; day < daysUntilExam; day++) {
       const planDate = new Date(today);
       planDate.setDate(planDate.getDate() + day);
 
-      // Select topics for this day (rotating with priority)
-      const dayTopics = [];
-      for (let t = 0; t < topicsPerDay; t++) {
-        const topicIndex = (day * topicsPerDay + t) % topicPriority.length;
-        dayTopics.push(topicPriority[topicIndex].topicId);
-      }
-
-      // Last few days before exam = review all
+      // Últimos 3 días antes del examen → repaso general de todos los temas
       if (daysUntilExam - day <= 3) {
         const allTopicIds = topicPriority.map((t) => t.topicId);
         plans.push({
@@ -96,6 +127,14 @@ class StudyPlanService {
           description: `📝 Repaso general intensivo — ${daysUntilExam - day} día(s) para el examen`,
         });
       } else {
+        // Días normales: rotar temas según prioridad usando módulo
+        // day * topicsPerDay + t garantiza una rotación progresiva de temas
+        const dayTopics = [];
+        for (let t = 0; t < topicsPerDay; t++) {
+          const topicIndex = (day * topicsPerDay + t) % topicPriority.length;
+          dayTopics.push(topicPriority[topicIndex].topicId);
+        }
+
         const descriptions = dayTopics.map((id) =>
           topicPriority.find((t) => t.topicId === id)?.title
         );
@@ -108,10 +147,10 @@ class StudyPlanService {
       }
     }
 
-    // Create plans in bulk
+    // Insertar todos los planes de una vez (más eficiente que uno a uno)
     await prisma.studyPlan.createMany({ data: plans });
 
-    // Update user exam date
+    // Guardar la fecha de examen en el perfil del usuario para mostrarse en el dashboard
     await prisma.user.update({
       where: { id: userId },
       data: { examDate: exam },
@@ -120,12 +159,21 @@ class StudyPlanService {
     return {
       totalDays: daysUntilExam,
       plansCreated: plans.length,
-      plans: plans.slice(0, 14), // Return first 2 weeks
+      // Solo devolvemos las primeras 2 semanas para la respuesta (el resto está en BD)
+      plans: plans.slice(0, 14),
     };
   }
 
   /**
-   * Get study plans for a date range
+   * Obtiene los planes de estudio del usuario en un rango de fechas opcional.
+   *
+   * Si no se pasan fechas, devuelve TODOS los planes del usuario.
+   * Para obtener solo los de la semana actual, el cliente puede enviar:
+   *   startDate = lunes de esta semana, endDate = domingo de esta semana.
+   *
+   * @param {string} userId  - UUID del usuario
+   * @param {object} params  - { startDate?: string, endDate?: string } (ISO)
+   * @returns {Array} Planes ordenados por fecha ascendente
    */
   async getPlans(userId, { startDate, endDate } = {}) {
     const where = { userId };
@@ -143,9 +191,19 @@ class StudyPlanService {
   }
 
   /**
-   * Get today's plan
+   * Obtiene el plan de estudio de hoy para el usuario.
+   *
+   * Incluye los detalles de los temas (id, title, icon, color) para
+   * mostrarlos directamente en la UI del Planner sin peticiones adicionales.
+   *
+   * Devuelve null si no hay plan para hoy (el usuario puede no haberlo generado
+   * o ya lo tienen todo estudiado).
+   *
+   * @param {string} userId - UUID del usuario
+   * @returns {object|null} Plan de hoy con temas enriquecidos, o null
    */
   async getTodayPlan(userId) {
+    // Calcular el rango "hoy" (desde medianoche hasta medianoche del día siguiente)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
@@ -160,7 +218,8 @@ class StudyPlanService {
 
     if (!plan) return null;
 
-    // Get topic details
+    // Cargar los detalles de los temas del plan para enriquecer la respuesta
+    // topicIds en StudyPlan es un campo Json (array de UUIDs)
     const topics = await prisma.topic.findMany({
       where: { id: { in: plan.topicIds } },
       select: { id: true, title: true, icon: true, color: true },
@@ -170,9 +229,17 @@ class StudyPlanService {
   }
 
   /**
-   * Mark plan as completed
+   * Marca un plan de estudio como completado.
+   *
+   * Verifica que el plan pertenezca al usuario antes de actualizar
+   * (protección contra modificaciones de planes ajenos).
+   *
+   * @param {string} userId - UUID del usuario (comprobación de propiedad)
+   * @param {string} planId - UUID del plan a completar
+   * @returns {object} Plan actualizado con isCompleted = true
    */
   async completePlan(userId, planId) {
+    // Verificar que el plan existe Y pertenece a este usuario
     const plan = await prisma.studyPlan.findFirst({
       where: { id: planId, userId },
     });
