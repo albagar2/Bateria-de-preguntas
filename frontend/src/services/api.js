@@ -154,9 +154,11 @@ class ApiService {
   getAdminUsers() { return this.request('GET', '/admin/users'); }
   deleteAdminUser(id) { return this.request('DELETE', `/admin/users/${id}`); }
   updateAdminUserRole(id, role) { return this.request('PATCH', `/admin/users/${id}/role`, { role }); }
+  createAdminTopic(data) { return this.request('POST', '/admin/topics', data); }
   updateAdminTopic(id, data) { return this.request('PATCH', `/admin/topics/${id}`, data); }
   deleteAdminTopic(id) { return this.request('DELETE', `/admin/topics/${id}`); }
   getAdminQuestions() { return this.request('GET', '/admin/questions'); }
+  createAdminQuestion(data) { return this.request('POST', '/admin/questions', data); }
   updateAdminQuestion(id, data) { return this.request('PATCH', `/admin/questions/${id}`, data); }
   deleteAdminQuestion(id) { return this.request('DELETE', `/admin/questions/${id}`); }
 }

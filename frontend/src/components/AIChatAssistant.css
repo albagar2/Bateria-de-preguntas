@@ -6,6 +6,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  /* CRITICAL: el wrapper es un div fixed que se expande y puede cubrir
+     elementos de la página. pointer-events: none lo hace "transparente"
+     a los clicks. Los hijos interactivos (.ai-chat-trigger, .ai-chat-window)
+     restauran pointer-events: auto. */
+  pointer-events: none;
 }
 
 .ai-chat-trigger {
@@ -21,6 +26,7 @@
   justify-content: center;
   transition: all var(--transition-spring);
   position: relative;
+  pointer-events: auto; /* Restaurar clicabilidad desde el wrapper */
 }
 
 .ai-chat-trigger:hover {
@@ -62,7 +68,7 @@
 .ai-chat-wrapper.open .ai-chat-window {
   transform: translateY(0) scale(1);
   opacity: 1;
-  pointer-events: all;
+  pointer-events: auto; /* Solo interactivo cuando está abierto */
 }
 
 .ai-chat-header {

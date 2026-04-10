@@ -15,12 +15,13 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
   
-  // Modal states
+  // Modal states — flags separados para evitar conflictos entre modales
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [editingTopic, setEditingTopic] = useState(null);
   const [editingQuestion, setEditingQuestion] = useState(null);
-  const [isModeEdit, setIsModeEdit] = useState(false);
+  const [isTopicEditMode, setIsTopicEditMode] = useState(false);
+  const [isQuestionEditMode, setIsQuestionEditMode] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -83,18 +84,18 @@ export default function AdminPanel() {
   // --- Topic CRUD ---
   const handleCreateTopic = () => {
     setEditingTopic({ title: '', description: '', icon: '📚', color: '#6366f1' });
-    setIsModeEdit(false);
+    setIsTopicEditMode(false);
     setIsTopicModalOpen(true);
   };
 
   const handleEditTopic = (topic) => {
     setEditingTopic({ ...topic });
-    setIsModeEdit(true);
+    setIsTopicEditMode(true);
     setIsTopicModalOpen(true);
   };
 
   const handleDeleteTopic = async (id) => {
-    if (!window.confirm('¿Eliminar este tema? Se perderán todas las preguntas asociadas.')) return;
+    if (!window.confirm('¿Eliminar este tema?')) return;
     try {
       await api.deleteAdminTopic(id);
       setTopics(topics.filter(t => t.id !== id));
@@ -106,18 +107,20 @@ export default function AdminPanel() {
 
   const handleSaveTopic = async () => {
     try {
-      if (isModeEdit) {
-        const { id, ...data } = editingTopic;
+      if (isTopicEditMode) {
+        // Editar: extraer el ID y pasar solo el resto de campos al endpoint PATCH
+        const { id, _count, createdAt, updatedAt, ...data } = editingTopic;
         await api.updateAdminTopic(id, data);
-        setTopics(topics.map(t => t.id === id ? editingTopic : t));
+        setTopics(topics.map(t => t.id === id ? { ...t, ...data } : t));
       } else {
-        const res = await api.createTopic(editingTopic);
+        // Crear: usar el endpoint admin protegido POST /admin/topics
+        const res = await api.createAdminTopic(editingTopic);
         setTopics([res.data, ...topics]);
       }
       setIsTopicModalOpen(false);
-      setMessage({ type: 'success', text: `Tema ${isModeEdit ? 'actualizado' : 'creado'} correctamente` });
+      setMessage({ type: 'success', text: `Tema ${isTopicEditMode ? 'actualizado' : 'creado'} correctamente` });
     } catch (err) {
-      setMessage({ type: 'error', text: 'Error al procesar el tema' });
+      setMessage({ type: 'error', text: err.message || 'Error al procesar el tema' });
     }
   };
 
@@ -131,13 +134,13 @@ export default function AdminPanel() {
       explanation: '',
       difficulty: 'MEDIUM'
     });
-    setIsModeEdit(false);
+    setIsQuestionEditMode(false);
     setIsQuestionModalOpen(true);
   };
 
   const handleEditQuestion = (question) => {
     setEditingQuestion({ ...question });
-    setIsModeEdit(true);
+    setIsQuestionEditMode(true);
     setIsQuestionModalOpen(true);
   };
 
@@ -146,6 +149,7 @@ export default function AdminPanel() {
     try {
       await api.deleteAdminQuestion(id);
       setTopicQuestions(topicQuestions.filter(q => q.id !== id));
+      setMessage({ type: 'success', text: 'Pregunta eliminada' });
     } catch (err) {
       setMessage({ type: 'error', text: 'Error al eliminar pregunta' });
     }
@@ -153,18 +157,20 @@ export default function AdminPanel() {
 
   const handleSaveQuestion = async () => {
     try {
-      if (isModeEdit) {
-        const { id, ...data } = editingQuestion;
+      if (isQuestionEditMode) {
+        // Editar: extraer el ID y campos no editables
+        const { id, topic, createdAt, updatedAt, isActive, ...data } = editingQuestion;
         await api.updateAdminQuestion(id, data);
-        setTopicQuestions(topicQuestions.map(q => q.id === id ? editingQuestion : q));
+        setTopicQuestions(topicQuestions.map(q => q.id === id ? { ...q, ...data } : q));
       } else {
-        const res = await api.createQuestion(editingQuestion);
+        // Crear: usar el endpoint admin protegido POST /admin/questions
+        const res = await api.createAdminQuestion(editingQuestion);
         setTopicQuestions([res.data, ...topicQuestions]);
       }
       setIsQuestionModalOpen(false);
-      setMessage({ type: 'success', text: `Pregunta ${isModeEdit ? 'actualizada' : 'creada'} correctamente` });
+      setMessage({ type: 'success', text: `Pregunta ${isQuestionEditMode ? 'actualizada' : 'creada'} correctamente` });
     } catch (err) {
-      setMessage({ type: 'error', text: 'Error al procesar la pregunta' });
+      setMessage({ type: 'error', text: err.message || 'Error al procesar la pregunta' });
     }
   };
 
@@ -289,7 +295,14 @@ export default function AdminPanel() {
       {activeTab === 'topics' && !selectedTopic && (
         <Card title="Listado Global de Temas">
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 'var(--space-md)' }}>
-                <Button size="sm" onClick={handleCreateTopic}>+ Nuevo Tema</Button>
+                <button 
+                  id="btn-create-topic"
+                  className="btn btn-primary btn-sm" 
+                  type="button"
+                  onClick={handleCreateTopic}
+                >
+                  + Nuevo Tema
+                </button>
             </div>
             <div className="grid grid-3">
                 {topics.map(t => (
@@ -316,7 +329,7 @@ export default function AdminPanel() {
       <Modal 
         isOpen={isTopicModalOpen} 
         onClose={() => setIsTopicModalOpen(false)} 
-        title={isModeEdit ? "Editar Tema" : "Nuevo Tema"}
+        title={isTopicEditMode ? "Editar Tema" : "Nuevo Tema"}
         footer={(
           <>
             <Button variant="ghost" onClick={() => setIsTopicModalOpen(false)}>Cancelar</Button>
@@ -361,7 +374,7 @@ export default function AdminPanel() {
       <Modal 
         isOpen={isQuestionModalOpen} 
         onClose={() => setIsQuestionModalOpen(false)} 
-        title={isModeEdit ? "Editar Pregunta" : "Nueva Pregunta"}
+        title={isQuestionEditMode ? "Editar Pregunta" : "Nueva Pregunta"}
         footer={(
           <>
             <Button variant="ghost" onClick={() => setIsQuestionModalOpen(false)}>Cancelar</Button>

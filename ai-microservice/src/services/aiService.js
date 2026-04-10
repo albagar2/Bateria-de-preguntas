@@ -1,10 +1,9 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const cache = require('../db/cache');
 
-// Pool of models categorized by priority
 const MODEL_POOL = [
-    'gemini-2.5-pro',        // 1. High Quality 
-    'gemini-2.5-flash',      // 2. Fast and cheaper fallback
+    'gemini-2.0-flash',
+    'gemini-flash-latest',
 ];
 
 // In a real environment, you might use 3.1 depending on API availability
@@ -36,7 +35,7 @@ async function callGeminiWithFallback(prompt) {
         try {
             console.log(`[AI Layer] Intentando con modelo: ${modelName}`);
             
-            const model = genAI.getGenerativeModel({ model: modelName });
+            const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1beta' });
             const response = await model.generateContent(prompt);
 
             return {
