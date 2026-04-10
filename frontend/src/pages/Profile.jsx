@@ -221,6 +221,15 @@ export default function Profile() {
             </div>
           )}
         </div>
+
+        <div style={{ marginTop: 'var(--space-2xl)', textAlign: 'center', opacity: 0.7 }}>
+          <p style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>
+            ¿Necesitas ayuda? <a href="/support" style={{ color: 'var(--primary-400)', textDecoration: 'none', fontWeight: 600 }}>Contactar con Soporte</a>
+          </p>
+          <div style={{ fontSize: 'var(--font-xs)', color: 'var(--text-muted)', marginTop: 'var(--space-md)' }}>
+            &copy; {new Date().getFullYear()} Alba García López. Todos los derechos reservados.
+          </div>
+        </div>
       </div>
     </div>
   );

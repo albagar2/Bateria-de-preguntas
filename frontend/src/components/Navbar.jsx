@@ -26,6 +26,7 @@ export default function Navbar() {
       { to: '/mistakes', label: 'Errores', icon: '❌' },
       { to: '/stats', label: 'Estadísticas', icon: '📊' },
       { to: '/planner', label: 'Planificador', icon: '📅' },
+      { to: '/support', label: 'Soporte', icon: '📞' },
     ] : []),
   ];
 

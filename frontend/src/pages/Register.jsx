@@ -161,7 +161,7 @@ export default function Register() {
         </div>
 
         <div className="copyright-footer">
-          &copy; {new Date().getFullYear()} BateriaQ. Todos los derechos reservados.
+          &copy; {new Date().getFullYear()} Alba García López. Todos los derechos reservados.
         </div>
       </div>
     </div>

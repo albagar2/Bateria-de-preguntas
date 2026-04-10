@@ -19,6 +19,7 @@ import Mistakes from './pages/Mistakes';
 import Stats from './pages/Stats';
 import Planner from './pages/Planner';
 import Profile from './pages/Profile';
+import Support from './pages/Support';
 import AdminPanel from './pages/AdminPanel';
 
 function ProtectedRoute({ children }) {
@@ -76,6 +77,7 @@ function AppRoutes() {
           <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
           <Route path="/planner" element={<ProtectedRoute><Planner /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
