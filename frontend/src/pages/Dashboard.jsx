@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import Modal from '../components/common/Modal';
+import Button from '../components/common/Button';
 import './Dashboard.css';
 
 export default function Dashboard() {
@@ -15,6 +17,11 @@ export default function Dashboard() {
   const [oppositions, setOppositions] = useState([]);
   const [selectingOpposition, setSelectingOpposition] = useState(false);
   const [selectedOpps, setSelectedOpps] = useState([]);
+  
+  // Modal states for new opposition
+  const [isOppModalOpen, setIsOppModalOpen] = useState(false);
+  const [newOppName, setNewOppName] = useState('');
+  const [newOppDesc, setNewOppDesc] = useState('');
 
   useEffect(() => {
     const loadData = async () => {
@@ -60,6 +67,20 @@ export default function Dashboard() {
       console.error('Error selecting oppositions:', err);
     } finally {
       setSelectingOpposition(false);
+    }
+  };
+
+  const handleCreateOpposition = async () => {
+    if (!newOppName.trim()) return;
+    try {
+      const res = await api.createOpposition({ name: newOppName, description: newOppDesc, icon: '🎯' });
+      setOppositions(prev => [...prev, res.data]);
+      toggleOpposition(res.data.id);
+      setIsOppModalOpen(false);
+      setNewOppName('');
+      setNewOppDesc('');
+    } catch (err) {
+      alert('Error al crear oposición: ' + err.message);
     }
   };
 
@@ -110,18 +131,7 @@ export default function Dashboard() {
 
             <button
               className="dashboard-action-card"
-              onClick={() => {
-                const name = prompt('Nombre de la oposición:');
-                if (name) {
-                  const description = prompt('Breve descripción:');
-                  api.createOpposition({ name, description, icon: '🎯' })
-                    .then(res => {
-                        setOppositions(prev => [...prev, res.data]);
-                        toggleOpposition(res.data.id);
-                    })
-                    .catch(err => alert('Error al crear oposición: ' + err.message));
-                }
-              }}
+              onClick={() => setIsOppModalOpen(true)}
               style={{ width: '100%', border: '1px dashed var(--primary-500)', background: 'rgba(99, 102, 241, 0.05)' }}
               disabled={selectingOpposition}
             >
@@ -147,6 +157,41 @@ export default function Dashboard() {
             </p>
           </div>
         </div>
+
+        {/* Modal de Nueva Oposición */}
+        <Modal 
+          isOpen={isOppModalOpen} 
+          onClose={() => setIsOppModalOpen(false)} 
+          title="Crear Nueva Oposición"
+          footer={(
+            <>
+              <Button variant="ghost" onClick={() => setIsOppModalOpen(false)}>Cancelar</Button>
+              <Button variant="primary" onClick={handleCreateOpposition} disabled={!newOppName.trim()}>Aceptar</Button>
+            </>
+          )}
+        >
+          <div className="form-group">
+            <label>Nombre de la oposición:</label>
+            <input 
+              type="text" 
+              className="input-field" 
+              value={newOppName} 
+              onChange={e => setNewOppName(e.target.value)} 
+              placeholder="Ej. Policía Nacional" 
+              autoFocus
+            />
+          </div>
+          <div className="form-group">
+            <label>Breve descripción:</label>
+            <textarea 
+              className="input-field" 
+              value={newOppDesc} 
+              onChange={e => setNewOppDesc(e.target.value)} 
+              placeholder="Ej. Escala Básica. Temario completo." 
+              rows={3} 
+            />
+          </div>
+        </Modal>
       </div>
     );
   }

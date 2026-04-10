@@ -36,6 +36,27 @@ export default function AIChatAssistant() {
     }
   };
 
+  // Utilidad para dar formato al texto de Markdown básico a HTML
+  const formatMessage = (text) => {
+    if (!text) return { __html: '' };
+    
+    let formatted = text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+      
+    // Convertir **negrita** a HTML
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--primary-500);">$1</strong>');
+    
+    // Convertir *cursiva* a HTML
+    formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Convertir saltos de línea a <br/>
+    formatted = formatted.replace(/\n/g, '<br/>');
+    
+    return { __html: formatted };
+  };
+
   return (
     <div className={`ai-chat-wrapper ${isOpen ? 'open' : ''}`}>
       {/* Chat Window */}
@@ -54,9 +75,10 @@ export default function AIChatAssistant() {
         <div className="ai-chat-messages" ref={scrollRef}>
           {messages.map((m, i) => (
             <div key={i} className={`ai-message ${m.role}`}>
-              <div className="ai-message-bubble">
-                {m.content}
-              </div>
+              <div 
+                className="ai-message-bubble"
+                dangerouslySetInnerHTML={formatMessage(m.content)}
+              />
             </div>
           ))}
           {loading && (
