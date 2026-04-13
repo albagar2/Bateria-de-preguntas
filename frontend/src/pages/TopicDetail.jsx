@@ -11,6 +11,7 @@ export default function TopicDetail() {
   const { id } = useParams();
   const [topic, setTopic] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [expandedSubtopics, setExpandedSubtopics] = useState({}); // Tracking expanded subtopics in student view
 
   useEffect(() => {
     api.getTopic(id)
@@ -21,8 +22,6 @@ export default function TopicDetail() {
 
   if (loading) return <div className="loading-screen"><div className="spinner"></div></div>;
   if (!topic) return <div className="empty-state"><h3>Tema no encontrado</h3></div>;
-
-  const [expandedSubtopics, setExpandedSubtopics] = useState({}); // Tracking expanded subtopics in student view
 
   const toggleSubtopic = (id) => {
     setExpandedSubtopics(prev => ({
