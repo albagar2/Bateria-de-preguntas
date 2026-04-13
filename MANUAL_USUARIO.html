@@ -3,86 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manual de Usuario - Batería de Preguntas</title>
+    <title>Manual de Usuario | BateriaQ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #a855f7;
             --bg: #0f172a;
-            --card: #1e293b;
+            --card-bg: #1e293b;
             --text: #f8fafc;
-            --text-dim: #94a3b8;
+            --text-muted: #94a3b8;
+            --accent: #22d3ee;
+            --border: rgba(148, 163, 184, 0.1);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
         }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Outfit', sans-serif;
             background-color: var(--bg);
             color: var(--text);
             line-height: 1.6;
-            margin: 0;
-            padding: 2rem;
+            padding: 20px;
+        }
+
+        .container {
             max-width: 900px;
-            margin: auto;
+            margin: 40px auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
         }
-        h1, h2, h3 { color: var(--primary); }
-        .card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid rgba(255,255,255,0.1);
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
         }
-        code {
-            background: #000;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: monospace;
+
+        .logo {
+            font-size: 42px;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            display: inline-block;
         }
-        .badge {
-            background: var(--primary);
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: var(--primary);
+            margin: 40px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 18px;
+            color: var(--accent);
+            margin: 25px 0 15px;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: var(--text-muted);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .feature-icon {
+            font-size: 30px;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .tip {
+            background: rgba(34, 211, 238, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 30px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            font-size: 14px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            padding-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--gradient);
             color: white;
-            padding: 0.2rem 0.6rem;
-            border-radius: 99px;
-            font-size: 0.8rem;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: opacity 0.3s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
 <body>
-    <h1>Manual de Usuario - Batería de Preguntas 📚</h1>
-    <p>Guía oficial para el ecosistema educativo inteligente v2.0</p>
+    <div class="container slide-up">
+        <header>
+            <div class="logo">BateriaQ</div>
+            <h1>Manual del Estudiante Élite</h1>
+            <p>Domina tu oposición con las herramientas más potentes del mercado.</p>
+        </header>
 
-    <div class="card">
-        <h2>1. Primeros Pasos 🚀</h2>
-        <ul>
-            <li><strong>Registro:</strong> Crea tu perfil de estudiante con un clic.</li>
-            <li><strong>Oposiciones Personalizadas ✨:</strong> Crea tus propias categorías si no existen. Puedes elegir iconos (🚓, 🚒, ⚖️) para personalizarlas.</li>
-        </ul>
+        <section id="inicio">
+            <h2>🚀 Empezando tu Camino</h2>
+            <p>Bienvenido a BateriaQ. Nuestra plataforma no es solo un banco de preguntas, es tu cuartel general de estudio. Para empezar, asegúrate de configurar tu oposición en el perfil de usuario.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <h3>Perfil Personalizado</h3>
+                    <p>Gestiona tus oposiciones activas y visualiza tu ritmo de aciertos global.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌓</div>
+                    <h3>Interfaz Adaptativa</h3>
+                    <p>Cambia entre modo claro y oscuro para proteger tu vista durante noches intensas de estudio.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="estudio">
+            <h2>🧠 Métodos de Entrenamiento</h2>
+            <h3>Modo Clásico (Tests)</h3>
+            <p>Simulacros de examen configurables por temas o subtemas. Evalúa tu conocimiento real con el tiempo de respuesta controlado.</p>
+
+            <h3>Modo Sin Fallos (Infinito)</h3>
+            <p>La herramienta definitiva para memorizar. El sistema te lanzará preguntas hasta que cometas un error. Ideal para repasar conceptos clave.</p>
+
+            <div class="tip">
+                <strong>Consejo Escuadrón:</strong> Usa el Modo Sin Fallos al final del día para consolidar lo aprendido sin la presión del reloj del examen.
+            </div>
+        </section>
+
+        <section id="IA">
+            <h2>🤖 Inteligencia Artificial</h2>
+            <p>BateriaQ integra un microservicio de IA diseñado para resolver tus dudas legales y estratégicas.</p>
+            <ul>
+                <li><strong>Explicaciones Instantáneas</strong>: Si no entiendes por qué una respuesta es correcta, la IA te explicará la base legal.</li>
+                <li><strong>Consejero Estratégico</strong>: En tu planificador, solicita una estrategia personalizada. La IA analizará tus fechas y temas pendientes.</li>
+            </ul>
+        </section>
+
+        <section id="planificacion">
+            <h2>📅 Planificador Inteligente</h2>
+            <p>Nuestra nueva vista de <strong>Calendario Estratégico</strong> te permite visualizar tu carga de trabajo a dos semanas vista.</p>
+            <ul>
+                <li><strong>Generación Automática</strong>: Introduce tu fecha de examen y deja que el sistema distribuya los temas por ti.</li>
+                <li><strong>Gestión Directa</strong>: Marca tus tareas como completadas haciendo clic directamente en el calendario.</li>
+                <li><strong>Sincronización</strong>: Lo que hagas en el planificador se reflejará instantáneamente en tu Dashboard principal.</li>
+            </ul>
+        </section>
+
+        <section id="soporte">
+            <h2>🛠️ Soporte y Derechos</h2>
+            <p>Si encuentras cualquier incidencia técnica, nuestro equipo de soporte está disponible a través de la sección de contacto. Recuerda que todos los contenidos y algoritmos de esta web están protegidos por derechos de autor.</p>
+        </section>
+
+        <div class="footer">
+            <p>&copy; 2026 BateriaQ Study Platform. Todos los derechos reservados.</p>
+            <p>Creado para opositores que no se rinden.</p>
+        </div>
     </div>
-
-    <div class="card">
-        <h2>2. Entrenamiento y Test 🧪</h2>
-        <ul>
-            <li><strong>Modo Sin Fallos:</strong> El reto definitivo. Un solo error y vuelves al inicio.</li>
-            <li><strong>Explicaciones IA 🤖:</strong> Si fallas, nuestro tutor Gemini te explicará el fundamento jurídico de la respuesta.</li>
-            <li><strong>Repaso Inteligente:</strong> El sistema prioriza las preguntas que más te cuestan.</li>
-        </ul>
-    </div>
-
-    <div class="card">
-        <h2>3. Panel de Administración 🛡️</h2>
-        <ul>
-            <li><strong>Carga Masiva Inteligente:</strong> Pega bloques de preguntas. El sistema detecta automáticamente enunciados y respuestas por texto completo.</li>
-            <li><strong>Subtemas Desplegables 🔽:</strong> Nueva interfaz organizada que permite colapsar secciones para una gestión más limpia.</li>
-            <li><strong>Buscador Global 🔍:</strong> Encuentra cualquier pregunta en segundos desde el nuevo listado global con buscador integrado.</li>
-            <li><strong>Protección contra Duplicados:</strong> El servidor bloquea automáticamente cualquier intento de subir contenido que ya existe en el tema.</li>
-        </ul>
-    </div>
-
-    <div class="card">
-        <h2>4. Experiencia de Usuario 💎</h2>
-        <p>Disfruta de una interfaz <strong>Dark-First</strong> con <strong>Glassmorphism</strong>, diseñada para largas sesiones de estudio sin fatiga visual.</p>
-    </div>
-
-    <footer style="text-align: center; color: var(--text-dim); margin-top: 3rem;">
-        © 2026 ALBA-OS EDUCATIONAL DIVISION
-    </footer>
 </body>
 </html>

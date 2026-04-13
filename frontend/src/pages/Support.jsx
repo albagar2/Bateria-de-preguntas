@@ -1,68 +1,64 @@
 // ============================================
 // Support Page
 // ============================================
-import { Link } from 'react-router-dom';
-import './Topics.css'; // Reusing some base styles
+import './Topics.css'; 
 
 export default function Support() {
   return (
     <div className="container animate-slide-up">
       <div className="page-header">
-        <h1 className="page-title">📞 Soporte Técnico</h1>
-        <p className="page-subtitle">¿Tienes alguna duda o problema? Estamos aquí para ayudarte.</p>
+        <h1 className="page-title">📞 Centro de Soporte</h1>
+        <p className="page-subtitle">Documentación técnica, guías de estudio y contacto directo.</p>
       </div>
 
       <div className="grid grid-2" style={{ gap: 'var(--space-xl)', marginTop: 'var(--space-2xl)' }}>
-        <div className="card">
-          <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-md)' }}>📧</div>
-          <h2 className="section-title">Contacto Directo</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)' }}>
-            Para cualquier consulta, puedes contactar con Alba García López:
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-            <a href="mailto:albagarcialopez39@gmail.com" className="btn btn-primary" style={{ textDecoration: 'none', textAlign: 'center' }}>
-              ✉️ albagarcialopez39@gmail.com
-            </a>
-            <a href="tel:+34606990974" className="btn btn-ghost" style={{ textDecoration: 'none', border: '1px solid var(--border-color)', textAlign: 'center' }}>
-              📞 +34 606 990 974
-            </a>
+        {/* Student Manual */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-md)' }}>🎓</div>
+            <h2 className="section-title">Guía del Estudiante</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)' }}>
+              Manual completo para opositores. Aprende a usar el planificador IA y el modo sin fallos.
+            </p>
           </div>
+          <a href="/MANUAL_USUARIO.html" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ textDecoration: 'none', textAlign: 'center' }}>
+            Abrir Guía Online
+          </a>
         </div>
 
-        <div className="card">
-          <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-md)' }}>❓</div>
-          <h2 className="section-title">Centro de Ayuda</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)' }}>
-            Consulta nuestras guías de usuario para resolver dudas rápidas sobre el funcionamiento de la app.
-          </p>
-          <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
-            <Link to="/manual" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
-              Manual Estudiante
-            </Link>
+        {/* Enterprise Manual */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-md)' }}>🏢</div>
+            <h2 className="section-title">Dossier Empresa</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)' }}>
+              Especificaciones técnicas, arquitectura serverless y potencial de escalabilidad B2B.
+            </p>
           </div>
+          <a href="/MANUAL_EMPRESA.html" target="_blank" rel="noopener noreferrer" className="btn btn-ghost" style={{ textDecoration: 'none', border: '1px solid var(--border-color)', textAlign: 'center' }}>
+            Ver Technical Specs
+          </a>
         </div>
       </div>
 
-      <div className="card" style={{ marginTop: 'var(--space-xl)' }}>
-        <h2 className="section-title">Preguntas Frecuentes</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)', marginTop: 'var(--space-lg)' }}>
-          <div>
-            <h4 style={{ color: 'var(--primary-400)', marginBottom: 'var(--space-xs)' }}>¿Cómo puedo cambiar mi oposición?</h4>
-            <p style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>
-              Puedes hacerlo en cualquier momento desde tu **Perfil**. Selecciona la nueva oposición y guarda los cambios.
-            </p>
-          </div>
-          <div>
-            <h4 style={{ color: 'var(--primary-400)', marginBottom: 'var(--space-xs)' }}>¿Mis temas creados son privados?</h4>
-            <p style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>
-              Sí, los temas y preguntas que creas manualmente son visibles para ti. Los administradores pueden supervisar el contenido para asegurar la calidad global.
-            </p>
-          </div>
+      {/* Contact Section */}
+      <div className="card" style={{ marginTop: 'var(--space-xl)', textAlign: 'center' }}>
+        <h2 className="section-title">¿Aún tienes dudas?</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)' }}>
+          Contacta directamente con nuestro equipo de desarrollo y soporte.
+        </p>
+        <div style={{ display: 'flex', gap: 'var(--space-md)', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <a href="mailto:albagarcialopez39@gmail.com" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
+            ✉️ Email Soporte
+          </a>
+          <a href="tel:+34606990974" className="btn btn-ghost" style={{ textDecoration: 'none', border: '1px solid var(--border-color)' }}>
+            📞 Llamar ahora
+          </a>
         </div>
       </div>
 
       <div style={{ textAlign: 'center', marginTop: 'var(--space-2xl)', color: 'var(--text-muted)', fontSize: 'var(--font-xs)' }}>
-        &copy; {new Date().getFullYear()} Alba García López. Todos los derechos reservados.
+        &copy; {new Date().getFullYear()} **BateriaQ Study Platform**. Todos los derechos reservados sobre el software, diseño y algoritmos.
       </div>
     </div>
   );

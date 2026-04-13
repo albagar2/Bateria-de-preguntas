@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especificaciones Corporativas | BateriaQ For Business</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-primary: #4f46e5;
+            --brand-secondary: #0ea5e9;
+            --dark-deep: #020617;
+            --dark-surface: #0f172a;
+            --gold: #f59e0b;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(148, 163, 184, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-deep);
+            color: var(--text-main);
+            line-height: 1.7;
+        }
+
+        .hero {
+            background: linear-gradient(rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.8)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            padding: 100px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, var(--brand-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--gold);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .content {
+            max-width: 1000px;
+            margin: -50px auto 100px;
+            background: var(--dark-surface);
+            padding: 60px;
+            border-radius: 32px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+        }
+
+        section {
+            margin-bottom: 80px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--brand-secondary);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--glass);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .card h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .stat {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--brand-primary);
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 18px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: rgba(255,255,255,0.05);
+            color: var(--brand-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <span class="badge">Enterprise Solution</span>
+        <h1>BateriaQ Evolution</h1>
+        <p>Documentación de Sistema, Arquitectura y Escalabilidad de Negocio</p>
+    </div>
+
+    <div class="content">
+        <section>
+            <h2>📊 Visión Ejecutiva</h2>
+            <p>BateriaQ representa la convergencia entre la educación tradicional de oposiciones y las tecnologías de vanguardia en IA. Nuestra infraestructura está diseñada para soportar grandes volúmenes de usuarios manteniendo tiempos de respuesta inferiores a 200ms.</p>
+            
+            <div class="tech-grid">
+                <div class="card">
+                    <div class="stat">99.9%</div>
+                    <h3>Uptime Garantizado</h3>
+                    <p>Infraestructura serverless distribuida geográficamente en Vercel Edge Network.</p>
+                </div>
+                <div class="card">
+                    <div class="stat">IA Gen</div>
+                    <h3>Tutoría Automática</h3>
+                    <p>Reducción del 80% en costes de soporte mediante el motor de respuesta legal autónomo.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>🛡️ Arquitectura y Seguridad</h2>
+            <p>Cumplimos con estándares modernos de protección de datos y robustez técnica:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Capa</th>
+                        <th>Tecnología</th>
+                        <th>Propósito</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Data Layer</td>
+                        <td>PostgreSQL (Supabase)</td>
+                        <td>Persistencia de datos con encriptación en reposo y tránsito.</td>
+                    </tr>
+                    <tr>
+                        <td>API Gateway</td>
+                        <td>Node.js / Express</td>
+                        <td>Control de flujo, Rate Limiting y sanitización de entradas XSS/NoSQL.</td>
+                    </tr>
+                    <tr>
+                        <td>Auth</td>
+                        <td>JWT (RS256)</td>
+                        <td>Gestión de sesiones segura mediante tokens de acceso y refresco.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>⚙️ Motor de Planificación Estratégica</h2>
+            <p>El núcleo de BateriaQ es su algoritmo de distribución de carga de estudio. A diferencia de las agendas lineales, nuestro sistema calcula el "Peso de Tema" basándose en:</p>
+            <ul>
+                <li><strong>Curva de Olvido</strong>: Prioriza temas no repasados en ciclos de 7 días.</li>
+                <li><strong>Heatmap de Aciertos</strong>: Detecta debilidades del usuario para intensificar el estudio en áreas críticas.</li>
+                <li><strong>Deadline Awareness</strong>: Ajusta la densidad de contenidos según la cercanía de la fecha de examen.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>🚀 Escalabilidad de Contenidos (CMS)</h2>
+            <p>La plataforma permite a la empresa gestora escalar sin límites:</p>
+            <ul>
+                <li><strong>Bulk Import</strong>: Carga masiva de preguntas vía parser inteligente.</li>
+                <li><strong>Jerarquía Dinámica</strong>: Categorización de Oposiciones > Temas > Subtemas con un solo clic.</li>
+                <li><strong>Analytics Administrativos</strong>: Visibilidad total sobre los temas más difíciles para los alumnos.</li>
+            </ul>
+        </section>
+
+        <div class="footer">
+            <p>Confidencial - Documento para uso corporativo de BateriaQ Ecosystem.</p>
+            <p>&copy; 2026 Reservados todos los derechos de propiedad intelectual, algoritmos y diseño.</p>
+        </div>
+    </div>
+</body>
+</html>

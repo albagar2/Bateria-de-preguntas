@@ -1,101 +1,80 @@
-<div align="center">
+# 🎯 BateriaQ — Plataforma de Oposiciones de Élite
 
-![Batería de Preguntas Banner](media/banner.png)
+![BateriaQ Banner](https://img.shields.io/badge/AESTHETICS-PREMIUM-indigo?style=for-the-badge)
+![Status](https://img.shields.io/badge/STATUS-PRODUCTION--READY-brightgreen?style=for-the-badge)
+![Tech Stack](https://img.shields.io/badge/STACK-FULLSTACK-blue?style=for-the-badge)
 
-# 🎯 BATERÍA DE PREGUNTAS
-### `INTEL_EDUCATIONAL_ECOSYSTEM_v2.0`
-
-[![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg?style=for-the-badge&logo=node.js)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-18-blue.svg?style=for-the-badge&logo=react)](https://reactjs.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg?style=for-the-badge&logo=postgresql)](https://postgresql.org/)
-[![AI-Tutor](https://img.shields.io/badge/AI--Tutor-Gemini%20Pro-blueviolet.svg?style=for-the-badge&logo=google-gemini)](#-arquitectura-ia)
-
-**BateriaQ** is a mission-critical adaptive learning platform. It combines a distributed microservices architecture with an AI core to deliver a high-performance study experience.
-
-</div>
+**BateriaQ** es un ecosistema de estudio revolucionario diseñado para opositores que buscan maximizar su rendimiento. Utiliza algoritmos de planificación inteligente e Inteligencia Artificial para transformar el tedioso estudio de leyes en un proceso dinámico y visual.
 
 ---
 
-### 📖 DOCUMENTACIÓN ESTRATÉGICA
+## 🚀 Características Destacadas
 
-> [!IMPORTANT]
-> Hemos preparado guías detalladas para maximizar tu rendimiento:
+### 📅 Planificador Estratégico IA
+Un calendario visual basado en una cuadrícula semanal que organiza automáticamente tus temas en base a la fecha de tu examen.
+*   **IA Tutor**: Consejos tácticos personalizados para abordar tu semana de estudio.
+*   **Gestión One-Touch**: Marca y desmarca tareas directamente en el calendario o Dashboard.
 
-- **[🎓 Manual del Estudiante](docs/MANUAL_ESTUDIANTE.md)**: Domina el ritmo de estudio y el Tutor IA.
-- **[🛠 Manual del Administrador](docs/MANUAL_ADMIN.md)**: Gestión de activos, usuarios y telemetría de contenido.
+### 🧪 Entrenamiento de Alto Rendimiento
+*   **Modo Sin Fallos**: Un reto infinito donde una sola respuesta incorrecta termina la racha. Ideal para perfeccionar la precisión.
+*   **Tests Personalizados**: Filtra por temas, subtemas y dificultad.
 
----
-
-### 🏗️ ARQUITECTURA DEL ECOSISTEMA
-
-```mermaid
-graph TD
-    User((Usuario)) --> FE[Frontend React HUD]
-    FE --> GW[API Gateway / Backend]
-    GW --> DB[(PostgreSQL Cluster)]
-    GW --> AI_S[AI Microservice]
-    AI_S --> Gemini[Google Gemini AI]
-    AI_S --> Cache[(SQLite Intelligent Cache)]
-```
-
-#### 📡 Capas del Sistema:
-1.  **API Gateway**: Motor logístico con **Clean Architecture**. Gestión de JWT y persistencia.
-2.  **AI Microservice**: Capa aislada con **Model Fallback** (Gemini Pro/Flash) y persistencia en caché SQLite.
-3.  **Frontend HUD**: Interfaz "Dark-First" con **Glassmorphism 4.0** y diseño resiliente.
+### 🤖 Soporte Legal con IA
+¿Dudas con un artículo? Nuestra IA integrada explica cada pregunta basándose en la normativa vigente, ahorrándote horas de búsqueda en el BOE.
 
 ---
 
-### 🔥 CARACTERÍSTICAS DE ÉLITE
+## 🛠️ Stack Tecnológico
 
-#### 🤖 Inteligencia Contextual
-- **Tutor Personal 24/7**: Chat cognitivo integrado para resolución de dudas en tiempo real.
-- **Explicaciones Estratégicas**: Mnemotecnias generadas por IA basadas en patrones de error.
-
-#### 📚 Metodologías de Alto Rendimiento
-- **Algoritmo SM-2**: Repetición espaciada para memoria profunda.
-- **Modo Sin Fallos**: Bloqueo de progresión por maestría de bloque.
-
-#### ⚡ Gestión Pro (Administración)
-- **Carga Masiva State-of-the-art**: Motor de procesamiento por Regex que acepta texto bruto y mapea respuestas automáticamente por coincidencia de texto.
-- **Auditoría Global**: Buscador instantáneo de preguntas en toda la base de datos con visualización por temas.
-- **Jerarquía Dinámica**: Organización de contenidos mediante subtemas colapsables con auto-expansión inteligente.
-- **Filtro de Duplicados**: Sistema de limpieza en tiempo real que previene la redundancia de contenido.
+| Capa | Tecnologías |
+| :--- | :--- |
+| **Frontend** | React (Vite), CSS3 Premium, Context API |
+| **Backend** | Node.js, Express, Prisma ORM |
+| **BBDD** | PostgreSQL (Supabase) |
+| **IA** | Microservicio dedicado con LLM |
+| **Despliegue** | Vercel (Frontend/Backend) & Supabase |
 
 ---
 
-### 🚀 DESPLIEGUE RÁPIDO (DOCKER_ENGINE)
+## 📦 Instalación y Despliegue
 
-Inicia el ecosistema completo en segundos:
+### Requisitos Previos
+- Node.js (v18+)
+- Cuenta en Supabase y Vercel
 
-```bash
-# 1. Configurar Entorno
-cp .env.example .env
+### Paso a paso
+1. **Clonar y descargar dependencias**:
+   ```bash
+   git clone https://github.com/albagar2/Bateria-de-preguntas
+   cd bateria-preguntas
+   npm install
+   ```
 
-# 2. Ignición de Infraestructura
-docker-compose up -d --build
+2. **Configurar Base de Datos**:
+   - Crea un proyecto en Supabase.
+   - Ejecuta el script `supabase_schema.sql` en el SQL Editor.
 
-# 3. Protocolo de Datos (Seed)
-docker exec bateria-backend npx prisma migrate deploy
-docker exec bateria-backend node prisma/seed.js
-```
+3. **Variables de Entorno (.env)**:
+   ```env
+   DATABASE_URL="tu-url-de-supabase"
+   JWT_SECRET="tu-clave-secreta"
+   AI_SERVICE_URL="tu-url-de-ia"
+   ```
 
-> **Access URL**: `http://localhost`  
-> **Admin Credentials**: `admin@bateriapreguntas.com` / `Admin@2024!`
+4. **Lanzar en local**:
+   ```bash
+   # En terminales separadas
+   npm run dev:backend
+   npm run dev:frontend
+   ```
 
 ---
 
-### 👤 MATRIZ DE ACCESO
+## 📜 Derechos y Propiedad Intelectual
 
-| Rol | Credenciales | Privilegios |
-| :--- | :--- | :--- |
-| **Administrador** | `admin@bateriapreguntas.com` | Control Total CMS / Salud del Sistema |
-| **Estudiante** | `demo@bateriapreguntas.com` | Estudiar / Crear Propias Oposiciones, Temas y Preguntas |
+© 2026 **BateriaQ Study Platform**. Todos los derechos reservados.
+Queda prohibida la reproducción total o parcial del código, diseño o algoritmos de planificación sin autorización expresa del autor.
 
 ---
 
-<div align="center">
-
-© 2026 **ALBA-OS EDUCATIONAL DIVISION**
-*Desarrollado para opositores que buscan la excelencia absoluta.*
-
-</div>
+*Desarrollado con ❤️ para opositores imparables.*
