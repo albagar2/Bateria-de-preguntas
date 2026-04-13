@@ -103,7 +103,17 @@ class ApiService {
   }
   getTopic(id) { return this.request('GET', `/topics/${id}`); }
   createTopic(data) { return this.request('POST', '/topics', data); }
+  updateAdminTopic(id, data) { return this.request('PUT', `/topics/${id}`, data); }
+  deleteAdminTopic(id) { return this.request('DELETE', `/topics/${id}`); }
+  
+  // ─── Subtopics ───────────────────────
+  getSubtopics(topicId) { return this.request('GET', `/topics/${topicId}/subtopics`); }
+  createSubtopic(data) { return this.request('POST', '/subtopics', data); }
+  updateSubtopic(id, data) { return this.request('PUT', `/subtopics/${id}`, data); }
+  deleteSubtopic(id) { return this.request('DELETE', `/subtopics/${id}`); }
+
   createQuestion(data) { return this.request('POST', '/questions', data); }
+  bulkCreateQuestions(data) { return this.request('POST', '/questions/bulk', data); }
 
   // ─── Questions ───────────────────────
   getQuestions(params = {}) {

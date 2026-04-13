@@ -24,6 +24,12 @@ export default function AdminPanel() {
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [isTopicEditMode, setIsTopicEditMode] = useState(false);
   const [isQuestionEditMode, setIsQuestionEditMode] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [subtopics, setSubtopics] = useState([]);
+  const [isSubtopicModalOpen, setIsSubtopicModalOpen] = useState(false);
+  const [editingSubtopic, setEditingSubtopic] = useState(null);
+  const [bulkText, setBulkText] = useState('');
+  const [bulkSubtopicId, setBulkSubtopicId] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -79,8 +85,12 @@ export default function AdminPanel() {
     setSelectedTopic(topic);
     setLoading(true);
     try {
-      const res = await api.getQuestions({ topicId: topic.id });
-      setTopicQuestions(res.data.questions);
+      const [questionsRes, subtopicsRes] = await Promise.all([
+        api.getQuestions({ topicId: topic.id }),
+        api.getSubtopics(topic.id)
+      ]);
+      setTopicQuestions(questionsRes.data.questions);
+      setSubtopics(subtopicsRes.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -168,7 +178,7 @@ export default function AdminPanel() {
     try {
       if (isQuestionEditMode) {
         // Editar: extraer el ID y campos no editables
-        const { id, topic, createdAt, updatedAt, isActive, ...data } = editingQuestion;
+        const { id, topic, subtopic, createdAt, updatedAt, isActive, ...data } = editingQuestion;
         await api.updateAdminQuestion(id, data);
         setTopicQuestions(topicQuestions.map(q => q.id === id ? { ...q, ...data } : q));
       } else {
@@ -180,6 +190,85 @@ export default function AdminPanel() {
       swal.success('Éxito', `Pregunta ${isQuestionEditMode ? 'actualizada' : 'creada'} correctamente`);
     } catch (err) {
       swal.error('Error', err.message || 'Error al procesar la pregunta');
+    }
+  };
+
+  // --- Subtopic CRUD ---
+  const handleCreateSubtopic = () => {
+    setEditingSubtopic({ title: '', order: 0, topicId: selectedTopic.id });
+    setIsSubtopicModalOpen(true);
+  };
+
+  const handleEditSubtopic = (sub) => {
+    setEditingSubtopic({ ...sub });
+    setIsSubtopicModalOpen(true);
+  };
+
+  const handleSaveSubtopic = async () => {
+    try {
+      if (editingSubtopic.id) {
+        await api.updateSubtopic(editingSubtopic.id, editingSubtopic);
+        setSubtopics(subtopics.map(s => s.id === editingSubtopic.id ? editingSubtopic : s));
+      } else {
+        const res = await api.createSubtopic(editingSubtopic);
+        setSubtopics([...subtopics, res.data]);
+      }
+      setIsSubtopicModalOpen(false);
+      swal.success('Éxito', 'Subtema guardado');
+    } catch (err) {
+      swal.error('Error', err.message);
+    }
+  };
+
+  const handleDeleteSubtopic = async (id) => {
+    const result = await swal.confirm('¿Eliminar subtema?', 'Las preguntas dejarán de estar agrupadas (pero no se borrarán)');
+    if (!result.isConfirmed) return;
+    try {
+      await api.deleteSubtopic(id);
+      setSubtopics(subtopics.filter(s => s.id !== id));
+      swal.success('Éxito', 'Subtema eliminado');
+    } catch (err) {
+      swal.error('Error', err.message);
+    }
+  };
+
+  const handleBulkImport = async () => {
+    if (!bulkText.trim()) return;
+    
+    try {
+      // Parser básico de texto a JSON
+      const blocks = bulkText.split('---').filter(b => b.trim());
+      const parsedQuestions = blocks.map(block => {
+        const lines = block.trim().split('\n');
+        const questionText = lines.find(l => l.startsWith('P:'))?.replace('P:', '').trim();
+        const options = lines.filter(l => /^[a-d]\)/.test(l.trim())).map(l => l.replace(/^[a-d]\)/, '').trim());
+        const correctLetter = lines.find(l => l.startsWith('R:'))?.replace('R:', '').trim().toLowerCase();
+        const correctIndex = ['a', 'b', 'c', 'd'].indexOf(correctLetter);
+        
+        if (!questionText || options.length < 2 || correctIndex === -1) return null;
+        
+        return {
+          topicId: selectedTopic.id,
+          subtopicId: bulkSubtopicId || null,
+          questionText,
+          options,
+          correctIndex,
+          difficulty: 'MEDIUM'
+        };
+      }).filter(Boolean);
+
+      if (parsedQuestions.length === 0) {
+        throw new Error('No se detectaron preguntas válidas. Revisa el formato.');
+      }
+
+      await api.bulkCreateQuestions(parsedQuestions);
+      setIsBulkModalOpen(false);
+      setBulkText('');
+      setBulkSubtopicId('');
+      swal.success('Importación Completa', `${parsedQuestions.length} preguntas añadidas con éxito.`);
+      viewQuestions(selectedTopic); // Refresh list
+    } catch (err) {
+      swal.error('Error de Importación', err.message);
     }
   };
 
@@ -202,24 +291,64 @@ export default function AdminPanel() {
       {/* Selected Topic Detail (Questions View) */}
       {activeTab === 'topics' && selectedTopic && (
         <Card title={`Preguntas: ${selectedTopic.title}`}>
-          <div style={{ marginBottom: 'var(--space-lg)', display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ marginBottom: 'var(--space-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-md)' }}>
             <Button size="sm" variant="ghost" onClick={() => setSelectedTopic(null)}>← Volver a Temas</Button>
-            <Button size="sm" onClick={handleCreateQuestion}>+ Nueva Pregunta</Button>
+            <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
+              <Button size="sm" variant="secondary" onClick={() => setIsBulkModalOpen(true)}>📤 Carga Masiva</Button>
+              <Button size="sm" onClick={handleCreateQuestion}>+ Nueva Pregunta</Button>
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-            {topicQuestions.map(q => (
-              <div key={q.id} className="card" style={{ padding: 'var(--space-md)', background: 'rgba(255,255,255,0.03)' }}>
-                <p style={{ fontWeight: 600, marginBottom: 'var(--space-sm)' }}>{q.questionText}</p>
-                <div style={{ display: 'flex', gap: 'var(--space-sm)', fontSize: 'var(--font-xs)', color: 'var(--text-secondary)' }}>
-                   <span className="badge badge-secondary">{q.difficulty}</span>
-                   <span>{q.options.length} opciones</span>
+
+          {/* Subtopics Section */}
+          <div className="card" style={{ marginBottom: 'var(--space-xl)', background: 'rgba(255,255,255,0.02)', padding: 'var(--space-md)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-sm)' }}>
+              <h4 style={{ margin: 0 }}>📂 Subtemas</h4>
+              <Button size="xs" variant="ghost" onClick={handleCreateSubtopic}>+ Añadir Subtema</Button>
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--space-sm)', flexWrap: 'wrap' }}>
+              {subtopics.map(sub => (
+                <div key={sub.id} className="badge badge-secondary" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)', padding: 'var(--space-xs) var(--space-sm)' }}>
+                  <span>{sub.title}</span>
+                  <button onClick={() => handleEditSubtopic(sub)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: '10px' }}>✏️</button>
+                  <button onClick={() => handleDeleteSubtopic(sub.id)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: '10px' }}>🗑️</button>
                 </div>
-                <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)' }}>
-                  <Button size="sm" variant="secondary" onClick={() => handleEditQuestion(q)}>Editar</Button>
-                  <Button size="sm" variant="danger" onClick={() => handleDeleteQuestion(q.id)}>Eliminar</Button>
+              ))}
+              {subtopics.length === 0 && <p style={{ fontSize: 'var(--font-xs)', color: 'var(--text-muted)' }}>No hay subtemas creados para este tema.</p>}
+            </div>
+          </div>
+
+          {/* Questions Grouped by Subtopic */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xl)' }}>
+            {[null, ...subtopics].map(container => {
+              const containerId = container?.id || null;
+              const filteredQuestions = topicQuestions.filter(q => q.subtopicId === containerId);
+              
+              if (containerId && filteredQuestions.length === 0) return null; // Ocultar subtemas vacíos
+              if (!containerId && filteredQuestions.length === 0 && subtopics.length > 0) return null; // Ocultar bloque "general" si está vacío y hay subtemas
+
+              return (
+                <div key={containerId || 'no-subtopic'}>
+                  <h5 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: 'var(--space-xs)', marginBottom: 'var(--space-md)', color: containerId ? 'var(--primary-400)' : 'var(--text-muted)' }}>
+                    {container ? `🔹 ${container.title}` : '🔸 Sin Subtema Asignado'}
+                  </h5>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+                    {filteredQuestions.map(q => (
+                      <div key={q.id} className="card" style={{ padding: 'var(--space-md)', background: 'rgba(255,255,255,0.03)' }}>
+                        <p style={{ fontWeight: 600, marginBottom: 'var(--space-sm)' }}>{q.questionText}</p>
+                        <div style={{ display: 'flex', gap: 'var(--space-sm)', fontSize: 'var(--font-xs)', color: 'var(--text-secondary)' }}>
+                           <span className="badge badge-secondary">{q.difficulty}</span>
+                           <span>{q.options.length} opciones</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)' }}>
+                          <Button size="sm" variant="secondary" onClick={() => handleEditQuestion(q)}>Editar</Button>
+                          <Button size="sm" variant="danger" onClick={() => handleDeleteQuestion(q.id)}>Eliminar</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {topicQuestions.length === 0 && <p style={{ textAlign: 'center', padding: 'var(--space-xl)', color: 'var(--text-muted)' }}>Este tema no tiene preguntas todavía.</p>}
           </div>
         </Card>
@@ -412,6 +541,42 @@ export default function AdminPanel() {
         )}
       </Modal>
 
+      {/* Edit Subtopic Modal */}
+      <Modal 
+        isOpen={isSubtopicModalOpen} 
+        onClose={() => setIsSubtopicModalOpen(false)} 
+        title={editingSubtopic?.id ? "Editar Subtema" : "Nuevo Subtema"}
+        footer={(
+          <>
+            <Button variant="ghost" onClick={() => setIsSubtopicModalOpen(false)}>Cancelar</Button>
+            <Button variant="primary" onClick={handleSaveSubtopic}>Guardar</Button>
+          </>
+        )}
+      >
+        {editingSubtopic && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div className="input-group">
+              <label className="input-label">Título del Subtema</label>
+              <input 
+                className="input" 
+                placeholder="Ej: Sección 1: Introducción"
+                value={editingSubtopic.title} 
+                onChange={(e) => setEditingSubtopic({...editingSubtopic, title: e.target.value})}
+              />
+            </div>
+            <div className="input-group">
+              <label className="input-label">Orden (opcional)</label>
+              <input 
+                type="number"
+                className="input" 
+                value={editingSubtopic.order} 
+                onChange={(e) => setEditingSubtopic({...editingSubtopic, order: parseInt(e.target.value)})}
+              />
+            </div>
+          </div>
+        )}
+      </Modal>
+
       {/* Edit Question Modal */}
       <Modal 
         isOpen={isQuestionModalOpen} 
@@ -434,6 +599,20 @@ export default function AdminPanel() {
                 value={editingQuestion.questionText} 
                 onChange={(e) => setEditingQuestion({...editingQuestion, questionText: e.target.value})}
               />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Asignar a Subtema</label>
+              <select 
+                className="input"
+                value={editingQuestion.subtopicId || ''}
+                onChange={(e) => setEditingQuestion({...editingQuestion, subtopicId: e.target.value || null})}
+              >
+                <option value="">Ninguno (General)</option>
+                {subtopics.map(sub => (
+                  <option key={sub.id} value={sub.id}>{sub.title}</option>
+                ))}
+              </select>
             </div>
             
             <div className="input-group">
@@ -484,6 +663,56 @@ export default function AdminPanel() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Bulk Import Modal */}
+      <Modal 
+        isOpen={isBulkModalOpen} 
+        onClose={() => setIsBulkModalOpen(false)} 
+        title="Carga Masiva de Preguntas"
+        footer={(
+          <>
+            <Button variant="ghost" onClick={() => setIsBulkModalOpen(false)}>Cerrar</Button>
+            <Button variant="primary" onClick={handleBulkImport}>Importar Todo</Button>
+          </>
+        )}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <p style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>
+            Pega tus preguntas respetando el formato para que el sistema pueda procesarlas automáticamente.
+          </p>
+          <div className="input-group">
+            <label className="input-label">Asignar todas estas preguntas al Subtema:</label>
+            <select 
+              className="input"
+              value={bulkSubtopicId}
+              onChange={(e) => setBulkSubtopicId(e.target.value)}
+            >
+              <option value="">Ninguno (General)</option>
+              {subtopics.map(sub => (
+                <option key={sub.id} value={sub.id}>{sub.title}</option>
+              ))}
+            </select>
+          </div>
+          <div className="card" style={{ padding: 'var(--space-sm)', background: 'rgba(99, 102, 241, 0.05)', fontSize: 'var(--font-xs)', border: '1px dashed var(--primary-300)' }}>
+            <strong>Ejemplo de formato:</strong><br/>
+            P: ¿Cuál es el órgano legislativo?<br/>
+            a) Gobierno<br/>
+            b) Cortes Generales<br/>
+            c) Jueces<br/>
+            d) Rey<br/>
+            R: b<br/>
+            --- (Separador entre preguntas)
+          </div>
+          <textarea 
+            className="input" 
+            rows="12"
+            placeholder="Pega aquí tu lista de preguntas..."
+            value={bulkText}
+            onChange={(e) => setBulkText(e.target.value)}
+            style={{ fontFamily: 'monospace', fontSize: 'var(--font-sm)' }}
+          />
+        </div>
       </Modal>
     </div>
   );

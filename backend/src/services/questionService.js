@@ -286,6 +286,13 @@ class QuestionService {
     const topic = await prisma.topic.findUnique({ where: { id: data.topicId } });
     if (!topic) throw new AppError('Tema no encontrado', 404);
 
+    if (data.subtopicId) {
+      const subtopic = await prisma.subtopic.findUnique({ where: { id: data.subtopicId } });
+      if (!subtopic || subtopic.topicId !== data.topicId) {
+        throw new AppError('Subtema inválido para este tema', 400);
+      }
+    }
+
     return prisma.question.create({ data });
   }
 
@@ -319,6 +326,35 @@ class QuestionService {
     return prisma.question.update({
       where: { id },
       data: { isActive: false },
+    });
+  }
+
+  /**
+   * Crea múltiples preguntas a la vez (importación masiva).
+   *
+   * @param {Array} questions - Lista de objetos { topicId, questionText, ... }
+   */
+  async bulkCreate(questions) {
+    if (!Array.isArray(questions) || questions.length === 0) {
+      throw new AppError('No se proporcionaron preguntas para importar', 400);
+    }
+
+    // Validamos que todas las preguntas tengan topicId
+    const topicId = questions[0].topicId;
+    const topic = await prisma.topic.findUnique({ where: { id: topicId } });
+    if (!topic) throw new AppError('El tema especificado no existe', 404);
+
+    return prisma.question.createMany({
+      data: questions.map(q => ({
+        questionText: q.questionText,
+        options: q.options,
+        correctIndex: q.correctIndex,
+        explanation: q.explanation || null,
+        difficulty: q.difficulty || 'MEDIUM',
+        topicId: topicId,
+        subtopicId: q.subtopicId && q.subtopicId !== '' ? q.subtopicId : null,
+      })),
+      skipDuplicates: true
     });
   }
 

@@ -1,66 +1,54 @@
 # Manual de Usuario - Batería de Preguntas 📚
 
-¡Bienvenido/a a la plataforma que te ayudará a conseguir tu plaza! Este manual está diseñado para explicarte paso a paso cómo utilizar nuestra aplicación, incluso si no tienes experiencia previa con este tipo de herramientas.
+¡Bienvenido/a a la plataforma definitiva para conseguir tu plaza! Este manual te guiará a través de todas las funcionalidades de la aplicación, desde el estudio diario hasta la gestión avanzada de contenidos.
 
 ---
 
 ## 1. Primeros Pasos 🚀
 
-### Registro y Configuración Inicial
-1. **Crear una cuenta**: En la pantalla de inicio, haz clic en **Registrarse**. Deberás introducir tu nombre, correo electrónico y crear una contraseña segura.
-2. **Elegir tus Oposiciones**: Una vez registrado, podrás seleccionar **una o varias oposiciones** para las que te estás preparando. ¡Incluso si son de categorías distintas! Podrás cambiar cómodamente entre ellas; la plataforma adaptará automáticamente tus temas, progresos y preguntas para la oposición que estés estudiando en ese momento.
+### Registro y Configuración Personalizada
+1. **Crear una cuenta**: Pulsa en **Registrarse** para crear tu perfil de estudiante.
+2. **Selector de Oposiciones**: Puedes inscribirte en una o varias oposiciones oficiales. 
+3. **Oposiciones Personalizadas ✨**: ¿No encuentras tu oposición en la lista? ¡Créala tú mismo! Puedes asignarle un nombre, una categoría y elegir un icono (🚓, 🚒, ⚖️) para que tu escritorio de estudio sea único.
+4. **Temas Propios**: Al crear un tema personalizado, este aparecerá siempre en tu panel, permitiéndote estudiar exactamente lo que necesitas.
 
 ---
 
 ## 2. El Panel de Control (Dashboard) 📊
 
-Al iniciar sesión, siempre entrarás al **Panel de Control**. Este es tu centro de mandos personal. Aquí encontrarás:
-
-- **Tu Racha**: Los días consecutivos que llevas estudiando. ¡Mantén la llama viva para no perder la motivación!
-- **Progreso General**: Un porcentaje que indica cuánto temario dominas actualmente en base a tus respuestas correctas.
-- **Accesos Rápidos**: Botones directos para empezar a hacer tests, revisar el cajón de errores o estudiar por temas.
-- **Plan de Hoy**: Recomendaciones diarias generadas automáticamente por el sistema para optimizar tu estudio.
-- **Progreso por Temas**: Barras de progreso que te muestran visualmente en qué temas vas genial y en cuáles necesitas repasar más.
+Tu centro de mandos ha sido diseñado para maximizar tu productividad:
+- **Racha y Motivación**: Visualiza tus días consecutivos de estudio y desbloquea logros.
+- **Tutoría IA Gratuita**: Nuestro tutor inteligente está disponible para resolver dudas sobre cualquier tema o pregunta específica.
+- **Acceso Directo**: Entra a tus tests o temas con un solo clic desde las tarjetas visuales.
 
 ---
 
-## 3. Realizar Tests 🧪
+## 3. Entrenamiento y Test 🧪
 
-La práctica hace al maestro. Tienes varias formas de ponerte a prueba:
+### Modos de Estudio
+- **Test por Temas**: Focaliza tu estudio en unidades concretas.
+- **Modo Sin Fallos**: Un reto de resistencia; si fallas una pregunta, vuelves al principio del tema.
+- **Repaso Inteligente**: El sistema usa **Repetición Espaciada** para preguntarte más a menudo lo que más te cuesta.
 
-1. **Test Rápido**: Genera un test aleatorio con preguntas de los temas que tienes activos para aprovechar pequeños ratos libres.
-2. **Test por Temas**: Selecciona uno o varios temas concretos que quieras repasar.
-3. **Simulacro de Examen**: Intenta hacer un test bajo condiciones reales (con límite de tiempo y número de preguntas similar al de tu oposición).
-4. **Revisión de Errores**: Un test creado exclusivamente con aquellas preguntas en las que has fallado anteriormente.
-
-> 💡 **Consejo con Inteligencia Artificial**: Al responder una pregunta y fallar, pulsa en "Ver explicación". Nuestro motor interno de IA generará una explicación adaptada a tu nivel (básico, intermedio o avanzado) para que entiendas perfectamente por qué la otra era la opción correcta.
-
----
-
-## 4. Banco de Errores y Repaso Inteligente ❌
-
-¿Has fallado una pregunta? ¡No pasa nada! El sistema la guarda automáticamente en tu **Banco de Errores**. 
-
-- La plataforma utiliza un sistema de **Repetición Espaciada**. Esto significa que es inteligente y te volverá a mostrar las preguntas que más te cuestan con mayor frecuencia, hasta que demuestres que te las has aprendido y las asimiles por completo.
+### Explicaciones con IA 🤖
+Si tienes dudas tras una respuesta, pulsa en **"Explicación IA"**. El sistema analizará la pregunta y te explicará los conceptos jurídicos o técnicos de forma sencilla y adaptada a tu progreso.
 
 ---
 
-## 5. Logros y Motivación 🏆
+## 4. Gestión para Administradores 🛡️
 
-Estudiar puede ser duro, así que hemos incluido un sistema de logros para animarte:
-- Consigue medallas por mejorar tu precisión.
-- Gana trofeos por mantener rachas de estudio largas (¡5, 10 o 30 días seguidos!).
-- Sé el mejor superando la cantidad de preguntas respondidas.
-
----
-
-## 6. Configuración de tu Perfil ⚙️
-
-En la esquina superior derecha puedes acceder a tu perfil. Allí podrás:
-- Editar tus datos personales.
-- Cambiar tu contraseña.
-- Activar el **Modo Oscuro** (Night Mode) si prefieres estudiar de noche o que la pantalla no te canse tanto la vista.
+Si tienes privilegios de administrador, dispones de herramientas avanzadas en el **Centro de Control**:
+- **Carga Masiva de Preguntas**: Olvídate de ir una a una. Puedes pegar un bloque de texto (formato P/R) e importar cientos de preguntas en un solo paso.
+- **Gestión por Oposición**: Filtra y organiza los temas por oposición para mantener la base de datos impecable.
+- **Control de Usuarios**: Gestiona roles y accesos de forma centralizada.
 
 ---
 
-**¡Mucho ánimo con el estudio! Si ingresas a la plataforma 15 minutos al día, estarás mucho más cerca de tu objetivo final.**
+## 5. Experiencia de Usuario 💎
+
+- **Notificaciones Modernas**: Olvídate de las alertas feas del navegador. Ahora el sistema utiliza diálogos elegantes y claros para confirmar tus acciones.
+- **Modo Oscuro**: Actívalo en cualquier momento desde tu perfil para reducir la fatiga visual durante las sesiones nocturnas.
+
+---
+
+**¡Mucho ánimo con el estudio! La constancia es la clave del éxito.**

@@ -74,24 +74,83 @@ export default function TopicDetail() {
           </div>
         </div>
 
+        {topic.subtopics?.length > 0 && (
+          <div className="subtopics-list" style={{ marginBottom: 'var(--space-xl)' }}>
+            <h3 className="section-title" style={{ fontSize: 'var(--font-md)', marginBottom: 'var(--space-md)' }}>📂 Subtemas en este tema</h3>
+            <div style={{ display: 'flex', gap: 'var(--space-sm)', flexWrap: 'wrap' }}>
+              {topic.subtopics.map(sub => (
+                <div key={sub.id} className="badge badge-secondary" style={{ padding: 'var(--space-xs) var(--space-md)' }}>
+                  {sub.title} ({sub._count?.questions || 0})
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <hr style={{ border: '0', borderTop: '1px solid var(--border-color)', margin: 'var(--space-xl) 0' }} />
+
+        <div className="topic-content-preview">
+           <h3 className="section-title" style={{ fontSize: 'var(--font-lg)', marginBottom: 'var(--space-xl)' }}>📖 Contenido del tema</h3>
+           {[null, ...(topic.subtopics || [])].map(container => {
+              const containerId = container?.id || null;
+              const filteredQuestions = (topic.questions || []).filter(q => q.subtopicId === containerId);
+              
+              if (filteredQuestions.length === 0) return null;
+
+              return (
+                <div key={containerId || 'no-subtopic'} style={{ marginBottom: 'var(--space-2xl)' }}>
+                  <h4 style={{ 
+                    borderBottom: '2px solid var(--primary-100)', 
+                    paddingBottom: 'var(--space-xs)', 
+                    marginBottom: 'var(--space-lg)', 
+                    color: containerId ? 'var(--primary-600)' : 'var(--text-muted)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-sm)'
+                  }}>
+                    {container ? `🔹 ${container.title}` : '🔸 Preguntas generales'}
+                    <span style={{ fontSize: 'var(--font-xs)', fontWeight: 'normal', background: 'var(--bg-light)', padding: '2px 8px', borderRadius: '10px' }}>
+                      {filteredQuestions.length}
+                    </span>
+                  </h4>
+                  <div className="questions-grid" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+                    {filteredQuestions.map((q, idx) => (
+                      <div key={q.id} className="card" style={{ padding: 'var(--space-md)', background: 'var(--bg-light)', border: '1px solid var(--border-color)' }}>
+                        <p style={{ margin: 0, fontWeight: 500, fontSize: 'var(--font-sm)' }}>
+                          <span style={{ color: 'var(--text-muted)', marginRight: 'var(--space-sm)' }}>{idx + 1}.</span>
+                          {q.questionText}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+           })}
+        </div>
+
         <hr style={{ border: '0', borderTop: '1px solid var(--border-color)', margin: 'var(--space-xl) 0' }} />
 
         <h3 className="section-title" style={{ fontSize: 'var(--font-lg)' }}>➕ Añadir Pregunta</h3>
-        <QuestionForm topicId={topic.id} onCreated={() => {
-          api.getTopic(id).then(res => setTopic(res.data));
-        }} />
+        <QuestionForm 
+          topicId={topic.id} 
+          subtopics={topic.subtopics || []}
+          onCreated={() => {
+            api.getTopic(id).then(res => setTopic(res.data));
+          }} 
+        />
       </div>
     </div>
   );
 }
 
-function QuestionForm({ topicId, onCreated }) {
+function QuestionForm({ topicId, subtopics, onCreated }) {
   const [form, setForm] = useState({
     questionText: '',
     options: ['', '', '', ''],
     correctIndex: 0,
     explanation: '',
-    difficulty: 'MEDIUM'
+    difficulty: 'MEDIUM',
+    subtopicId: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -109,7 +168,8 @@ function QuestionForm({ topicId, onCreated }) {
         options: ['', '', '', ''],
         correctIndex: 0,
         explanation: '',
-        difficulty: 'MEDIUM'
+        difficulty: 'MEDIUM',
+        subtopicId: ''
       });
       onCreated();
       swal.success('¡Hecho!', 'Pregunta añadida correctamente');
@@ -132,6 +192,22 @@ function QuestionForm({ topicId, onCreated }) {
           placeholder="¿Cuál es el artículo de...?"
         />
       </div>
+
+      {subtopics.length > 0 && (
+        <div className="input-group">
+          <label className="input-label">Vincular a Subtema</label>
+          <select 
+            className="input"
+            value={form.subtopicId}
+            onChange={e => setForm({...form, subtopicId: e.target.value})}
+          >
+            <option value="">Ninguno (General)</option>
+            {subtopics.map(sub => (
+              <option key={sub.id} value={sub.id}>{sub.title}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="grid grid-2" style={{ gap: 'var(--space-md)' }}>
         {form.options.map((opt, i) => (

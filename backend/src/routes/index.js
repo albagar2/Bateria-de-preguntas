@@ -25,6 +25,7 @@ const {
 
 const authController = require('../controllers/authController');
 const topicController = require('../controllers/topicController');
+const subtopicController = require('../controllers/subtopicController');
 const questionController = require('../controllers/questionController');
 const testController = require('../controllers/testController');
 const statsController = require('../controllers/statsController');
@@ -70,12 +71,19 @@ router.post('/topics', authenticate, validate(createTopicSchema), topicControlle
 router.put('/topics/:id', authenticate, validate(updateTopicSchema), topicController.update);
 router.delete('/topics/:id', authenticate, authorize('ADMIN'), topicController.remove);
 
+// ─── Subtopics ────────────────────────
+router.get('/topics/:topicId/subtopics', authenticate, subtopicController.getByTopic);
+router.post('/subtopics', authenticate, authorize('ADMIN'), subtopicController.create);
+router.put('/subtopics/:id', authenticate, authorize('ADMIN'), subtopicController.update);
+router.delete('/subtopics/:id', authenticate, authorize('ADMIN'), subtopicController.remove);
+
 // ─── Question Routes ─────────────────────────
 router.get('/questions', authenticate, questionController.getAll);
 router.get('/questions/review', authenticate, questionController.getReviewQuestions);
 router.get('/questions/no-fail/:topicId', authenticate, questionController.getNoFailMode);
 router.get('/questions/:id', authenticate, authorize('ADMIN'), questionController.getById);
 router.post('/questions', authenticate, validate(createQuestionSchema), questionController.create);
+router.post('/questions/bulk', authenticate, authorize('ADMIN'), questionController.bulkCreate);
 router.put('/questions/:id', authenticate, authorize('ADMIN'), validate(updateQuestionSchema), questionController.update);
 router.delete('/questions/:id', authenticate, authorize('ADMIN'), questionController.remove);
 router.post('/questions/answer', authenticate, validate(answerQuestionSchema), questionController.answer);

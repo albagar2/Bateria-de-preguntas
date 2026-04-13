@@ -29,8 +29,8 @@ app.use(hpp);
 app.use('/api/', generalLimiter);
 
 // ─── Parsing & Logging ──────────────────────
-app.use(express.json({ limit: '10kb' })); // Limit body size
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(express.json({ limit: '10mb' })); 
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
 // ─── Request sanitization ────────────────────

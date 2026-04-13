@@ -126,6 +126,14 @@ class TopicService {
     const topic = await prisma.topic.findUnique({
       where: { id },
       include: {
+        subtopics: {
+          orderBy: { order: 'asc' },
+          include: {
+             _count: {
+               select: { questions: { where: { isActive: true } } },
+             },
+          }
+        },
         questions: {
           where: { isActive: true },
           orderBy: { createdAt: 'asc' },

@@ -172,4 +172,19 @@ const remove = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { getAll, getById, getNoFailMode, getReviewQuestions, answer, create, update, remove };
+/**
+ * POST /questions/bulk  (solo ADMIN)
+ * 
+ * Crea múltiples preguntas a partir de un array.
+ */
+const bulkCreate = asyncHandler(async (req, res) => {
+  const result = await questionService.bulkCreate(req.body);
+
+  res.status(201).json({
+    success: true,
+    message: `${result.count} preguntas importadas correctamente`,
+    data: result
+  });
+});
+
+module.exports = { getAll, getById, getNoFailMode, getReviewQuestions, answer, create, update, remove, bulkCreate };
