@@ -3,120 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Especificaciones Corporativas | BateriaQ For Business</title>
+    <title>Enterprise Technical Docs | BateriaQ</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --brand-primary: #4f46e5;
-            --brand-secondary: #0ea5e9;
-            --dark-deep: #020617;
-            --dark-surface: #0f172a;
-            --gold: #f59e0b;
-            --text-main: #f1f5f9;
-            --text-dim: #94a3b8;
-            --glass: rgba(255, 255, 255, 0.03);
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #a855f7;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #22d3ee;
             --border: rgba(148, 163, 184, 0.15);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--dark-deep);
-            color: var(--text-main);
-            line-height: 1.7;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
         }
 
-        .hero {
-            background: linear-gradient(rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.8)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            padding: 100px 20px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            letter-spacing: -2px;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #fff, var(--brand-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .badge {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--gold);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-
-        .content {
+        .container {
             max-width: 1000px;
-            margin: -50px auto 100px;
-            background: var(--dark-surface);
+            margin: 40px auto;
+            background: var(--card-bg);
             padding: 60px;
             border-radius: 32px;
             box-shadow: 0 40px 100px rgba(0,0,0,0.5);
             border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
         }
 
-        section {
-            margin-bottom: 80px;
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            filter: blur(150px);
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        header {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
         }
 
         h2 {
-            font-size: 1.8rem;
-            color: var(--brand-secondary);
-            margin-bottom: 30px;
+            font-size: 24px;
+            color: var(--primary);
+            margin: 50px 0 25px;
             display: flex;
             align-items: center;
             gap: 15px;
-        }
-
-        h2::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
         }
 
         .tech-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
+            gap: 25px;
+            margin: 30px 0;
+            position: relative;
+            z-index: 1;
         }
 
-        .card {
+        .card-stat {
             background: var(--glass);
             padding: 30px;
             border-radius: 20px;
             border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
         }
 
-        .card h3 {
-            color: white;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-
-        .stat {
-            font-size: 2rem;
+        .stat-val {
+            font-size: 32px;
             font-weight: 700;
-            color: var(--brand-primary);
-            margin-bottom: 10px;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-dim);
-            font-size: 13px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
         }
 
         table {
@@ -124,102 +139,132 @@
             border-collapse: collapse;
             margin: 30px 0;
             background: rgba(0,0,0,0.2);
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
+            border: 1px solid var(--border);
         }
 
         th, td {
-            padding: 18px;
+            padding: 20px;
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
 
         th {
-            background: rgba(255,255,255,0.05);
-            color: var(--brand-secondary);
+            background: rgba(255, 255, 255, 0.03);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        ul {
+            list-style: none;
+            margin-left: 10px;
+        }
+
+        li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+
+        li::before {
+            content: '✦';
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <span class="badge">Enterprise Solution</span>
-        <h1>BateriaQ Evolution</h1>
-        <p>Documentación de Sistema, Arquitectura y Escalabilidad de Negocio</p>
-    </div>
+    <div class="container">
+        <header>
+            <div class="badge">Technical Whitepaper</div>
+            <div class="logo">BateriaQ Business</div>
+            <h1>Documentación de Infraestructura</h1>
+            <p style="color: var(--text-muted)">Potencia, Seguridad y Escalabilidad Operativa</p>
+        </header>
 
-    <div class="content">
         <section>
-            <h2>📊 Visión Ejecutiva</h2>
-            <p>BateriaQ representa la convergencia entre la educación tradicional de oposiciones y las tecnologías de vanguardia en IA. Nuestra infraestructura está diseñada para soportar grandes volúmenes de usuarios manteniendo tiempos de respuesta inferiores a 200ms.</p>
-            
+            <h2>📊 Eficiencia Operativa</h2>
             <div class="tech-grid">
-                <div class="card">
-                    <div class="stat">99.9%</div>
-                    <h3>Uptime Garantizado</h3>
-                    <p>Infraestructura serverless distribuida geográficamente en Vercel Edge Network.</p>
+                <div class="card-stat">
+                    <div class="stat-val">Serverless</div>
+                    <h3>Arquitectura</h3>
+                    <p style="color: var(--text-muted); font-size: 14px;">Despliegue distribuido en Vercel para una latencia mínima global.</p>
                 </div>
-                <div class="card">
-                    <div class="stat">IA Gen</div>
-                    <h3>Tutoría Automática</h3>
-                    <p>Reducción del 80% en costes de soporte mediante el motor de respuesta legal autónomo.</p>
+                <div class="card-stat">
+                    <div class="stat-val">PostgreSQL</div>
+                    <h3>Engine</h3>
+                    <p style="color: var(--text-muted); font-size: 14px;">Base de datos relacional robusta via Supabase con pooling activo.</p>
+                </div>
+                <div class="card-stat">
+                    <div class="stat-val">IA Core</div>
+                    <h3>Inteligencia</h3>
+                    <p style="color: var(--text-muted); font-size: 14px;">Motor de tutoría autónomo integrado con microservicio dedicado.</p>
                 </div>
             </div>
         </section>
 
         <section>
-            <h2>🛡️ Arquitectura y Seguridad</h2>
-            <p>Cumplimos con estándares modernos de protección de datos y robustez técnica:</p>
+            <h2>🛡️ Seguridad y Datos</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Protocolos de grado industrial para la protección del ecosistema:</p>
             <table>
                 <thead>
                     <tr>
-                        <th>Capa</th>
+                        <th>Nivel</th>
                         <th>Tecnología</th>
-                        <th>Propósito</th>
+                        <th>Descripción</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Data Layer</td>
-                        <td>PostgreSQL (Supabase)</td>
-                        <td>Persistencia de datos con encriptación en reposo y tránsito.</td>
+                        <td style="font-weight: 600">Sesión</td>
+                        <td>JWT / RS256</td>
+                        <td>Tokens de acceso con rotación y revocación segura.</td>
                     </tr>
                     <tr>
-                        <td>API Gateway</td>
-                        <td>Node.js / Express</td>
-                        <td>Control de flujo, Rate Limiting y sanitización de entradas XSS/NoSQL.</td>
+                        <td style="font-weight: 600">DB</td>
+                        <td>SSL Encription</td>
+                        <td>Cifrado AES-256 en reposo y tránsito de información.</td>
                     </tr>
                     <tr>
-                        <td>Auth</td>
-                        <td>JWT (RS256)</td>
-                        <td>Gestión de sesiones segura mediante tokens de acceso y refresco.</td>
+                        <td style="font-weight: 600">Red</td>
+                        <td>Rate Limiting</td>
+                        <td>Protección contra ataques de denegación de servicio (DDoS).</td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
         <section>
-            <h2>⚙️ Motor de Planificación Estratégica</h2>
-            <p>El núcleo de BateriaQ es su algoritmo de distribución de carga de estudio. A diferencia de las agendas lineales, nuestro sistema calcula el "Peso de Tema" basándose en:</p>
+            <h2>🧠 Lógica de Planificación</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Nuestro algoritmo propietario optimiza el tiempo del opositor:</p>
             <ul>
-                <li><strong>Curva de Olvido</strong>: Prioriza temas no repasados en ciclos de 7 días.</li>
-                <li><strong>Heatmap de Aciertos</strong>: Detecta debilidades del usuario para intensificar el estudio en áreas críticas.</li>
-                <li><strong>Deadline Awareness</strong>: Ajusta la densidad de contenidos según la cercanía de la fecha de examen.</li>
+                <li><strong>Análisis de Rendimiento</strong>: Priorización dinámica de temas basada en la tasa de error histórica.</li>
+                <li><strong>Planificación Adaptativa</strong>: Reajuste automático del calendario según hitos de fecha de examen.</li>
+                <li><strong>Sincronización Multi-Device</strong>: Gestión de estado en tiempo real entre Dashboard y Planificador.</li>
             </ul>
         </section>
 
         <section>
-            <h2>🚀 Escalabilidad de Contenidos (CMS)</h2>
-            <p>La plataforma permite a la empresa gestora escalar sin límites:</p>
-            <ul>
-                <li><strong>Bulk Import</strong>: Carga masiva de preguntas vía parser inteligente.</li>
-                <li><strong>Jerarquía Dinámica</strong>: Categorización de Oposiciones > Temas > Subtemas con un solo clic.</li>
-                <li><strong>Analytics Administrativos</strong>: Visibilidad total sobre los temas más difíciles para los alumnos.</li>
-            </ul>
+            <h2>🚀 Escalabilidad B2B</h2>
+            <p style="color: var(--text-muted); border-left: 3px solid var(--primary); padding-left: 20px; margin: 30px 0;">
+                BateriaQ está diseñado para crecer. El sistema soporta la incorporación masiva de contenido legislativo y miles de concurrencias simultáneas sin degradación del rendimiento.
+            </p>
         </section>
 
         <div class="footer">
-            <p>Confidencial - Documento para uso corporativo de BateriaQ Ecosystem.</p>
-            <p>&copy; 2026 Reservados todos los derechos de propiedad intelectual, algoritmos y diseño.</p>
+            <p>Propiedad Intelectual de **BateriaQ Study Ecosystem**.</p>
+            <p>&copy; 2026 Reservados todos los derechos técnicos y de diseño.</p>
         </div>
     </div>
 </body>
