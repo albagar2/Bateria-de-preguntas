@@ -41,16 +41,27 @@ class TopicService {
    * @returns {Array} Lista de temas con campo extra de progreso si userId presente
    */
   async getAll(userId = null, oppositionId = null, ignoreOpposition = false) {
-    // Construir el filtro WHERE dinámicamente
     const where = { isActive: true };
+
     if (!ignoreOpposition) {
-      if (Array.isArray(oppositionId)) {
-        // Multi-oposición: temas de cualquiera de las oposiciones del usuario
-        where.oppositionId = { in: oppositionId };
-      } else {
-        // Una sola oposición o null (temas generales)
-        where.oppositionId = oppositionId;
+      // Separamos los IDs válidos del valor null para evitar errores de validación en Prisma
+      const ids = Array.isArray(oppositionId) 
+        ? oppositionId.filter(id => id !== null)
+        : (oppositionId ? [oppositionId] : []);
+
+      const orConditions = [
+        { oppositionId: null } // Siempre incluimos temas generales
+      ];
+
+      if (ids.length > 0) {
+        orConditions.push({ oppositionId: { in: ids } });
       }
+
+      if (userId) {
+        orConditions.push({ creatorId: userId }); // Temas creados por el propio usuario
+      }
+
+      where.OR = orConditions;
     }
 
     const topics = await prisma.topic.findMany({

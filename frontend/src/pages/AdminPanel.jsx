@@ -11,6 +11,8 @@ export default function AdminPanel() {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [topics, setTopics] = useState([]);
+  const [oppositions, setOppositions] = useState([]);
+  const [filterOppId, setFilterOppId] = useState('all');
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topicQuestions, setTopicQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,8 +39,12 @@ export default function AdminPanel() {
         const res = await api.getAdminUsers();
         setUsers(res.data);
       } else if (activeTab === 'topics') {
-        const res = await api.getTopics({ all: 'true' });
-        setTopics(res.data);
+        const [topicsRes, oppsRes] = await Promise.all([
+          api.getTopics({ all: 'true' }),
+          api.getOppositions()
+        ]);
+        setTopics(topicsRes.data);
+        setOppositions(oppsRes.data);
       }
     } catch (err) {
       console.error(err);
@@ -84,7 +90,7 @@ export default function AdminPanel() {
 
   // --- Topic CRUD ---
   const handleCreateTopic = () => {
-    setEditingTopic({ title: '', description: '', icon: '📚', color: '#6366f1' });
+    setEditingTopic({ title: '', description: '', icon: '📚', color: '#6366f1', oppositionId: '' });
     setIsTopicEditMode(false);
     setIsTopicModalOpen(true);
   };
@@ -290,8 +296,23 @@ export default function AdminPanel() {
 
       {/* TOPICS TAB */}
       {activeTab === 'topics' && !selectedTopic && (
-        <Card title="Listado Global de Temas">
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 'var(--space-md)' }}>
+        <Card title="Gestión de Contenidos: Temas">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)', gap: 'var(--space-md)', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
+                  <label style={{ fontSize: 'var(--font-sm)', fontWeight: 600 }}>Filtrar por Oposición:</label>
+                  <select 
+                    className="input" 
+                    style={{ width: '250px', padding: 'var(--space-xs) var(--space-sm)' }}
+                    value={filterOppId}
+                    onChange={(e) => setFilterOppId(e.target.value)}
+                  >
+                    <option value="all">Todas las Oposiciones</option>
+                    <option value="none">Sin Oposición (Generales)</option>
+                    {oppositions.map(opp => (
+                      <option key={opp.id} value={opp.id}>{opp.name}</option>
+                    ))}
+                  </select>
+                </div>
                 <button 
                   id="btn-create-topic"
                   className="btn btn-primary btn-sm" 
@@ -302,23 +323,34 @@ export default function AdminPanel() {
                 </button>
             </div>
             <div className="grid grid-3">
-                {topics.map(t => (
-                    <Card key={t.id} style={{ padding: 'var(--space-md)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', marginBottom: 'var(--space-sm)' }}>
-                            <span style={{ fontSize: '1.5rem' }}>{t.icon || '📚'}</span>
-                            <div style={{ flex: 1 }}>
-                                <h4 style={{ margin: 0 }}>{t.title}</h4>
-                                <span style={{ fontSize: 'var(--font-xs)', color: 'var(--text-muted)' }}>Opo ID: {t.oppositionId?.split('-')[0] || 'Gral'}</span>
+                {topics
+                  .filter(t => {
+                    if (filterOppId === 'all') return true;
+                    if (filterOppId === 'none') return !t.oppositionId;
+                    return t.oppositionId === filterOppId;
+                  })
+                  .map(t => {
+                    const opp = oppositions.find(o => o.id === t.oppositionId);
+                    return (
+                        <Card key={t.id} style={{ padding: 'var(--space-md)', borderTop: opp ? '4px solid var(--primary-500)' : '1px solid var(--border-color)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', marginBottom: 'var(--space-sm)' }}>
+                                <span style={{ fontSize: '1.5rem' }}>{t.icon || '📚'}</span>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <h4 style={{ margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.title}</h4>
+                                    <span style={{ fontSize: 'var(--font-xs)', color: 'var(--primary-400)', fontWeight: 600 }}>
+                                      {opp ? opp.name : 'Tema General'}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                        <p style={{ fontSize: 'var(--font-xs)', color: 'var(--text-secondary)', marginBottom: 'var(--space-md)', height: '40px', overflow: 'hidden' }}>{t.description}</p>
-                        <div style={{ display: 'flex', gap: 'var(--space-xs)' }}>
-                            <Button size="sm" variant="secondary" fullWidth onClick={() => handleEditTopic(t)}>Editar</Button>
-                            <Button size="sm" variant="secondary" fullWidth onClick={() => viewQuestions(t)}>Preguntas</Button>
-                            <Button size="sm" variant="danger" onClick={() => handleDeleteTopic(t.id)}>🗑️</Button>
-                        </div>
-                    </Card>
-                ))}
+                            <p style={{ fontSize: 'var(--font-xs)', color: 'var(--text-secondary)', marginBottom: 'var(--space-md)', height: '40px', overflow: 'hidden' }}>{t.description}</p>
+                            <div style={{ display: 'flex', gap: 'var(--space-xs)' }}>
+                                <Button size="sm" variant="secondary" fullWidth onClick={() => handleEditTopic(t)}>Editar</Button>
+                                <Button size="sm" variant="secondary" fullWidth onClick={() => viewQuestions(t)}>Preguntas</Button>
+                                <Button size="sm" variant="danger" onClick={() => handleDeleteTopic(t.id)}>🗑️</Button>
+                            </div>
+                        </Card>
+                    );
+                })}
             </div>
         </Card>
       )}
@@ -352,6 +384,19 @@ export default function AdminPanel() {
                 value={editingTopic.description} 
                 onChange={(e) => setEditingTopic({...editingTopic, description: e.target.value})}
               />
+            </div>
+            <div className="input-group">
+              <label className="input-label">Vincular a Oposición</label>
+              <select 
+                className="input"
+                value={editingTopic.oppositionId || ''}
+                onChange={(e) => setEditingTopic({...editingTopic, oppositionId: e.target.value || null})}
+              >
+                <option value="">General (Sin oposición específica)</option>
+                {oppositions.map(opp => (
+                  <option key={opp.id} value={opp.id}>{opp.name}</option>
+                ))}
+              </select>
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
               <div className="input-group" style={{ flex: 1 }}>

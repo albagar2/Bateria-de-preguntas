@@ -23,6 +23,8 @@ export default function Dashboard() {
   const [isOppModalOpen, setIsOppModalOpen] = useState(false);
   const [newOppName, setNewOppName] = useState('');
   const [newOppDesc, setNewOppDesc] = useState('');
+  const [newOppIcon, setNewOppIcon] = useState('🎯');
+  const [newOppCategory, setNewOppCategory] = useState('');
 
   useEffect(() => {
     const loadData = async () => {
@@ -74,12 +76,19 @@ export default function Dashboard() {
   const handleCreateOpposition = async () => {
     if (!newOppName.trim()) return;
     try {
-      const res = await api.createOpposition({ name: newOppName, description: newOppDesc, icon: '🎯' });
+      const res = await api.createOpposition({ 
+        name: newOppName, 
+        description: newOppDesc, 
+        icon: newOppIcon,
+        category: newOppCategory 
+      });
       setOppositions(prev => [...prev, res.data]);
       toggleOpposition(res.data.id);
       setIsOppModalOpen(false);
       setNewOppName('');
       setNewOppDesc('');
+      setNewOppIcon('🎯');
+      setNewOppCategory('');
     } catch (err) {
       swal.error('Error', 'No se pudo crear la oposición: ' + err.message);
     }
@@ -112,20 +121,15 @@ export default function Dashboard() {
                   key={opp.id}
                   className={`dashboard-action-card ${isSelected ? 'active' : ''}`}
                   onClick={() => toggleOpposition(opp.id)}
-                  style={{ 
-                    width: '100%', 
-                    border: isSelected ? '2px solid var(--primary-500)' : '1px solid var(--border-color)', 
-                    background: isSelected ? 'rgba(99, 102, 241, 0.08)' : 'none',
-                    transition: 'all 0.2s ease'
-                  }}
                   disabled={selectingOpposition}
                 >
                   <span className="dashboard-action-icon">{opp.icon}</span>
-                  <div style={{ flex: 1 }}>
-                    <span className="dashboard-action-label" style={{ display: 'block', fontWeight: isSelected ? '700' : '600' }}>{opp.name}</span>
+                  <div className="dashboard-action-content">
+                    {opp.category && <span className="dashboard-action-category">{opp.category}</span>}
+                    <span className="dashboard-action-label">{opp.name}</span>
                     <span className="dashboard-action-desc">{opp.description || 'Prepárate con nosotros'}</span>
                   </div>
-                  {isSelected && <span style={{ color: 'var(--primary-400)', fontWeight: 800 }}>✓</span>}
+                  {isSelected && <div className="dashboard-action-badge">✓</div>}
                 </button>
               );
             })}
@@ -133,13 +137,20 @@ export default function Dashboard() {
             <button
               className="dashboard-action-card"
               onClick={() => setIsOppModalOpen(true)}
-              style={{ width: '100%', border: '1px dashed var(--primary-500)', background: 'rgba(99, 102, 241, 0.05)' }}
+              style={{ 
+                border: '2px dashed var(--primary-400)', 
+                background: 'rgba(99, 102, 241, 0.05)',
+                justifyContent: 'center',
+                textAlign: 'center'
+              }}
               disabled={selectingOpposition}
             >
-              <span className="dashboard-action-icon">➕</span>
-              <div style={{ flex: 1 }}>
-                <span className="dashboard-action-label" style={{ display: 'block' }}>Abrir nueva...</span>
-                <span className="dashboard-action-desc">Crea tu propio temario personalizado</span>
+              <div style={{ padding: 'var(--space-md)' }}>
+                <span className="dashboard-action-icon" style={{ margin: '0 auto var(--space-md)' }}>✨</span>
+                <span className="dashboard-action-label" style={{ display: 'block', marginBottom: 'var(--space-xs)' }}>
+                  Oposición Personalizada
+                </span>
+                <span className="dashboard-action-desc">Crea un temario a tu medida</span>
               </div>
             </button>
           </div>
@@ -163,34 +174,76 @@ export default function Dashboard() {
         <Modal 
           isOpen={isOppModalOpen} 
           onClose={() => setIsOppModalOpen(false)} 
-          title="Crear Nueva Oposición"
+          title="✨ Nueva Oposición Personalizada"
           footer={(
             <>
               <Button variant="ghost" onClick={() => setIsOppModalOpen(false)}>Cancelar</Button>
-              <Button variant="primary" onClick={handleCreateOpposition} disabled={!newOppName.trim()}>Aceptar</Button>
+              <Button variant="primary" onClick={handleCreateOpposition} disabled={!newOppName.trim()}>
+                Crear Oposición
+              </Button>
             </>
           )}
         >
-          <div className="form-group">
-            <label>Nombre de la oposición:</label>
-            <input 
-              type="text" 
-              className="input-field" 
-              value={newOppName} 
-              onChange={e => setNewOppName(e.target.value)} 
-              placeholder="Ej. Policía Nacional" 
-              autoFocus
-            />
-          </div>
-          <div className="form-group">
-            <label>Breve descripción:</label>
-            <textarea 
-              className="input-field" 
-              value={newOppDesc} 
-              onChange={e => setNewOppDesc(e.target.value)} 
-              placeholder="Ej. Escala Básica. Temario completo." 
-              rows={3} 
-            />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
+              <div className="input-group" style={{ flex: '0 0 80px' }}>
+                <label className="input-label">Icono</label>
+                <select 
+                  className="input" 
+                  value={newOppIcon} 
+                  onChange={e => setNewOppIcon(e.target.value)}
+                  style={{ fontSize: '1.5rem', textAlign: 'center', padding: '0.5rem' }}
+                >
+                  <option value="🎯">🎯</option>
+                  <option value="🚓">🚓</option>
+                  <option value="🚒">🚒</option>
+                  <option value="🚑">🚑</option>
+                  <option value="⚖️">⚖️</option>
+                  <option value="📚">📚</option>
+                  <option value="🏛️">🏛️</option>
+                  <option value="💻">💻</option>
+                </select>
+              </div>
+              <div className="input-group" style={{ flex: 1 }}>
+                <label className="input-label">Nombre de la Oposición</label>
+                <input 
+                  type="text" 
+                  className="input" 
+                  value={newOppName} 
+                  onChange={e => setNewOppName(e.target.value)} 
+                  placeholder="Ej: Policía Local Madrid" 
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Categoría o Cuerpo</label>
+              <input 
+                type="text" 
+                className="input" 
+                value={newOppCategory} 
+                onChange={e => setNewOppCategory(e.target.value)} 
+                placeholder="Ej: Seguridad Ciudadana" 
+              />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Descripción</label>
+              <textarea 
+                className="input" 
+                value={newOppDesc} 
+                onChange={e => setNewOppDesc(e.target.value)} 
+                placeholder="Indica de qué trata esta oposición o qué temario incluye..." 
+                rows={3} 
+              />
+            </div>
+            
+            <div style={{ padding: 'var(--space-md)', background: 'rgba(99, 102, 241, 0.05)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+              <p style={{ fontSize: 'var(--font-xs)', color: 'var(--text-secondary)', margin: 0 }}>
+                💡 <b>Tip:</b> Una vez creada, podrás añadir temas específicos y preguntas desde tu panel.
+              </p>
+            </div>
           </div>
         </Modal>
       </div>
