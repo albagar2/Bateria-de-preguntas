@@ -22,6 +22,15 @@ export default function TopicDetail() {
   if (loading) return <div className="loading-screen"><div className="spinner"></div></div>;
   if (!topic) return <div className="empty-state"><h3>Tema no encontrado</h3></div>;
 
+  const [expandedSubtopics, setExpandedSubtopics] = useState({}); // Tracking expanded subtopics in student view
+
+  const toggleSubtopic = (id) => {
+    setExpandedSubtopics(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
   const questionCount = topic.questions?.length || topic._count?.questions || 0;
 
   return (
@@ -79,9 +88,16 @@ export default function TopicDetail() {
             <h3 className="section-title" style={{ fontSize: 'var(--font-md)', marginBottom: 'var(--space-md)' }}>📂 Subtemas en este tema</h3>
             <div style={{ display: 'flex', gap: 'var(--space-sm)', flexWrap: 'wrap' }}>
               {topic.subtopics.map(sub => (
-                <div key={sub.id} className="badge badge-secondary" style={{ padding: 'var(--space-xs) var(--space-md)' }}>
+                <Link 
+                  key={sub.id} 
+                  to={`/tests?topicId=${topic.id}&subtopicId=${sub.id}`}
+                  className="badge badge-secondary" 
+                  style={{ padding: 'var(--space-xs) var(--space-md)', textDecoration: 'none', transition: 'transform 0.2s' }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
                   {sub.title} ({sub._count?.questions || 0})
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -90,39 +106,67 @@ export default function TopicDetail() {
         <hr style={{ border: '0', borderTop: '1px solid var(--border-color)', margin: 'var(--space-xl) 0' }} />
 
         <div className="topic-content-preview">
-           <h3 className="section-title" style={{ fontSize: 'var(--font-lg)', marginBottom: 'var(--space-xl)' }}>📖 Contenido del tema</h3>
+           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-xl)' }}>
+             <h3 className="section-title" style={{ fontSize: 'var(--font-lg)', margin: 0 }}>📖 Contenido del tema</h3>
+             <button 
+                className="btn btn-ghost btn-sm"
+                onClick={() => {
+                  const allExpanded = topic.subtopics.reduce((acc, s) => ({ ...acc, [s.id]: true }), { 'no-subtopic': true });
+                  const allCollapsed = {};
+                  const currentlyAllExpanded = Object.values(expandedSubtopics).filter(Boolean).length >= topic.subtopics.length;
+                  setExpandedSubtopics(currentlyAllExpanded ? allCollapsed : allExpanded);
+                }}
+             >
+               {Object.values(expandedSubtopics).filter(Boolean).length >= (topic.subtopics?.length || 0) ? 'Colapsar todo' : 'Expandir todo'}
+             </button>
+           </div>
+
            {[null, ...(topic.subtopics || [])].map(container => {
               const containerId = container?.id || null;
               const filteredQuestions = (topic.questions || []).filter(q => q.subtopicId === containerId);
+              const isExpanded = expandedSubtopics[containerId || 'no-subtopic'];
               
               if (filteredQuestions.length === 0) return null;
 
               return (
-                <div key={containerId || 'no-subtopic'} style={{ marginBottom: 'var(--space-2xl)' }}>
-                  <h4 style={{ 
-                    borderBottom: '2px solid var(--primary-100)', 
-                    paddingBottom: 'var(--space-xs)', 
-                    marginBottom: 'var(--space-lg)', 
-                    color: containerId ? 'var(--primary-600)' : 'var(--text-muted)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-sm)'
-                  }}>
+                <div key={containerId || 'no-subtopic'} style={{ marginBottom: 'var(--space-lg)' }}>
+                  <h4 
+                    onClick={() => toggleSubtopic(containerId || 'no-subtopic')}
+                    style={{ 
+                      borderBottom: '2px solid var(--primary-100)', 
+                      padding: 'var(--space-xs) 0', 
+                      marginBottom: isExpanded ? 'var(--space-lg)' : '0', 
+                      color: containerId ? 'var(--primary-600)' : 'var(--text-muted)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--space-sm)',
+                      cursor: 'pointer',
+                      userSelect: 'none'
+                    }}
+                  >
+                    <span style={{ 
+                      transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', 
+                      transition: 'transform 0.2s',
+                      fontSize: '12px'
+                    }}>▶</span>
                     {container ? `🔹 ${container.title}` : '🔸 Preguntas generales'}
                     <span style={{ fontSize: 'var(--font-xs)', fontWeight: 'normal', background: 'var(--bg-light)', padding: '2px 8px', borderRadius: '10px' }}>
                       {filteredQuestions.length}
                     </span>
                   </h4>
-                  <div className="questions-grid" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-                    {filteredQuestions.map((q, idx) => (
-                      <div key={q.id} className="card" style={{ padding: 'var(--space-md)', background: 'var(--bg-light)', border: '1px solid var(--border-color)' }}>
-                        <p style={{ margin: 0, fontWeight: 500, fontSize: 'var(--font-sm)' }}>
-                          <span style={{ color: 'var(--text-muted)', marginRight: 'var(--space-sm)' }}>{idx + 1}.</span>
-                          {q.questionText}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
+
+                  {isExpanded && (
+                    <div className="questions-grid animate-slide-up" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+                      {filteredQuestions.map((q, idx) => (
+                        <div key={q.id} className="card" style={{ padding: 'var(--space-md)', background: 'var(--bg-light)', border: '1px solid var(--border-color)' }}>
+                          <p style={{ margin: 0, fontWeight: 500, fontSize: 'var(--font-sm)' }}>
+                            <span style={{ color: 'var(--text-muted)', marginRight: 'var(--space-sm)' }}>{idx + 1}.</span>
+                            {q.questionText}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
            })}

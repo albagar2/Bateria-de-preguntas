@@ -8,7 +8,7 @@ class SubtopicService {
       orderBy: { order: 'asc' },
       include: {
         _count: {
-          select: { questions: { where: { isActive: true } } }
+          select: { questions: true }
         }
       }
     });

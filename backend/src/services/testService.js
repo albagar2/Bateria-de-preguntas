@@ -9,12 +9,16 @@ class TestService {
   /**
    * Create a new test with randomly selected questions
    */
-  async create(userId, { type, topicIds, totalQuestions, timeLimit, penalizeErrors, difficulty }) {
+  async create(userId, { type, topicIds, subtopicId, totalQuestions, timeLimit, penalizeErrors, difficulty }) {
     // Build question filter
     const where = { isActive: true };
 
     if (topicIds && topicIds.length > 0) {
       where.topicId = { in: topicIds };
+    }
+
+    if (subtopicId) {
+      where.subtopicId = subtopicId;
     }
 
     if (difficulty) {

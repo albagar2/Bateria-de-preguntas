@@ -175,10 +175,10 @@ class AdminService {
    * @param {object} data - Objeto con los nuevos valores
    */
   async updateTopic(id, data) {
-    const { title, description, icon, color, order } = data;
+    const { title, description, icon, color, order, oppositionId } = data;
     return prisma.topic.update({
       where: { id },
-      data: { title, description, icon, color, order }
+      data: { title, description, icon, color, order, oppositionId }
     });
   }
 
@@ -258,10 +258,10 @@ class AdminService {
    * @param {object} data - Nuevos valores para los campos editables
    */
   async updateQuestion(id, data) {
-    const { questionText, options, correctIndex, explanation, difficulty } = data;
+    const { questionText, options, correctIndex, explanation, difficulty, topicId, subtopicId } = data;
     return prisma.question.update({
       where: { id },
-      data: { questionText, options, correctIndex, explanation, difficulty }
+      data: { questionText, options, correctIndex, explanation, difficulty, topicId, subtopicId }
     });
   }
 

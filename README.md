@@ -54,7 +54,12 @@ graph TD
 #### 📚 Metodologías de Alto Rendimiento
 - **Algoritmo SM-2**: Repetición espaciada para memoria profunda.
 - **Modo Sin Fallos**: Bloqueo de progresión por maestría de bloque.
-- **Contenido Comunitario**: Los usuarios pueden crear sus propias oposiciones, temas y preguntas.
+
+#### ⚡ Gestión Pro (Administración)
+- **Carga Masiva State-of-the-art**: Motor de procesamiento por Regex que acepta texto bruto y mapea respuestas automáticamente por coincidencia de texto.
+- **Auditoría Global**: Buscador instantáneo de preguntas en toda la base de datos con visualización por temas.
+- **Jerarquía Dinámica**: Organización de contenidos mediante subtemas colapsables con auto-expansión inteligente.
+- **Filtro de Duplicados**: Sistema de limpieza en tiempo real que previene la redundancia de contenido.
 
 ---
 

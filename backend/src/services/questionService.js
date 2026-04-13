@@ -330,22 +330,55 @@ class QuestionService {
   }
 
   /**
-   * Crea múltiples preguntas a la vez (importación masiva).
-   *
-   * @param {Array} questions - Lista de objetos { topicId, questionText, ... }
+   * INGESTA MASIVA DE PREGUNTAS (Bulk Import)
+   * ----------------------------------------
+   * Inserta un listado de preguntas de forma atómica y evita duplicados por texto.
+   * 
+   * Lógica de protección:
+   * 1. Comprueba que el tema existe.
+   * 2. Recupera todos los enunciados existentes en ese tema.
+   * 3. Filtra la lista de entrada para descartar enunciados idénticos (case-insensitive).
+   * 4. Inserta las preguntas restantes en una sola operación de BD.
+   * 
+   * @param {Array} questions - Lista de objetos de pregunta
    */
   async bulkCreate(questions) {
-    if (!Array.isArray(questions) || questions.length === 0) {
-      throw new AppError('No se proporcionaron preguntas para importar', 400);
+    if (!questions || questions.length === 0) {
+      throw new AppError('No hay preguntas para importar', 400);
     }
 
-    // Validamos que todas las preguntas tengan topicId
+    // Validamos que todas las preguntas tengan topicId (usamos el del primero como referencia)
     const topicId = questions[0].topicId;
     const topic = await prisma.topic.findUnique({ where: { id: topicId } });
     if (!topic) throw new AppError('El tema especificado no existe', 404);
 
+    // --- PROTECCIÓN CONTRA DUPLICADOS ---
+    // Obtenemos textos de preguntas actuales para comparar
+    const existingQuestions = await prisma.question.findMany({
+      where: { topicId },
+      select: { questionText: true }
+    });
+    
+    // Set de normalización para búsqueda rápida O(1)
+    const existingTexts = new Set(existingQuestions.map(q => q.questionText.trim().toLowerCase()));
+    
+    // Filtrado de preguntas de entrada
+    const newQuestions = questions.filter(q => {
+      const text = q.questionText.trim().toLowerCase();
+      if (existingTexts.has(text)) {
+        return false; // Salta si ya existe
+      }
+      existingTexts.add(text); // Añade al set para evitar duplicados dentro del mismo lote
+      return true;
+    });
+
+    if (newQuestions.length === 0) {
+      return { count: 0, message: 'Todas las preguntas ya existen en este tema.' };
+    }
+
+    // Inserción masiva aprovechando prisma.createMany (alto rendimiento)
     return prisma.question.createMany({
-      data: questions.map(q => ({
+      data: newQuestions.map(q => ({
         questionText: q.questionText,
         options: q.options,
         correctIndex: q.correctIndex,

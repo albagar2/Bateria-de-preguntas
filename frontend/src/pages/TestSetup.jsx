@@ -14,9 +14,10 @@ export default function TestSetup() {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
   const [form, setForm] = useState({
-    type: 'QUICK',
+    type: searchParams.get('subtopicId') ? 'TOPIC' : 'QUICK',
     topicIds: searchParams.get('topicId') ? [searchParams.get('topicId')] : [],
-    totalQuestions: 20,
+    subtopicId: searchParams.get('subtopicId') || null,
+    totalQuestions: searchParams.get('subtopicId') ? 10 : 20, // Pre-select small count for subtopic
     timeLimit: null,
     penalizeErrors: false,
   });
@@ -60,6 +61,14 @@ export default function TestSetup() {
         <h1 className="page-title">🧪 Tests</h1>
         <p className="page-subtitle">Configura y comienza un test</p>
       </div>
+
+      {form.subtopicId && (
+        <div className="card" style={{ marginBottom: 'var(--space-lg)', background: 'var(--primary-light)', border: '1px solid var(--primary-200)' }}>
+          <p style={{ margin: 0, fontWeight: 600, color: 'var(--primary-700)' }}>
+            🎯 Has seleccionado un subtema específico. El test solo incluirá preguntas de esa sección.
+          </p>
+        </div>
+      )}
 
       <div style={{ maxWidth: '700px' }}>
         {/* Test Type */}

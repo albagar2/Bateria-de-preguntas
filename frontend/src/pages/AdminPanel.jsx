@@ -6,18 +6,32 @@ import Modal from '../components/common/Modal';
 import swal from '../utils/swal';
 import './Dashboard.css';
 
+/**
+ * CAMPO DE CONTROL: PANEL DE ADMINISTRACIÓN
+ * -----------------------------------------
+ * Este componente es el centro neurálgico de gestión de la plataforma.
+ * Permite gestionar usuarios, temas (topics), oposiciones y preguntas.
+ * 
+ * Funcionalidades clave:
+ * - Dashboard de estadísticas (Resumen).
+ * - Gestión de roles de usuario.
+ * - CRUD de temas con iconos y colores personalizados.
+ * - Sistema de Carga Masiva (Bulk Import) con Regex inteligente.
+ * - Auditoría global de preguntas con buscador.
+ */
 export default function AdminPanel() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [stats, setStats] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [topics, setTopics] = useState([]);
-  const [oppositions, setOppositions] = useState([]);
-  const [filterOppId, setFilterOppId] = useState('all');
-  const [selectedTopic, setSelectedTopic] = useState(null);
-  const [topicQuestions, setTopicQuestions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // --- ESTADO LOCAL ---
+  const [activeTab, setActiveTab] = useState('overview');          // Pestaña actual: overview, users, topics, questions
+  const [stats, setStats] = useState(null);                        // Datos estadísticos globales
+  const [users, setUsers] = useState([]);                          // Listado de usuarios cargados
+  const [topics, setTopics] = useState([]);                        // Listado de temas (después de filtrar por oposición)
+  const [oppositions, setOppositions] = useState([]);              // Todas las oposiciones disponibles
+  const [filterOppId, setFilterOppId] = useState('all');          // Filtro actual por oposición
+  const [selectedTopic, setSelectedTopic] = useState(null);        // Tema que se está explorando actualmente
+  const [topicQuestions, setTopicQuestions] = useState([]);        // Preguntas del tema seleccionado
+  const [loading, setLoading] = useState(true);                    // Estado de carga general
   
-  // Modal states — flags separados para evitar conflictos entre modales
+  // --- ESTADO DE MODALES Y EDICIÓN ---
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [editingTopic, setEditingTopic] = useState(null);
@@ -25,11 +39,13 @@ export default function AdminPanel() {
   const [isTopicEditMode, setIsTopicEditMode] = useState(false);
   const [isQuestionEditMode, setIsQuestionEditMode] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
-  const [subtopics, setSubtopics] = useState([]);
+  const [subtopics, setSubtopics] = useState([]);                  // Subtemas del tema seleccionado
   const [isSubtopicModalOpen, setIsSubtopicModalOpen] = useState(false);
   const [editingSubtopic, setEditingSubtopic] = useState(null);
-  const [bulkText, setBulkText] = useState('');
-  const [bulkSubtopicId, setBulkSubtopicId] = useState('');
+  const [bulkText, setBulkText] = useState('');                    // Texto bruto para la carga masiva
+  const [bulkSubtopicId, setBulkSubtopicId] = useState('');        // ID del subtema para la carga masiva
+  const [expandedAdminSubtopics, setExpandedAdminSubtopics] = useState({}); // Control de acordeones en la vista de preguntas
+  const [globalQuestions, setGlobalQuestions] = useState([]);     // Cache para la pestaña de Lista Global
 
   useEffect(() => {
     fetchData();
@@ -51,6 +67,9 @@ export default function AdminPanel() {
         ]);
         setTopics(topicsRes.data);
         setOppositions(oppsRes.data);
+      } else if (activeTab === 'questions') {
+        const res = await api.getAdminQuestions();
+        setGlobalQuestions(res.data);
       }
     } catch (err) {
       console.error(err);
@@ -59,6 +78,11 @@ export default function AdminPanel() {
     }
   };
 
+  // --- GESTIÓN DE USUARIOS ---
+
+  /**
+   * Elimina un usuario del sistema previa confirmación.
+   */
   const handleDeleteUser = async (userId) => {
     const result = await swal.confirm('¿Eliminar usuario?', 'Esta acción no se puede deshacer');
     if (!result.isConfirmed) return;
@@ -71,6 +95,9 @@ export default function AdminPanel() {
     }
   };
 
+  /**
+   * Cambia el rol de un usuario entre USER y ADMIN.
+   */
   const handleRoleToggle = async (user) => {
     const newRole = user.role === 'ADMIN' ? 'USER' : 'ADMIN';
     try {
@@ -81,16 +108,30 @@ export default function AdminPanel() {
     }
   };
 
+  // --- GESTIÓN DE PREGUNTAS Y SUBTEMAS ---
+
+  /**
+   * Carga y muestra todas las preguntas de un tema específico.
+   * Recupera tanto preguntas (límite 1000) como subtemas.
+   */
   const viewQuestions = async (topic) => {
     setSelectedTopic(topic);
     setLoading(true);
     try {
       const [questionsRes, subtopicsRes] = await Promise.all([
-        api.getQuestions({ topicId: topic.id }),
+        api.getQuestions({ topicId: topic.id, limit: 1000 }),
         api.getSubtopics(topic.id)
       ]);
-      setTopicQuestions(questionsRes.data.questions);
+      const questions = questionsRes.data.questions || [];
+      setTopicQuestions(questions);
       setSubtopics(subtopicsRes.data);
+      
+      // Auto-expandimos todos los subtemas que tienen preguntas para facilitar la vista
+      const expandMap = {};
+      questions.forEach(q => {
+        expandMap[q.subtopicId || 'no-subtopic'] = true;
+      });
+      setExpandedAdminSubtopics(expandMap);
     } catch (err) {
       console.error(err);
     } finally {
@@ -156,9 +197,18 @@ export default function AdminPanel() {
     setIsQuestionModalOpen(true);
   };
 
-  const handleEditQuestion = (question) => {
+  const handleEditQuestion = async (question) => {
     setEditingQuestion({ ...question });
     setIsQuestionEditMode(true);
+    
+    // Cargar subtemas del tema al que pertenece la pregunta para el desplegable
+    try {
+      const res = await api.getSubtopics(question.topicId);
+      setSubtopics(res.data);
+    } catch (err) {
+      console.error("Error al cargar subtemas:", err);
+    }
+    
     setIsQuestionModalOpen(true);
   };
 
@@ -232,43 +282,95 @@ export default function AdminPanel() {
     }
   };
 
+  /**
+   * PROCESADOR DE CARGA MASIVA (Bulk Import)
+   * ----------------------------------------
+   * Utiliza una expresión regular avanzada para segmentar el texto en bloques de preguntas.
+   * Soporta formatos:
+   * P: enunciado | a) op1 | b) op2 | R: c
+   * P: enunciado | 1. op1 | 2. op2 | R: Texto exacto de la respuesta
+   */
   const handleBulkImport = async () => {
     if (!bulkText.trim()) return;
+    setLoading(true);
     
     try {
-      // Parser básico de texto a JSON
-      const blocks = bulkText.split('---').filter(b => b.trim());
-      const parsedQuestions = blocks.map(block => {
-        const lines = block.trim().split('\n');
-        const questionText = lines.find(l => l.startsWith('P:'))?.replace('P:', '').trim();
-        const options = lines.filter(l => /^[a-d]\)/.test(l.trim())).map(l => l.replace(/^[a-d]\)/, '').trim());
-        const correctLetter = lines.find(l => l.startsWith('R:'))?.replace('R:', '').trim().toLowerCase();
-        const correctIndex = ['a', 'b', 'c', 'd'].indexOf(correctLetter);
+      // Estrategia: Detectar bloques buscando el inicio de cada pregunta (P: o Pregunta:)
+      // Ignora mayúsculas/minúsculas y soporta puntos o dos puntos.
+      const questionRegex = /(?:^|\n)(?:P|Pregunta)\s*[:.].*?(?=(?:\n(?:P|Pregunta)\s*[:.])|$)/gis;
+      const blocks = bulkText.match(questionRegex) || [];
+      
+      let failCount = 0;
+      const parsedQuestions = blocks.map((block, idx) => {
+        const lines = block.trim().split('\n').map(l => l.trim());
         
-        if (!questionText || options.length < 2 || correctIndex === -1) return null;
+        // 1. Extraer enunciado
+        const questionLine = lines.find(l => /^(P|Pregunta)\s*[:.]/i.test(l));
+        const questionText = questionLine?.replace(/^(P|Pregunta)\s*[:.]/i, '').trim();
+        
+        // 2. Extraer opciones (soporta a), a. o número 1))
+        const options = lines
+          .filter(l => /^[a-d][\s).]/i.test(l))
+          .map(l => l.replace(/^[a-d][\s).]/i, '').trim());
+          
+        // 3. Extraer respuesta (soporta letra, número o texto completo)
+        const answerLine = lines.find(l => /^(R|Respuesta|Solución|Solucion)\s*[:.]/i.test(l));
+        const correctValue = answerLine?.replace(/^(R|Respuesta|Solución|Solucion)\s*[:.]/i, '').trim().toLowerCase();
+        
+        // Algoritmo de resolución de índice correcto
+        let correctIndex = ['a', 'b', 'c', 'd'].indexOf(correctValue); // Por letra
+        
+        if (correctIndex === -1 && /^[1-4]$/.test(correctValue)) {      // Por número
+          correctIndex = parseInt(correctValue) - 1;
+        }
+
+        if (correctIndex === -1 && correctValue) {                     // Por coincidencia de texto
+          correctIndex = options.findIndex(opt => opt.toLowerCase() === correctValue);
+        }
+        
+        // Validación de integridad del bloque
+        if (!questionText || options.length < 2 || correctIndex === -1) {
+          console.warn(`Bloque ${idx + 1} ignorado:`, block);
+          failCount++;
+          return null;
+        }
         
         return {
           topicId: selectedTopic.id,
           subtopicId: bulkSubtopicId || null,
           questionText,
-          options,
+          options: options.slice(0, 4),
           correctIndex,
           difficulty: 'MEDIUM'
         };
       }).filter(Boolean);
 
       if (parsedQuestions.length === 0) {
-        throw new Error('No se detectaron preguntas válidas. Revisa el formato.');
+        throw new Error('No se pudo procesar ninguna pregunta. Revisa el formato.');
       }
 
+      // Envío al servidor
       await api.bulkCreateQuestions(parsedQuestions);
+      
+      // Feedback visual: expandir el subtema de destino
+      const targetKey = bulkSubtopicId || 'no-subtopic';
+      setExpandedAdminSubtopics(prev => ({ ...prev, [targetKey]: true }));
+
       setIsBulkModalOpen(false);
       setBulkText('');
       setBulkSubtopicId('');
-      swal.success('Importación Completa', `${parsedQuestions.length} preguntas añadidas con éxito.`);
-      viewQuestions(selectedTopic); // Refresh list
+      
+      const message = failCount > 0 
+        ? `Importadas ${parsedQuestions.length} preguntas. ${failCount} bloques fueron ignorados.`
+        : `Importadas ${parsedQuestions.length} preguntas correctamente.`;
+      
+      swal.success('Importación Terminada', message);
+      viewQuestions(selectedTopic); // Refrescar lista
+
     } catch (err) {
-      swal.error('Error de Importación', err.message);
+      swal.error('Error en Importación', err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -285,7 +387,8 @@ export default function AdminPanel() {
       <div className="tab-container" style={{ marginBottom: 'var(--space-xl)', display: 'flex', gap: 'var(--space-md)', borderBottom: '1px solid var(--border-color)', paddingBottom: 'var(--space-sm)' }}>
         <button className={`btn ${activeTab === 'overview' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActiveTab('overview')}>📊 Resumen</button>
         <button className={`btn ${activeTab === 'users' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActiveTab('users')}>👥 Usuarios</button>
-        <button className={`btn ${activeTab === 'topics' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => { setActiveTab('topics'); setSelectedTopic(null); }}>📚 Temas y Preguntas</button>
+        <button className={`btn ${activeTab === 'topics' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => { setActiveTab('topics'); setSelectedTopic(null); }}>📚 Temas</button>
+        <button className={`btn ${activeTab === 'questions' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActiveTab('questions')}>📝 Preguntas Globales</button>
       </div>
 
       {/* Selected Topic Detail (Questions View) */}
@@ -317,35 +420,71 @@ export default function AdminPanel() {
             </div>
           </div>
 
-          {/* Questions Grouped by Subtopic */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xl)' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button 
+                variant="ghost" 
+                size="xs"
+                onClick={() => {
+                  const allExpanded = subtopics.reduce((acc, s) => ({ ...acc, [s.id]: true }), { 'no-subtopic': true });
+                  const allCollapsed = {};
+                  const currentlyAllExpanded = Object.values(expandedAdminSubtopics).filter(Boolean).length >= subtopics.length;
+                  setExpandedAdminSubtopics(currentlyAllExpanded ? allCollapsed : allExpanded);
+                }}
+              >
+                {Object.values(expandedAdminSubtopics).filter(Boolean).length >= subtopics.length ? 'Colapsar todo' : 'Expandir todo'}
+              </Button>
+            </div>
             {[null, ...subtopics].map(container => {
               const containerId = container?.id || null;
               const filteredQuestions = topicQuestions.filter(q => q.subtopicId === containerId);
+              const isExpanded = expandedAdminSubtopics[containerId || 'no-subtopic'];
               
               if (containerId && filteredQuestions.length === 0) return null; // Ocultar subtemas vacíos
               if (!containerId && filteredQuestions.length === 0 && subtopics.length > 0) return null; // Ocultar bloque "general" si está vacío y hay subtemas
 
               return (
                 <div key={containerId || 'no-subtopic'}>
-                  <h5 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: 'var(--space-xs)', marginBottom: 'var(--space-md)', color: containerId ? 'var(--primary-400)' : 'var(--text-muted)' }}>
+                  <h5 
+                    onClick={() => setExpandedAdminSubtopics(prev => ({ ...prev, [containerId || 'no-subtopic']: !prev[containerId || 'no-subtopic'] }))}
+                    style={{ 
+                      borderBottom: '1px solid var(--border-color)', 
+                      paddingBottom: 'var(--space-xs)', 
+                      marginBottom: isExpanded ? 'var(--space-md)' : '0', 
+                      color: containerId ? 'var(--primary-400)' : 'var(--text-muted)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--space-sm)',
+                      cursor: 'pointer',
+                      userSelect: 'none'
+                    }}
+                  >
+                    <span style={{ 
+                      transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', 
+                      transition: 'transform 0.2s',
+                      fontSize: '10px'
+                    }}>▶</span>
                     {container ? `🔹 ${container.title}` : '🔸 Sin Subtema Asignado'}
+                    <span style={{ fontSize: 'var(--font-xs)', color: 'var(--text-muted)', fontWeight: 'normal' }}>({filteredQuestions.length})</span>
                   </h5>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-                    {filteredQuestions.map(q => (
-                      <div key={q.id} className="card" style={{ padding: 'var(--space-md)', background: 'rgba(255,255,255,0.03)' }}>
-                        <p style={{ fontWeight: 600, marginBottom: 'var(--space-sm)' }}>{q.questionText}</p>
-                        <div style={{ display: 'flex', gap: 'var(--space-sm)', fontSize: 'var(--font-xs)', color: 'var(--text-secondary)' }}>
-                           <span className="badge badge-secondary">{q.difficulty}</span>
-                           <span>{q.options.length} opciones</span>
+                  
+                  {isExpanded && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }} className="animate-slide-up">
+                      {filteredQuestions.map(q => (
+                        <div key={q.id} className="card" style={{ padding: 'var(--space-md)', background: 'rgba(255,255,255,0.03)' }}>
+                          <p style={{ fontWeight: 600, marginBottom: 'var(--space-sm)' }}>{q.questionText}</p>
+                          <div style={{ display: 'flex', gap: 'var(--space-sm)', fontSize: 'var(--font-xs)', color: 'var(--text-secondary)' }}>
+                             <span className="badge badge-secondary">{q.difficulty}</span>
+                             <span>{q.options.length} opciones</span>
+                          </div>
+                          <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)' }}>
+                            <Button size="sm" variant="secondary" onClick={() => handleEditQuestion(q)}>Editar</Button>
+                            <Button size="sm" variant="danger" onClick={() => handleDeleteQuestion(q.id)}>Eliminar</Button>
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)' }}>
-                          <Button size="sm" variant="secondary" onClick={() => handleEditQuestion(q)}>Editar</Button>
-                          <Button size="sm" variant="danger" onClick={() => handleDeleteQuestion(q.id)}>Eliminar</Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -388,7 +527,70 @@ export default function AdminPanel() {
         </>
       )}
 
-      {/* USERS TAB */}
+      {/* GLOBAL QUESTIONS TAB */}
+      {activeTab === 'questions' && (
+        <Card title="Listado Global de Preguntas">
+          <div style={{ marginBottom: 'var(--space-md)' }}>
+            <input 
+              type="text" 
+              className="input" 
+              placeholder="🔍 Buscar por enunciado..." 
+              onChange={(e) => {
+                const term = e.target.value.toLowerCase();
+                // Simple local filter for better UX
+                const rows = document.querySelectorAll('.question-row');
+                rows.forEach(row => {
+                  const text = row.querySelector('.q-text').textContent.toLowerCase();
+                  row.style.display = text.includes(term) ? '' : 'none';
+                });
+              }}
+            />
+          </div>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                <tr style={{ borderBottom: '2px solid var(--border-color)' }}>
+                    <th style={{ padding: 'var(--space-sm)' }}>Enunciado</th>
+                    <th style={{ padding: 'var(--space-sm)' }}>Tema</th>
+                    <th style={{ padding: 'var(--space-sm)' }}>Dificultad</th>
+                    <th style={{ padding: 'var(--space-sm)' }}>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {globalQuestions.map(q => (
+                    <tr key={q.id} className="question-row" style={{ borderBottom: '1px solid var(--border-color)' }}>
+                    <td style={{ padding: 'var(--space-sm)', fontSize: 'var(--font-sm)', maxWidth: '400px' }} className="q-text">
+                        {q.questionText}
+                    </td>
+                    <td style={{ padding: 'var(--space-sm)' }}>
+                        <span className="badge badge-ghost">{q.topic?.title}</span>
+                    </td>
+                    <td style={{ padding: 'var(--space-sm)' }}>
+                        <span className={`badge badge-secondary`}>{q.difficulty}</span>
+                    </td>
+                    <td style={{ padding: 'var(--space-sm)', display: 'flex', gap: '0.5rem' }}>
+                        <Button variant="secondary" size="sm" onClick={() => {
+                          // Buscar el tema y abrirlo
+                          const topic = topics.find(t => t.id === q.topicId);
+                          if (topic) {
+                            viewQuestions(topic);
+                            setActiveTab('topics');
+                          } else {
+                            handleEditQuestion(q);
+                          }
+                        }}>Editar</Button>
+                    </td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+            {globalQuestions.length === 0 && <p style={{ textAlign: 'center', padding: 'var(--space-xl)' }}>No hay preguntas cargadas.</p>}
+          </div>
+          <p style={{ marginTop: 'var(--space-md)', fontSize: 'var(--font-xs)', color: 'var(--text-muted)' }}>
+            * Mostrando las últimas 100 preguntas. Para buscar una específica, utiliza el buscador o navega por Temas.
+          </p>
+        </Card>
+      )}
       {activeTab === 'users' && !selectedTopic && (
         <Card title="Gestión de Usuarios">
             <div style={{ overflowX: 'auto' }}>
@@ -501,7 +703,7 @@ export default function AdminPanel() {
               <label className="input-label">Título</label>
               <input 
                 className="input" 
-                value={editingTopic.title} 
+                value={editingTopic.title || ''} 
                 onChange={(e) => setEditingTopic({...editingTopic, title: e.target.value})}
               />
             </div>
@@ -510,7 +712,7 @@ export default function AdminPanel() {
               <textarea 
                 className="input" 
                 rows="3"
-                value={editingTopic.description} 
+                value={editingTopic.description || ''} 
                 onChange={(e) => setEditingTopic({...editingTopic, description: e.target.value})}
               />
             </div>
@@ -530,7 +732,7 @@ export default function AdminPanel() {
             <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
               <div className="input-group" style={{ flex: 1 }}>
                 <label className="input-label">Icono</label>
-                <input className="input" value={editingTopic.icon} onChange={(e) => setEditingTopic({...editingTopic, icon: e.target.value})}/>
+                <input className="input" value={editingTopic.icon || ''} onChange={(e) => setEditingTopic({...editingTopic, icon: e.target.value})}/>
               </div>
               <div className="input-group" style={{ flex: 1 }}>
                 <label className="input-label">Color</label>
@@ -560,7 +762,7 @@ export default function AdminPanel() {
               <input 
                 className="input" 
                 placeholder="Ej: Sección 1: Introducción"
-                value={editingSubtopic.title} 
+                value={editingSubtopic.title || ''} 
                 onChange={(e) => setEditingSubtopic({...editingSubtopic, title: e.target.value})}
               />
             </div>
@@ -569,8 +771,11 @@ export default function AdminPanel() {
               <input 
                 type="number"
                 className="input" 
-                value={editingSubtopic.order} 
-                onChange={(e) => setEditingSubtopic({...editingSubtopic, order: parseInt(e.target.value)})}
+                value={editingSubtopic.order ?? ''} 
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setEditingSubtopic({...editingSubtopic, order: val === '' ? null : parseInt(val)});
+                }}
               />
             </div>
           </div>
@@ -596,7 +801,7 @@ export default function AdminPanel() {
               <textarea 
                 className="input" 
                 rows="3"
-                value={editingQuestion.questionText} 
+                value={editingQuestion.questionText || ''} 
                 onChange={(e) => setEditingQuestion({...editingQuestion, questionText: e.target.value})}
               />
             </div>
@@ -644,7 +849,7 @@ export default function AdminPanel() {
               <textarea 
                 className="input" 
                 rows="2"
-                value={editingQuestion.explanation} 
+                value={editingQuestion.explanation || ''} 
                 onChange={(e) => setEditingQuestion({...editingQuestion, explanation: e.target.value})}
               />
             </div>
@@ -673,7 +878,9 @@ export default function AdminPanel() {
         footer={(
           <>
             <Button variant="ghost" onClick={() => setIsBulkModalOpen(false)}>Cerrar</Button>
-            <Button variant="primary" onClick={handleBulkImport}>Importar Todo</Button>
+            <Button variant="primary" onClick={handleBulkImport} disabled={loading}>
+              {loading ? <span className="spinner spinner-sm"></span> : 'Importar Todo'}
+            </Button>
           </>
         )}
       >
@@ -711,6 +918,8 @@ export default function AdminPanel() {
             value={bulkText}
             onChange={(e) => setBulkText(e.target.value)}
             style={{ fontFamily: 'monospace', fontSize: 'var(--font-sm)' }}
+            spellCheck={false}
+            data-gramm={false}
           />
         </div>
       </Modal>

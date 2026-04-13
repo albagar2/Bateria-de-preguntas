@@ -6,123 +6,83 @@
     <title>Manual de Usuario - Batería de Preguntas</title>
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-light: #eff6ff;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --bg-light: #f9fafb;
-            --accent: #10b981;
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
         }
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            line-height: 1.7;
-            color: var(--text-main);
-            background-color: var(--bg-light);
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
             margin: 0;
             padding: 2rem;
+            max-width: 900px;
+            margin: auto;
         }
-        .container {
-            max-width: 850px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 3.5rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-        }
-        h1, h2, h3 { color: var(--primary); letter-spacing: -0.02em; }
-        h1 { border-bottom: 3px solid var(--primary-light); padding-bottom: 1.5rem; font-size: 2.5rem; text-align: center; }
-        h2 { margin-top: 3rem; border-left: 4px solid var(--primary); padding-left: 1rem; }
-        h3 { color: var(--text-main); margin-top: 1.5rem; }
-        ul, ol { padding-left: 1.2rem; }
-        li { margin-bottom: 0.75rem; }
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        .feature-card {
-            background: var(--primary-light);
+        h1, h2, h3 { color: var(--primary); }
+        .card {
+            background: var(--card);
+            border-radius: 12px;
             padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid rgba(79, 70, 229, 0.1);
-        }
-        .tip-box {
-            background-color: #ecfdf5;
-            border-left: 4px solid var(--accent);
-            padding: 1.2rem;
-            margin: 2rem 0;
-            border-radius: 0 12px 12px 0;
-        }
-        .admin-note {
-            background-color: #fff7ed;
-            border: 1px solid #fdba74;
-            padding: 1.2rem;
-            border-radius: 12px;
-            margin: 2rem 0;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         code {
-            background: #f1f5f9;
+            background: #000;
             padding: 0.2rem 0.4rem;
             border-radius: 4px;
             font-family: monospace;
         }
+        .badge {
+            background: var(--primary);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Manual de Usuario 📚</h1>
-        <p style="text-align: center; font-size: 1.1rem; color: var(--text-muted);">Bienvenido a la plataforma definitiva para la preparación de oposiciones.</p>
+    <h1>Manual de Usuario - Batería de Preguntas 📚</h1>
+    <p>Guía oficial para el ecosistema educativo inteligente v2.0</p>
 
+    <div class="card">
         <h2>1. Primeros Pasos 🚀</h2>
-        <p>Configura tu entorno de estudio en pocos segundos:</p>
         <ul>
-            <li><strong>Registro Personalizado</strong>: Crea tu cuenta y accede a tu panel privado.</li>
-            <li><strong>Selector de Oposiciones</strong>: Elige los cuerpos oficiales a los que aspiras.</li>
-            <li><strong>Oposiciones Propias ✨</strong>: Si preparas un examen específico, crea tu propia oposición con nombre, categoría e iconos personalizados (🚓, 🚒, ⚖️).</li>
+            <li><strong>Registro:</strong> Crea tu perfil de estudiante con un clic.</li>
+            <li><strong>Oposiciones Personalizadas ✨:</strong> Crea tus propias categorías si no existen. Puedes elegir iconos (🚓, 🚒, ⚖️) para personalizarlas.</li>
         </ul>
-
-        <h2>2. Tu Panel de Control 📊</h2>
-        <div class="feature-grid">
-            <div class="feature-card">
-                <strong>Racha de Estudio</strong>
-                <p>Mantén tu constancia y visualiza visualmente tu progreso diario.</p>
-            </div>
-            <div class="feature-card">
-                <strong>Tutoría IA</strong>
-                <p>Pregunta cualquier duda al Tutor Inteligente en tiempo real.</p>
-            </div>
-            <div class="feature-card">
-                <strong>Progreso Real</strong>
-                <p>Gráficas actualizadas sobre tu dominio de cada tema.</p>
-            </div>
-        </div>
-
-        <h2>3. Entrenamiento Inteligente 🧪</h2>
-        <p>Nuestra metodología se basa en la práctica constante:</p>
-        <ol>
-            <li><strong>Repetición Espaciada</strong>: El sistema prioriza las preguntas que fallas para que nunca las olvides.</li>
-            <li><strong>Modo Sin Fallos</strong>: Ideal para repasar temas completos antes del examen real.</li>
-            <li><strong>Explicaciones IA 🤖</strong>: Tras cada respuesta, solicita una explicación detallada generada por inteligencia artificial según tu nivel actual.</li>
-        </ol>
-
-        <div class="tip-box">
-            <strong>💎 Experiencia Premium</strong>: Hemos eliminado los avisos intrusivos del navegador por un sistema de notificaciones elegante y moderno que no interrumpe tu flujo de estudio.
-        </div>
-
-        <h2>4. Área de Administración 🛡️</h2>
-        <div class="admin-note">
-            <strong>Solo Administradores:</strong>
-            <p>Accede al Centro de Control para gestionar la base de datos:</p>
-            <ul>
-                <li><strong>Carga Masiva</strong>: Usa el importador de texto para añadir cientos de preguntas en un solo paso usando el formato <code>P: / R:</code>.</li>
-                <li><strong>Filtros Avanzados</strong>: Organiza y busca temas filtrando por oposición oficial o personalizada.</li>
-            </ul>
-        </div>
-
-        <p style="text-align: center; margin-top: 4rem; font-weight: bold; color: var(--primary); font-size: 1.2rem;">
-            ¡Mucho ánimo! La victoria se construye día a día.
-        </p>
     </div>
+
+    <div class="card">
+        <h2>2. Entrenamiento y Test 🧪</h2>
+        <ul>
+            <li><strong>Modo Sin Fallos:</strong> El reto definitivo. Un solo error y vuelves al inicio.</li>
+            <li><strong>Explicaciones IA 🤖:</strong> Si fallas, nuestro tutor Gemini te explicará el fundamento jurídico de la respuesta.</li>
+            <li><strong>Repaso Inteligente:</strong> El sistema prioriza las preguntas que más te cuestan.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>3. Panel de Administración 🛡️</h2>
+        <ul>
+            <li><strong>Carga Masiva Inteligente:</strong> Pega bloques de preguntas. El sistema detecta automáticamente enunciados y respuestas por texto completo.</li>
+            <li><strong>Subtemas Desplegables 🔽:</strong> Nueva interfaz organizada que permite colapsar secciones para una gestión más limpia.</li>
+            <li><strong>Buscador Global 🔍:</strong> Encuentra cualquier pregunta en segundos desde el nuevo listado global con buscador integrado.</li>
+            <li><strong>Protección contra Duplicados:</strong> El servidor bloquea automáticamente cualquier intento de subir contenido que ya existe en el tema.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>4. Experiencia de Usuario 💎</h2>
+        <p>Disfruta de una interfaz <strong>Dark-First</strong> con <strong>Glassmorphism</strong>, diseñada para largas sesiones de estudio sin fatiga visual.</p>
+    </div>
+
+    <footer style="text-align: center; color: var(--text-dim); margin-top: 3rem;">
+        © 2026 ALBA-OS EDUCATIONAL DIVISION
+    </footer>
 </body>
 </html>

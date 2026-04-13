@@ -38,16 +38,19 @@ Si tienes dudas tras una respuesta, pulsa en **"Explicación IA"**. El sistema a
 ## 4. Gestión para Administradores 🛡️
 
 Si tienes privilegios de administrador, dispones de herramientas avanzadas en el **Centro de Control**:
-- **Carga Masiva de Preguntas**: Olvídate de ir una a una. Puedes pegar un bloque de texto (formato P/R) e importar cientos de preguntas en un solo paso.
-- **Gestión por Oposición**: Filtra y organiza los temas por oposición para mantener la base de datos impecable.
-- **Control de Usuarios**: Gestiona roles y accesos de forma centralizada.
+- **Carga Masiva Inteligente 🚀**: Olvídate de ir una a una. Puedes pegar bloques de texto y el sistema detectará automáticamente los enunciados, las opciones y las respuestas.
+- **Detección de Texto en Respuestas**: El importador es capaz de identificar la respuesta correcta incluso si pones el texto completo (ej: `R: Artículo 113`) en lugar de solo la letra.
+- **Subtemas Desplegables 🔽**: Organiza las preguntas en grupos lógicos. Tanto en la vista de estudio como en administración, puedes colapsar y expandir secciones para no abrumarte con temas largos.
+- **Buscador Global de Preguntas 🔍**: Una potente herramienta que te permite buscar cualquier enunciado en toda la base de datos simultáneamente, facilitando tareas de corrección o edición rápida.
+- **Prevención de Duplicados 🛡️**: El sistema audita automáticamente cada carga para asegurar que no se introduzca la misma pregunta dos veces en el mismo tema.
 
 ---
 
 ## 5. Experiencia de Usuario 💎
 
-- **Notificaciones Modernas**: Olvídate de las alertas feas del navegador. Ahora el sistema utiliza diálogos elegantes y claros para confirmar tus acciones.
-- **Modo Oscuro**: Actívalo en cualquier momento desde tu perfil para reducir la fatiga visual durante las sesiones nocturnas.
+- **Diseño Premium**: Interfaz "Dark-First" con efectos de cristal (glassmorphism) para una experiencia de estudio state-of-the-art.
+- **Notificaciones Modernas**: Diálogos elegantes y claros para confirmar tus acciones.
+- **Modo Oscuro**: Optimizado para reducir la fatiga visual durante las sesiones nocturnas.
 
 ---
 
