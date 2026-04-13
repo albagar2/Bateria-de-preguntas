@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import swal from '../utils/swal';
 import './Topics.css';
 
 export default function Topics() {
@@ -35,7 +36,7 @@ export default function Topics() {
       setShowForm(false);
       navigate(`/topics/${res.data.id}`);
     } catch (err) {
-      alert(err.message || 'Error al crear tema');
+      swal.error('Error', err.message || 'Error al crear tema');
     }
   };
 

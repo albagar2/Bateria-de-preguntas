@@ -3,6 +3,7 @@ import api from '../services/api';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
+import swal from '../utils/swal';
 import './Dashboard.css';
 
 export default function AdminPanel() {
@@ -13,7 +14,6 @@ export default function AdminPanel() {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topicQuestions, setTopicQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState(null);
   
   // Modal states — flags separados para evitar conflictos entre modales
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
@@ -48,13 +48,14 @@ export default function AdminPanel() {
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!window.confirm('¿Estás seguro de que quieres eliminar este usuario?')) return;
+    const result = await swal.confirm('¿Eliminar usuario?', 'Esta acción no se puede deshacer');
+    if (!result.isConfirmed) return;
     try {
       await api.deleteAdminUser(userId);
       setUsers(users.filter(u => u.id !== userId));
-      setMessage({ type: 'success', text: 'Usuario eliminado con éxito' });
+      swal.success('Eliminado', 'Usuario eliminado con éxito');
     } catch (err) {
-      setMessage({ type: 'error', text: 'Error al eliminar usuario' });
+      swal.error('Error', 'No se pudo eliminar el usuario');
     }
   };
 
@@ -64,7 +65,7 @@ export default function AdminPanel() {
       await api.updateAdminUserRole(user.id, newRole);
       setUsers(users.map(u => u.id === user.id ? { ...u, role: newRole } : u));
     } catch (err) {
-      setMessage({ type: 'error', text: 'Error al cambiar rol' });
+      swal.error('Error', 'No se pudo cambiar el rol');
     }
   };
 
@@ -95,13 +96,14 @@ export default function AdminPanel() {
   };
 
   const handleDeleteTopic = async (id) => {
-    if (!window.confirm('¿Eliminar este tema?')) return;
+    const result = await swal.confirm('¿Eliminar tema?', 'Se borrarán las preguntas asociadas');
+    if (!result.isConfirmed) return;
     try {
       await api.deleteAdminTopic(id);
       setTopics(topics.filter(t => t.id !== id));
-      setMessage({ type: 'success', text: 'Tema eliminado' });
+      swal.success('Eliminado', 'Tema eliminado');
     } catch (err) {
-      setMessage({ type: 'error', text: err.message });
+      swal.error('Error', err.message);
     }
   };
 
@@ -118,9 +120,9 @@ export default function AdminPanel() {
         setTopics([res.data, ...topics]);
       }
       setIsTopicModalOpen(false);
-      setMessage({ type: 'success', text: `Tema ${isTopicEditMode ? 'actualizado' : 'creado'} correctamente` });
+      swal.success('Éxito', `Tema ${isTopicEditMode ? 'actualizado' : 'creado'} correctamente`);
     } catch (err) {
-      setMessage({ type: 'error', text: err.message || 'Error al procesar el tema' });
+      swal.error('Error', err.message || 'Error al procesar el tema');
     }
   };
 
@@ -145,13 +147,14 @@ export default function AdminPanel() {
   };
 
   const handleDeleteQuestion = async (id) => {
-    if (!window.confirm('¿Eliminar esta pregunta?')) return;
+    const result = await swal.confirm('¿Eliminar pregunta?', '¿Estás seguro?');
+    if (!result.isConfirmed) return;
     try {
       await api.deleteAdminQuestion(id);
       setTopicQuestions(topicQuestions.filter(q => q.id !== id));
-      setMessage({ type: 'success', text: 'Pregunta eliminada' });
+      swal.success('Eliminado', 'Pregunta eliminada');
     } catch (err) {
-      setMessage({ type: 'error', text: 'Error al eliminar pregunta' });
+      swal.error('Error', 'No se pudo eliminar la pregunta');
     }
   };
 
@@ -168,9 +171,9 @@ export default function AdminPanel() {
         setTopicQuestions([res.data, ...topicQuestions]);
       }
       setIsQuestionModalOpen(false);
-      setMessage({ type: 'success', text: `Pregunta ${isQuestionEditMode ? 'actualizada' : 'creada'} correctamente` });
+      swal.success('Éxito', `Pregunta ${isQuestionEditMode ? 'actualizada' : 'creada'} correctamente`);
     } catch (err) {
-      setMessage({ type: 'error', text: err.message || 'Error al procesar la pregunta' });
+      swal.error('Error', err.message || 'Error al procesar la pregunta');
     }
   };
 
@@ -189,12 +192,6 @@ export default function AdminPanel() {
         <button className={`btn ${activeTab === 'users' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActiveTab('users')}>👥 Usuarios</button>
         <button className={`btn ${activeTab === 'topics' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => { setActiveTab('topics'); setSelectedTopic(null); }}>📚 Temas y Preguntas</button>
       </div>
-
-      {message && (
-        <div className={`alert alert-${message.type}`} style={{ marginBottom: 'var(--space-lg)' }}>
-          {message.text}
-        </div>
-      )}
 
       {/* Selected Topic Detail (Questions View) */}
       {activeTab === 'topics' && selectedTopic && (

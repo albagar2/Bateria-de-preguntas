@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
+import swal from '../utils/swal';
 import './Topics.css';
 
 export default function TopicDetail() {
@@ -97,7 +98,7 @@ function QuestionForm({ topicId, onCreated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.questionText || form.options.some(o => !o)) {
-      alert('Por favor rellena todos los campos');
+      swal.alert('Atención', 'Por favor rellena todos los campos', 'warning');
       return;
     }
     setLoading(true);
@@ -111,9 +112,9 @@ function QuestionForm({ topicId, onCreated }) {
         difficulty: 'MEDIUM'
       });
       onCreated();
-      alert('Pregunta añadida correctamente');
+      swal.success('¡Hecho!', 'Pregunta añadida correctamente');
     } catch (err) {
-      alert('Error: ' + err.message);
+      swal.error('Error', err.message);
     } finally {
       setLoading(false);
     }

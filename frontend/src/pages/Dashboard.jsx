@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import Modal from '../components/common/Modal';
 import Button from '../components/common/Button';
+import swal from '../utils/swal';
 import './Dashboard.css';
 
 export default function Dashboard() {
@@ -80,7 +81,7 @@ export default function Dashboard() {
       setNewOppName('');
       setNewOppDesc('');
     } catch (err) {
-      alert('Error al crear oposición: ' + err.message);
+      swal.error('Error', 'No se pudo crear la oposición: ' + err.message);
     }
   };
 
