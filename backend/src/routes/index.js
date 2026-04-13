@@ -108,6 +108,7 @@ router.post('/stats/achievements/check', authenticate, statsController.checkAchi
 router.post('/study-plans/generate', authenticate, validate(createStudyPlanSchema), studyPlanController.generate);
 router.get('/study-plans', authenticate, studyPlanController.getPlans);
 router.get('/study-plans/today', authenticate, studyPlanController.getTodayPlan);
+router.get('/study-plans/ai-advice', authenticate, studyPlanController.getAIAdvice);
 router.patch('/study-plans/:id/complete', authenticate, studyPlanController.completePlan);
 
 // ─── AI Routes ───────────────────────────────

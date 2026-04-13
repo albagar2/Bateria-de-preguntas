@@ -20,6 +20,16 @@ export default function Profile() {
     api.getOppositions().then(res => setOppositions(res.data)).catch(console.error);
   }, []);
 
+  // Sync state when user changes (critical for correct initial values)
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setDarkMode(user.darkMode || false);
+      setNotifications(user.notifications ?? true);
+      setOppositionId(user.oppositions?.map(o => o.id) || []);
+    }
+  }, [user]);
+
   const [passwords, setPasswords] = useState({ currentPassword: '', newPassword: '', confirm: '' });
   const [changingPass, setChangingPass] = useState(false);
 

@@ -14,6 +14,7 @@ export default function Dashboard() {
   const { user, updateUser } = useAuth();
   const [stats, setStats] = useState(null);
   const [todayPlan, setTodayPlan] = useState(null);
+  const [allPlans, setAllPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [oppositions, setOppositions] = useState([]);
   const [selectingOpposition, setSelectingOpposition] = useState(false);
@@ -29,12 +30,14 @@ export default function Dashboard() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [statsRes, planRes] = await Promise.all([
+        const [statsRes, planRes, allPlansRes] = await Promise.all([
           api.getStats(),
           api.getTodayPlan(),
+          api.getPlans(), // New: load all for the preview
         ]);
         setStats(statsRes.data);
         setTodayPlan(planRes.data);
+        setAllPlans(allPlansRes.data || []);
       } catch (err) {
         console.error('Dashboard error:', err);
       } finally {
@@ -47,6 +50,20 @@ export default function Dashboard() {
       setLoading(false);
     }
   }, [user?.oppositions]);
+
+  const handleCompletePlan = async (planId) => {
+    try {
+      await api.completePlan(planId);
+      setAllPlans((prev) => prev.map(p => p.id === planId ? { ...p, isCompleted: !p.isCompleted } : p));
+      
+      // Also update todayPlan if it's the same record
+      setTodayPlan(prev => prev && prev.id === planId ? { ...prev, isCompleted: !prev.isCompleted } : prev);
+      
+      toast.success('✅ Estado actualizado');
+    } catch (err) {
+      toast.error('No se pudo actualizar el plan');
+    }
+  };
 
   useEffect(() => {
     if (user && user.oppositions?.length === 0) {
@@ -333,26 +350,65 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Today's Plan */}
-      {todayPlan && (
-        <div className="dashboard-plan card">
-          <h2 className="section-title">📅 Plan de hoy</h2>
-          <p className="dashboard-plan-desc">{todayPlan.description}</p>
-          {todayPlan.topics && (
-            <div className="dashboard-plan-topics">
-              {todayPlan.topics.map((topic) => (
-                <Link
-                  key={topic.id}
-                  to={`/topics/${topic.id}`}
-                  className="badge badge-primary"
-                >
-                  {topic.icon} {topic.title}
-                </Link>
-              ))}
-            </div>
+      {/* Weekly Planning Quick View */}
+      <div className="dashboard-plan card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-lg)' }}>
+          <h2 className="section-title" style={{ margin: 0 }}>📅 Mi Planificación</h2>
+          {(todayPlan || allPlans.length > 0) && (
+            <Link to="/planner" className="btn btn-ghost btn-sm" style={{ color: 'var(--primary-300)' }}>Ver calendario completo →</Link>
           )}
         </div>
-      )}
+        
+        {allPlans.length > 0 ? (
+          <div style={{ display: 'flex', gap: 'var(--space-md)', overflowX: 'auto', paddingBottom: 'var(--space-sm)' }}>
+             {/* Show today + next 4 days */}
+             { [0,1,2,3,4].map(offset => {
+                const date = new Date();
+                date.setDate(date.getDate() + offset);
+                const dateStr = date.toISOString().split('T')[0];
+                const plan = allPlans.find(p => p.date.split('T')[0] === dateStr);
+                const isToday = offset === 0;
+
+                return (
+                  <div key={offset} 
+                    onClick={plan ? () => handleCompletePlan(plan.id) : null}
+                    style={{
+                      minWidth: '160px',
+                      padding: 'var(--space-md)',
+                      borderRadius: 'var(--radius-md)',
+                      background: isToday ? 'rgba(99, 102, 241, 0.1)' : 'var(--bg-elevated)',
+                      border: isToday ? '1px solid var(--primary-500)' : '1px solid var(--border-light)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 'var(--space-xs)',
+                      cursor: plan ? 'pointer' : 'default',
+                      transition: 'transform 0.2s',
+                    }}
+                  >
+                    <div style={{ fontSize: 'var(--font-xs)', fontWeight: 700, color: isToday ? 'var(--primary-400)' : 'var(--text-muted)' }}>
+                      {isToday ? 'HOY' : date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' }).toUpperCase()}
+                    </div>
+                    {plan ? (
+                      <div style={{ fontSize: 'var(--font-sm)', fontWeight: 500, color: 'var(--text-secondary)' }}>
+                        {plan.description.replace('📚 Estudiar: ', '').replace('📝 Repaso general intensivo', 'Repaso General')}
+                        {plan.isCompleted && <span style={{ marginLeft: '4px' }}>✅</span>}
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: 'var(--font-xs)', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                        Libre
+                      </div>
+                    )}
+                  </div>
+                );
+             })}
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', padding: 'var(--space-lg)', background: 'rgba(99, 102, 241, 0.05)', borderRadius: 'var(--radius-md)', border: '1px dashed var(--primary-400)' }}>
+             <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-md)' }}>Aún no tienes un plan de estudio activo para el examen.</p>
+             <Link to="/planner" className="btn btn-primary">✨ Configurar mi Planificador</Link>
+          </div>
+        )}
+      </div>
 
       {/* Recent Activity */}
       {stats?.recentActivity && (

@@ -153,6 +153,7 @@ class ApiService {
     return this.request('GET', `/study-plans${qs ? `?${qs}` : ''}`);
   }
   getTodayPlan() { return this.request('GET', '/study-plans/today'); }
+  getPlanAIAdvice() { return this.request('GET', '/study-plans/ai-advice'); }
   completePlan(id) { return this.request('PATCH', `/study-plans/${id}/complete`); }
 
   // ─── AI Integration ──────────────────────

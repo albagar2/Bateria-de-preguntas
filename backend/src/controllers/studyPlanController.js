@@ -37,4 +37,9 @@ const completePlan = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { generate, getPlans, getTodayPlan, completePlan };
+const getAIAdvice = asyncHandler(async (req, res) => {
+  const result = await studyPlanService.getAIAdvice(req.user.id);
+  res.json({ success: true, data: result });
+});
+
+module.exports = { generate, getPlans, getTodayPlan, completePlan, getAIAdvice };

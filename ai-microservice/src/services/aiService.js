@@ -167,8 +167,34 @@ async function askQuestion({ question, topic, user_name }) {
     };
 }
 
+async function generateStudyStrategy({ plan, user_progress, days_to_exam }) {
+    const prompt = `
+    ROL: Eres el Estratega de Estudios de BateriaQ.
+    
+    CONTEXTO:
+    - Plan de la semana: ${JSON.stringify(plan)}
+    - Progreso actual: ${user_progress} temas registrados.
+    - Días para examen: ${days_to_exam} (si es 30 es un valor estimado).
+    
+    TAREA:
+    Analiza el plan y genera un consejo corto (max 60 palabras) que sea motivador y táctico. 
+    Menciona algo específico sobre la carga de trabajo o la importancia de la constancia.
+    
+    ESTILO: Pedagógico, directo y estimulante.
+    SÉ DIRECTO. No saludes.
+    `.trim();
+
+    const { text } = await callGeminiWithFallback(prompt);
+    
+    return {
+        strategy: text,
+        created_at: new Date().toISOString()
+    };
+}
+
 module.exports = {
     generateExplanation,
     callGeminiWithFallback,
-    askQuestion
+    askQuestion,
+    generateStudyStrategy
 };

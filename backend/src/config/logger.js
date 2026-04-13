@@ -38,6 +38,7 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(),
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
   ],
   // Don't exit on unhandled errors
   exitOnError: false,

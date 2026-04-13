@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 require('dotenv').config();
-const { generateExplanation, askQuestion } = require('./services/aiService');
+const { generateExplanation, askQuestion, generateStudyStrategy } = require('./services/aiService');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -53,6 +53,18 @@ app.post('/api/v1/ask', async (req, res) => {
     } catch (error) {
         console.error('[AI Chat Error]', error);
         return res.status(500).json({ error: 'Error interno en el chat de IA.' });
+    }
+});
+
+// Endpoint: Study Plan Strategic Advice
+app.post('/api/v1/study-strategy', async (req, res) => {
+    try {
+        const { plan, user_progress, days_to_exam } = req.body;
+        const result = await generateStudyStrategy({ plan, user_progress, days_to_exam });
+        return res.json({ advice: result.strategy });
+    } catch (error) {
+        console.error('[AI Strategy Error]', error);
+        return res.status(500).json({ error: 'Error al generar la estrategia de estudio.' });
     }
 });
 

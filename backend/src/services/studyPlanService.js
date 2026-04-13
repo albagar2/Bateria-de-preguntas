@@ -248,8 +248,63 @@ class StudyPlanService {
 
     return prisma.studyPlan.update({
       where: { id: planId },
-      data: { isCompleted: true },
+      data: { isCompleted: !plan.isCompleted },
     });
+  }
+  /**
+   * Obtiene consejos estratégicos de la IA para el plan de estudio actual.
+   * 
+   * Envía al microservicio de IA el resumen del plan (próximos temas)
+   * y el progreso del usuario para que genere una recomendación personalizada.
+   */
+  async getAIAdvice(userId) {
+    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:4001/api/v1';
+
+    // Obtener los planes de la próxima semana
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const nextWeek = new Date(today);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+
+    const [plans, stats] = await Promise.all([
+      prisma.studyPlan.findMany({
+        where: { userId, date: { gte: today, lt: nextWeek } },
+        orderBy: { date: 'asc' }
+      }),
+      prisma.userProgress.findMany({
+        where: { userId },
+        include: { question: { select: { topicId: true } } }
+      })
+    ]);
+
+    if (plans.length === 0) {
+      return { advice: "Aún no has generado un plan de estudio. Ve a la sección del Planificador para empezar." };
+    }
+
+    // Simplificar datos para la IA
+    const planSummary = plans.map(p => ({
+      fecha: p.date.toLocaleDateString('es-ES'),
+      tarea: p.description
+    }));
+
+    try {
+      const response = await fetch(`${aiServiceUrl}/study-strategy`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan: planSummary,
+          user_progress: stats.length, // Un resumen simple por ahora
+          days_to_exam: plans.length > 0 ? 30 : 0 // Dato ficticio o real si lo tenemos
+        })
+      });
+
+      if (!response.ok) throw new Error('Error al conectar con la IA');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error IA Planner:', error);
+      return { advice: "La IA está descansando en este momento, pero tu plan sigue vigente: ¡Céntrate en los temas marcados para hoy!" };
+    }
   }
 }
 
