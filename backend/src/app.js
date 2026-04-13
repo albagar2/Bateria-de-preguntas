@@ -44,6 +44,15 @@ if (env.NODE_ENV !== 'test') {
 // ─── Disable X-Powered-By ───────────────────
 app.disable('x-powered-by');
 
+// ─── Welcome Route ───────────────────────────
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: '🚀 BateriaQ API is live and running!',
+    version: '1.0.0'
+  });
+});
+
 // ─── API Routes ──────────────────────────────
 app.use('/api/v1', routes);
 
