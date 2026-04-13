@@ -57,4 +57,9 @@ async function startServer() {
   }
 }
 
-startServer();
+// Support for Vercel Serverless
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  startServer();
+}
+
+module.exports = app;
