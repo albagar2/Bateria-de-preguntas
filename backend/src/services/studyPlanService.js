@@ -27,6 +27,7 @@
 
 const { prisma } = require('../config/database');
 const { AppError } = require('../utils/AppError');
+const aiService = require('./aiService');
 
 class StudyPlanService {
 
@@ -258,15 +259,13 @@ class StudyPlanService {
    * y el progreso del usuario para que genere una recomendación personalizada.
    */
   async getAIAdvice(userId) {
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:4001/api/v1';
-
     // Obtener los planes de la próxima semana
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const nextWeek = new Date(today);
     nextWeek.setDate(nextWeek.getDate() + 7);
 
-    const [plans, stats] = await Promise.all([
+    const [plans, stats, user] = await Promise.all([
       prisma.studyPlan.findMany({
         where: { userId, date: { gte: today, lt: nextWeek } },
         orderBy: { date: 'asc' }
@@ -274,7 +273,8 @@ class StudyPlanService {
       prisma.userProgress.findMany({
         where: { userId },
         include: { question: { select: { topicId: true } } }
-      })
+      }),
+      prisma.user.findUnique({ where: { id: userId }, select: { examDate: true } })
     ]);
 
     if (plans.length === 0) {
@@ -287,20 +287,17 @@ class StudyPlanService {
       tarea: p.description
     }));
 
-    try {
-      const response = await fetch(`${aiServiceUrl}/study-strategy`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan: planSummary,
-          user_progress: stats.length, // Un resumen simple por ahora
-          days_to_exam: plans.length > 0 ? 30 : 0 // Dato ficticio o real si lo tenemos
-        })
-      });
+    const daysToExam = user.examDate 
+      ? Math.ceil((new Date(user.examDate) - today) / (1000 * 60 * 60 * 24)) 
+      : 30;
 
-      if (!response.ok) throw new Error('Error al conectar con la IA');
-      const data = await response.json();
-      return data;
+    try {
+      const result = await aiService.generateStudyStrategy({
+        plan: planSummary,
+        userProgress: stats.length,
+        daysToExam
+      });
+      return result;
     } catch (error) {
       console.error('Error IA Planner:', error);
       return { advice: "La IA está descansando en este momento, pero tu plan sigue vigente: ¡Céntrate en los temas marcados para hoy!" };

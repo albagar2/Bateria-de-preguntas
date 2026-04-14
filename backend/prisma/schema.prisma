@@ -268,6 +268,18 @@ model Bookmark {
   @@map("bookmarks")
 }
 
+model AICache {
+  hashKey        String   @id @map("hash_key")
+  questionId     String?  @map("question_id")
+  content        String   @db.Text
+  modelUsed      String?  @map("model_used")
+  difficulty     String?  @map("difficulty")
+  type           String   @default("explanation") // explanation, strategy, chat
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("ai_cache")
+}
+
 enum Role {
   USER
   ADMIN
