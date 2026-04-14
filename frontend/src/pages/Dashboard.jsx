@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 import Modal from '../components/common/Modal';
 import Button from '../components/common/Button';
@@ -12,6 +13,7 @@ import './Dashboard.css';
 
 export default function Dashboard() {
   const { user, updateUser } = useAuth();
+  const toast = useToast();
   const [stats, setStats] = useState(null);
   const [todayPlan, setTodayPlan] = useState(null);
   const [allPlans, setAllPlans] = useState([]);

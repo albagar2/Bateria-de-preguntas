@@ -18,12 +18,25 @@ exports.generateExplanation = async (req, res, next) => {
         user_id: req.user.id,
         difficulty: difficulty || 'intermediate'
       })
+    }).catch(err => {
+      console.error('❌ Error de conexión con AI Microservice (Explicación):', err.message);
+      return null;
     });
 
+    if (!response) {
+      return res.status(503).json({ 
+        success: false, 
+        message: 'El servicio de explicaciones IA no está disponible en este momento.' 
+      });
+    }
+
     if (!response.ok) {
-      const errText = await response.text();
-      console.error('❌ Error del microservicio IA:', errText);
-      return res.status(response.status).json({ success: false, message: 'La IA no pudo procesar la solicitud.', details: errText });
+      const errData = await response.json().catch(() => ({}));
+      console.error('❌ Error del microservicio IA:', errData);
+      return res.status(response.status).json({ 
+        success: false, 
+        message: errData.message || 'La IA no pudo procesar la solicitud de explicación.' 
+      });
     }
 
     const data = await response.json();
@@ -49,10 +62,24 @@ exports.askQuestion = async (req, res, next) => {
         topic,
         user_name: req.user.name
       })
+    }).catch(err => {
+      console.error('❌ Error de conexión con AI Microservice:', err.message);
+      return null;
     });
 
+    if (!response) {
+      return res.status(503).json({ 
+        success: false, 
+        message: 'El servicio de IA no está disponible en este momento. Por favor, inténtalo más tarde.' 
+      });
+    }
+
     if (!response.ok) {
-        throw new Error('El microservicio de IA no respondió correctamente');
+        const errData = await response.json().catch(() => ({}));
+        return res.status(response.status).json({ 
+          success: false, 
+          message: errData.message || 'El microservicio de IA no respondió correctamente' 
+        });
     }
 
     const data = await response.json();

@@ -80,6 +80,8 @@ class AuthService {
           email: true,
           role: true,
           oppositions: { select: { id: true, name: true } },
+          darkMode: true,
+          notifications: true,
           createdAt: true,
         },
       });
@@ -138,6 +140,8 @@ class AuthService {
         role: true,
         oppositions: { select: { id: true, name: true, icon: true } },
         passwordHash: true,
+        darkMode: true,
+        notifications: true,
         createdAt: true,
       },
     });
@@ -202,6 +206,8 @@ class AuthService {
         user: {
           select: {
             id: true, name: true, email: true, role: true,
+            darkMode: true,
+            notifications: true,
             oppositions: { select: { id: true, name: true } }
           },
         },

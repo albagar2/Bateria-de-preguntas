@@ -146,15 +146,32 @@ export default function Profile() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', cursor: 'pointer' }}>
-              <input type="checkbox" checked={darkMode} onChange={(e) => {
-                setDarkMode(e.target.checked);
-                // Apply immediately
-                document.documentElement.setAttribute('data-theme', e.target.checked ? '' : 'light');
+              <input type="checkbox" checked={darkMode} onChange={async (e) => {
+                const val = e.target.checked;
+                setDarkMode(val);
+                // Apply immediately to DOM
+                document.documentElement.setAttribute('data-theme', val ? '' : 'light');
+                // Persist to DB
+                try {
+                  const res = await api.updateProfile({ darkMode: val });
+                  updateUser(res.data);
+                } catch (err) {
+                  toast.error('Error al guardar tema');
+                }
               }} />
               🌙 Modo oscuro
             </label>
             <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', cursor: 'pointer' }}>
-              <input type="checkbox" checked={notifications} onChange={(e) => setNotifications(e.target.checked)} />
+              <input type="checkbox" checked={notifications} onChange={async (e) => {
+                const val = e.target.checked;
+                setNotifications(val);
+                try {
+                  const res = await api.updateProfile({ notifications: val });
+                  updateUser(res.data);
+                } catch (err) {
+                  toast.error('Error al guardar preferencia');
+                }
+              }} />
               🔔 Notificaciones
             </label>
           </div>

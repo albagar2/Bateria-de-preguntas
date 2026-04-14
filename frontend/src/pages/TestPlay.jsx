@@ -18,6 +18,7 @@ export default function TestPlay() {
   const [answered, setAnswered] = useState(false);
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState(false);
+  const [result, setResult] = useState(null);
   const [startTime, setStartTime] = useState(Date.now());
   const [elapsed, setElapsed] = useState(0);
   const [answers, setAnswers] = useState({});
