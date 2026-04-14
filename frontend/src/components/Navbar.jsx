@@ -20,7 +20,7 @@ export default function Navbar() {
   const navLinks = [
     { to: '/', label: 'Dashboard', icon: '🏠' },
     ...(user?.role === 'ADMIN' ? [{ to: '/admin', label: 'Admin', icon: '🛠️' }] : []),
-    ...(user?.oppositionId ? [
+    ...(user ? [
       { to: '/topics', label: 'Temas', icon: '📚' },
       { to: '/tests', label: 'Tests', icon: '🧪' },
       { to: '/mistakes', label: 'Errores', icon: '❌' },
