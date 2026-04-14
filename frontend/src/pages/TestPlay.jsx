@@ -16,8 +16,8 @@ export default function TestPlay() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [answered, setAnswered] = useState(false);
-  const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [checking, setChecking] = useState(false);
   const [startTime, setStartTime] = useState(Date.now());
   const [elapsed, setElapsed] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -79,6 +79,7 @@ export default function TestPlay() {
 
   const handleAnswer = async () => {
     if (selectedIndex === null || answered) return;
+    setChecking(true);
     setAnswered(true);
 
     const question = test.answers[currentIndex]?.question;
@@ -94,6 +95,9 @@ export default function TestPlay() {
       setAnswers((prev) => ({ ...prev, [question.id]: { selectedIndex, isCorrect: res.data.isCorrect } }));
     } catch (err) {
       toast.error(err.message);
+      setAnswered(false);
+    } finally {
+      setChecking(false);
     }
   };
 
@@ -220,8 +224,12 @@ export default function TestPlay() {
         {/* Actions */}
         <div className="nofail-actions">
           {!answered ? (
-            <button onClick={handleAnswer} className="btn btn-primary btn-lg btn-full" disabled={selectedIndex === null}>
-              Confirmar respuesta
+            <button 
+              onClick={handleAnswer} 
+              className="btn btn-primary btn-lg btn-full" 
+              disabled={selectedIndex === null || checking}
+            >
+              {checking ? 'Comprobando...' : 'Confirmar respuesta'}
             </button>
           ) : isLast ? (
             <button onClick={handleComplete} className="btn btn-success btn-lg btn-full">

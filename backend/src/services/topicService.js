@@ -142,6 +142,7 @@ class TopicService {
             questionText: true,
             options: true,
             difficulty: true,
+            subtopicId: true,
             // correctIndex NO se incluye aquí intencionalmente (anti-cheat)
           },
         },

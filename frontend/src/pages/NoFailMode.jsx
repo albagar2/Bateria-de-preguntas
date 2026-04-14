@@ -19,6 +19,7 @@ export default function NoFailMode() {
   const [answered, setAnswered] = useState(false);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [checking, setChecking] = useState(false);
   const [failed, setFailed] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [startTime, setStartTime] = useState(null);
@@ -56,6 +57,7 @@ export default function NoFailMode() {
     const question = questions[currentIndex];
     const responseTime = Date.now() - startTime;
 
+    setChecking(true);
     setAnswered(true);
 
     try {
@@ -84,6 +86,9 @@ export default function NoFailMode() {
       }
     } catch (err) {
       toast.error('Error al enviar respuesta');
+      setAnswered(false);
+    } finally {
+      setChecking(false);
     }
   }, [selectedIndex, answered, currentIndex, questions, startTime, streak, maxReached, toast]);
 
@@ -266,9 +271,9 @@ export default function NoFailMode() {
             <button
               onClick={handleAnswer}
               className="btn btn-primary btn-lg btn-full"
-              disabled={selectedIndex === null}
+              disabled={selectedIndex === null || checking}
             >
-              Confirmar respuesta
+              {checking ? 'Comprobando...' : 'Confirmar respuesta'}
             </button>
           ) : result?.isCorrect && !completed ? (
             <button onClick={handleNext} className="btn btn-success btn-lg btn-full">
