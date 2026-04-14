@@ -6,9 +6,8 @@ const { prisma } = require('../config/database');
 const crypto = require('crypto');
 
 const MODEL_POOL = [
-  'gemini-1.5-flash',
-  'gemini-1.5-pro',
-  'gemini-1.0-pro',
+  'gemini-2.0-flash',
+  'gemini-flash-latest',
 ];
 
 /**
@@ -34,10 +33,10 @@ async function callGeminiWithFallback(prompt) {
   for (let i = 0; i < MODEL_POOL.length; i++) {
     const modelName = MODEL_POOL[i];
     try {
-      console.log(`[AI Service] Intentando con modelo: ${modelName} (API v1)`);
+      console.log(`[AI Service] Intentando con modelo: ${modelName} (API v1beta)`);
       
-      // Forzamos explícitamente la versión v1 para evitar el error 404 de v1beta
-      const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1' });
+      // Replicamos la configuración exacta del microservicio que funcionaba:
+      const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1beta' });
       
       const response = await model.generateContent(prompt);
       const text = response.response.text();
