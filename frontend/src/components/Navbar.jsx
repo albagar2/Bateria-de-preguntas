@@ -57,7 +57,7 @@ export default function Navbar() {
           {user && (
             <div className="navbar-user">
               <div className="user-info-badge">
-                <span className="user-name-label">Alba G.</span>
+                <span className="user-name-label"></span>
                 <Link to="/profile" className="navbar-avatar" title="Mi perfil">
                   {user.name.charAt(0).toUpperCase()}
                 </Link>
