@@ -56,11 +56,13 @@ export default function Navbar() {
         <div className="navbar-actions">
           {user && (
             <div className="navbar-user">
-              <Link to="/profile" className="navbar-avatar" title="Mi perfil">
-                {user.name.charAt(0).toUpperCase()}
-              </Link>
-              <button onClick={handleLogout} className="btn-logout" title="Cerrar sesión">
-                <span>Cerrar sesión</span>
+              <div className="user-info-badge">
+                <span className="user-name-label">Alba G.</span>
+                <Link to="/profile" className="navbar-avatar" title="Mi perfil">
+                  {user.name.charAt(0).toUpperCase()}
+                </Link>
+              </div>
+              <button onClick={handleLogout} className="btn-logout-minimal" title="Cerrar sesión">
                 <span className="logout-icon">🚪</span>
               </button>
             </div>
