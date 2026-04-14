@@ -5,6 +5,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+import { Download, PlayCircle, BookOpen, AlertCircle } from 'lucide-react';
 
 export default function Mistakes() {
   const [mistakes, setMistakes] = useState([]);
@@ -41,6 +44,43 @@ export default function Mistakes() {
     }
   };
 
+  const exportMistakesPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(22);
+    doc.setTextColor(239, 68, 68); // Error Red
+    doc.text('Banco de Errores - BateriaQ', 20, 20);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generado el: ${new Date().toLocaleDateString()}`, 20, 30);
+    doc.text(`Total Errores Pendientes: ${mistakes.length}`, 20, 35);
+
+    const tableData = mistakes.map((m, i) => [
+      i + 1,
+      m.question?.topic?.title || 'General',
+      m.question?.questionText,
+      m.question?.options[m.question.correctIndex],
+      m.question?.explanation || 'Sin explicación'
+    ]);
+
+    doc.autoTable({
+      startY: 45,
+      head: [['#', 'Tema', 'Pregunta', 'Respuesta Correcta', 'Explicación']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [239, 68, 68] },
+      styles: { fontSize: 8, cellPadding: 4 },
+      columnStyles: {
+        2: { cellWidth: 50 },
+        3: { cellWidth: 40 },
+        4: { cellWidth: 40 }
+      }
+    });
+
+    doc.save('BateriaQ_Mis_Errores.pdf');
+    toast.success('📥 Descargando archivo PDF...');
+  };
+
   if (loading) return <div className="loading-screen"><div className="spinner"></div></div>;
 
   return (
@@ -51,16 +91,28 @@ export default function Mistakes() {
       </div>
 
       <div style={{ display: 'flex', gap: 'var(--space-md)', marginBottom: 'var(--space-2xl)', flexWrap: 'wrap', alignItems: 'center' }}>
-        <button onClick={handleReviewErrors} className="btn btn-primary" disabled={mistakes.length === 0}>
-          🔁 Repetir errores ({mistakes.length})
+        <button onClick={handleReviewErrors} className="btn btn-primary" disabled={mistakes.length === 0} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+          <PlayCircle size={18} /> Repetir errores ({mistakes.length})
         </button>
 
-        <select className="input" style={{ width: 'auto', minWidth: '200px' }} value={filter} onChange={(e) => setFilter(e.target.value)}>
-          <option value="">Todos los temas</option>
-          {topics.map((t) => (
-            <option key={t.id} value={t.id}>{t.title}</option>
-          ))}
-        </select>
+        <button onClick={exportMistakesPDF} className="btn btn-outline" disabled={mistakes.length === 0} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+          <Download size={18} /> Exportar Errores PDF
+        </button>
+
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+          <label style={{ fontSize: 'var(--font-xs)', fontWeight: 600, color: 'var(--text-muted)' }}>Filtrar Tema:</label>
+          <select 
+            className="input" 
+            style={{ width: 'auto', minWidth: '200px' }} 
+            value={filter} 
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <option value="">Todos los temas</option>
+            {topics.map((t) => (
+              <option key={t.id} value={t.id}>{t.title}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {mistakes.length === 0 ? (

@@ -6,6 +6,7 @@ import { useEffect, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import AIChatAssistant from './components/AIChatAssistant';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -24,6 +25,7 @@ import Planner from './pages/Planner';
 import Profile from './pages/Profile';
 import Support from './pages/Support';
 import AdminPanel from './pages/AdminPanel';
+import Pomodoro from './pages/Pomodoro';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -89,6 +91,7 @@ function AppRoutes() {
           <Route path="/planner" element={<ProtectedRoute><Planner /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
+          <Route path="/pomodoro" element={<ProtectedRoute><Pomodoro /></ProtectedRoute>} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
@@ -97,6 +100,7 @@ function AppRoutes() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      <Footer />
     </>
   );
 }
