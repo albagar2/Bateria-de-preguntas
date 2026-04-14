@@ -4,6 +4,7 @@
 // ============================================
 const { prisma } = require('../config/database');
 const { AppError } = require('../utils/AppError');
+const achievementService = require('./achievementService');
 
 class StatsService {
   /**
@@ -17,6 +18,7 @@ class StatsService {
       testStats,
       topicStats,
       recentActivity,
+      achievements,
     ] = await Promise.all([
       // Overall progress
       prisma.userProgress.aggregate({
@@ -40,7 +42,13 @@ class StatsService {
       this._getTopicStats(userId),
       // Recent activity (last 7 days)
       this._getRecentActivity(userId),
+      achievementService.getUserAchievements(userId),
     ]);
+
+    const activeUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { dailyGoal: true }
+    });
 
     // Count correct answers
     const correctCount = await prisma.userProgress.count({
@@ -87,6 +95,7 @@ class StatsService {
           : 0,
         avgResponseTime: Math.round(totalProgress._avg.responseTime || 0),
         pendingErrors: totalMistakes,
+        dailyGoal: activeUser?.dailyGoal || 20,
       },
       streak: streak ? {
         currentStreak: streak.currentStreak,
@@ -98,10 +107,14 @@ class StatsService {
       tests: {
         totalCompleted: testStats._count.id,
         averageScore: Math.round((testStats._avg.score || 0) * 100) / 100,
-        averageTime: Math.round(testStats._avg.timeSpent || 0),
+        averageTime: Math.round((testStats._avg.timeSpent || 0) * 100) / 100,
       },
       topicStats,
       recentActivity,
+      achievements: achievements.map(ua => ({
+        ...ua.achievement,
+        unlockedAt: ua.unlockedAt
+      })),
     };
   }
 
@@ -360,7 +373,7 @@ class StatsService {
   }
 
   async _getRecentActivity(userId) {
-    const days = 7;
+    const days = 30;
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 

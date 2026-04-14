@@ -4,6 +4,7 @@
 // ============================================
 const { prisma } = require('../config/database');
 const { AppError } = require('../utils/AppError');
+const achievementService = require('./achievementService');
 
 class TestService {
   /**
@@ -201,6 +202,12 @@ class TestService {
         },
       },
     });
+
+    // Award Achievements (Async)
+    achievementService.checkAchievements(userId, { 
+      type: 'TEST_COMPLETE', 
+      data: { score: updatedTest.score, totalQuestions: updatedTest.totalQuestions } 
+    }).catch(err => console.error('[Achievement Error]:', err));
 
     return updatedTest;
   }

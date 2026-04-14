@@ -2,13 +2,15 @@
 // Topic Detail Page
 // ============================================
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Zap } from 'lucide-react';
 import api from '../services/api';
 import swal from '../utils/swal';
 import './Topics.css';
 
 export default function TopicDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [topic, setTopic] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedSubtopics, setExpandedSubtopics] = useState({}); // Tracking expanded subtopics in student view
@@ -48,12 +50,12 @@ export default function TopicDetail() {
             <Link to={`/no-fail/${topic.id}`} className="btn btn-primary btn-lg">
               🔁 Modo sin fallos
             </Link>
-            <Link
-              to={`/tests?topicId=${topic.id}`}
-              className="btn btn-secondary btn-lg"
-            >
+            <button className="btn btn-secondary btn-lg" onClick={() => navigate(`/tests?topicId=${topic.id}`)}>
               🧪 Test del tema
-            </Link>
+            </button>
+            <button className="btn btn-outline btn-lg" onClick={() => navigate(`/flashcards/${id}`)}>
+              <Zap size={18} /> Modo Flashcards
+            </button>
           </>
         ) : (
           <div className="card text-center" style={{ width: '100%', background: 'rgba(99, 102, 241, 0.1)', border: '1px dashed var(--primary-400)' }}>

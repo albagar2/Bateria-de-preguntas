@@ -14,6 +14,11 @@ async function startServer() {
     await prisma.$connect();
     logger.info('✅ Database connected successfully');
 
+    // Init Achievements
+    const achievementService = require('./services/achievementService');
+    await achievementService.seedAchievements();
+    logger.info('🏆 Achievements initialized');
+
     // Start server
     const server = app.listen(PORT, () => {
       logger.info(`🚀 Server running on port ${PORT} in ${env.NODE_ENV} mode`);

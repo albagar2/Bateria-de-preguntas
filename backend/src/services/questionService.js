@@ -25,6 +25,7 @@
 const { prisma } = require('../config/database');
 const { AppError } = require('../utils/AppError');
 const { calculateSpacedRepetition, getQualityFromAnswer } = require('../utils/spacedRepetition');
+const achievementService = require('./achievementService');
 
 class QuestionService {
 
@@ -264,6 +265,12 @@ class QuestionService {
 
       return progress;
     });
+
+    // Award Achievements (Async)
+    achievementService.checkAchievements(userId, { 
+      type: 'ANSWER_QUESTION', 
+      data: { isCorrect, responseTime } 
+    }).catch(err => console.error('[Achievement Error]:', err));
 
     return {
       isCorrect,

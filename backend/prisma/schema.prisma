@@ -31,6 +31,7 @@ model User {
   passwordHash       String            @map("password_hash")
   role               Role              @default(USER)
   examDate           DateTime?         @map("exam_date")
+  dailyGoal          Int               @default(20) @map("daily_goal")
   darkMode           Boolean           @default(false) @map("dark_mode")
   notifications      Boolean           @default(true)
   createdAt          DateTime          @default(now()) @map("created_at")
@@ -231,6 +232,7 @@ model StudyPlan {
 
 model Achievement {
   id          String            @id @default(uuid())
+  code        String            @unique @db.VarChar(50)
   name        String            @db.VarChar(100)
   description String
   icon        String            @db.VarChar(50)

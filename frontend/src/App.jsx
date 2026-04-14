@@ -2,7 +2,7 @@
 // App — Root component with routing
 // ============================================
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import Navbar from './components/Navbar';
@@ -13,11 +13,13 @@ import Register from './pages/Register';
 import Topics from './pages/Topics';
 import TopicDetail from './pages/TopicDetail';
 import NoFailMode from './pages/NoFailMode';
+import Landing from './pages/Landing';
 import TestSetup from './pages/TestSetup';
 import TestPlay from './pages/TestPlay';
 import TestResult from './pages/TestResult';
 import Mistakes from './pages/Mistakes';
 import Stats from './pages/Stats';
+import Flashcards from './pages/Flashcards';
 import Planner from './pages/Planner';
 import Profile from './pages/Profile';
 import Support from './pages/Support';
@@ -71,12 +73,10 @@ function AppRoutes() {
       {user && <AIChatAssistant />}
       <main className="page">
         <Routes>
-          {/* Guest Routes */}
+          {/* Public/Guest Routes */}
+          <Route path="/" element={user ? <ProtectedRoute><Dashboard /></ProtectedRoute> : <Landing />} />
           <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
           <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
-
-          {/* Protected Routes */}
-          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/topics" element={<ProtectedRoute><Topics /></ProtectedRoute>} />
           <Route path="/topics/:id" element={<ProtectedRoute><TopicDetail /></ProtectedRoute>} />
           <Route path="/no-fail/:topicId" element={<ProtectedRoute><NoFailMode /></ProtectedRoute>} />
@@ -85,6 +85,7 @@ function AppRoutes() {
           <Route path="/tests/:testId/result" element={<ProtectedRoute><TestResult /></ProtectedRoute>} />
           <Route path="/mistakes" element={<ProtectedRoute><Mistakes /></ProtectedRoute>} />
           <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
+          <Route path="/flashcards/:topicId" element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
           <Route path="/planner" element={<ProtectedRoute><Planner /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
