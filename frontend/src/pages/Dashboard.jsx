@@ -3,6 +3,7 @@
 // ============================================
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
@@ -290,6 +291,74 @@ export default function Dashboard() {
           📚 Continuar estudio
         </Link>
       </div>
+      
+      {/* NEW: Planning Quick View at the TOP */}
+      <div className="dashboard-plan card animate-slide-up" style={{ animationDelay: '0.1s', marginBottom: 'var(--space-xl)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-lg)' }}>
+          <h2 className="section-title" style={{ margin: 0 }}>📅 Mi Hoja de Ruta</h2>
+          {(todayPlan || allPlans.length > 0) && (
+            <Link to="/planner" className="btn btn-ghost btn-sm" style={{ color: 'var(--primary-300)' }}>Gestionar calendario →</Link>
+          )}
+        </div>
+        
+        {allPlans.length > 0 ? (
+          <div style={{ display: 'flex', gap: 'var(--space-md)', overflowX: 'auto', paddingBottom: 'var(--space-sm)' }}>
+             { [0,1,2,3,4].map(offset => {
+                const date = new Date();
+                date.setDate(date.getDate() + offset);
+                const dateStr = date.toISOString().split('T')[0];
+                const plan = allPlans.find(p => p.date.split('T')[0] === dateStr);
+                const isToday = offset === 0;
+
+                return (
+                  <motion.div 
+                    key={offset} 
+                    whileHover={plan ? { scale: 1.02, y: -5 } : {}}
+                    onClick={plan ? () => handleCompletePlan(plan.id) : null}
+                    style={{
+                      minWidth: isToday ? '240px' : '180px',
+                      padding: 'var(--space-lg)',
+                      borderRadius: '20px',
+                      background: isToday ? 'var(--gradient-primary)' : 'var(--bg-elevated)',
+                      color: isToday ? 'white' : 'inherit',
+                      border: isToday ? 'none' : '1px solid var(--border-light)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 'var(--space-xs)',
+                      cursor: plan ? 'pointer' : 'default',
+                      boxShadow: isToday ? '0 10px 25px -5px rgba(99, 102, 241, 0.4)' : 'none',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    <div style={{ fontSize: '0.7rem', fontWeight: 800, opacity: 0.8, letterSpacing: '1px' }}>
+                      {isToday ? '🎯 HOY' : date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' }).toUpperCase()}
+                    </div>
+                    {plan ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        <div style={{ fontSize: isToday ? '1.1rem' : '0.9rem', fontWeight: 700, margin: '8px 0' }}>
+                          {plan.description.replace('📚 Estudiar: ', '').replace('📝 Repaso general intensivo', 'Repaso General')}
+                        </div>
+                        <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                           <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>{plan.isCompleted ? '✓ Completado' : 'Pendiente'}</span>
+                           {plan.isCompleted ? <span style={{fontSize: '1.2rem'}}>✨</span> : <div style={{width: '20px', height: '20px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)'}}></div>}
+                        </div>
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '10px' }}>
+                        Día libre o sin plan
+                      </div>
+                    )}
+                  </motion.div>
+                );
+             })}
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', padding: 'var(--space-2xl)', background: 'rgba(99, 102, 241, 0.03)', borderRadius: '24px', border: '2px dashed rgba(99, 102, 241, 0.2)' }}>
+             <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: 'var(--space-xl)' }}>Aún no has trazado tu estrategia de estudio.</p>
+             <Link to="/planner" className="btn btn-primary btn-lg">✨ Generar mi Plan de Estudio IA</Link>
+          </div>
+        )}
+      </div>
 
       {/* Stats Grid */}
       <div className="grid grid-4 dashboard-stats">
@@ -352,65 +421,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Weekly Planning Quick View */}
-      <div className="dashboard-plan card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-lg)' }}>
-          <h2 className="section-title" style={{ margin: 0 }}>📅 Mi Planificación</h2>
-          {(todayPlan || allPlans.length > 0) && (
-            <Link to="/planner" className="btn btn-ghost btn-sm" style={{ color: 'var(--primary-300)' }}>Ver calendario completo →</Link>
-          )}
-        </div>
-        
-        {allPlans.length > 0 ? (
-          <div style={{ display: 'flex', gap: 'var(--space-md)', overflowX: 'auto', paddingBottom: 'var(--space-sm)' }}>
-             {/* Show today + next 4 days */}
-             { [0,1,2,3,4].map(offset => {
-                const date = new Date();
-                date.setDate(date.getDate() + offset);
-                const dateStr = date.toISOString().split('T')[0];
-                const plan = allPlans.find(p => p.date.split('T')[0] === dateStr);
-                const isToday = offset === 0;
-
-                return (
-                  <div key={offset} 
-                    onClick={plan ? () => handleCompletePlan(plan.id) : null}
-                    style={{
-                      minWidth: '160px',
-                      padding: 'var(--space-md)',
-                      borderRadius: 'var(--radius-md)',
-                      background: isToday ? 'rgba(99, 102, 241, 0.1)' : 'var(--bg-elevated)',
-                      border: isToday ? '1px solid var(--primary-500)' : '1px solid var(--border-light)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 'var(--space-xs)',
-                      cursor: plan ? 'pointer' : 'default',
-                      transition: 'transform 0.2s',
-                    }}
-                  >
-                    <div style={{ fontSize: 'var(--font-xs)', fontWeight: 700, color: isToday ? 'var(--primary-400)' : 'var(--text-muted)' }}>
-                      {isToday ? 'HOY' : date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' }).toUpperCase()}
-                    </div>
-                    {plan ? (
-                      <div style={{ fontSize: 'var(--font-sm)', fontWeight: 500, color: 'var(--text-secondary)' }}>
-                        {plan.description.replace('📚 Estudiar: ', '').replace('📝 Repaso general intensivo', 'Repaso General')}
-                        {plan.isCompleted && <span style={{ marginLeft: '4px' }}>✅</span>}
-                      </div>
-                    ) : (
-                      <div style={{ fontSize: 'var(--font-xs)', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                        Libre
-                      </div>
-                    )}
-                  </div>
-                );
-             })}
-          </div>
-        ) : (
-          <div style={{ textAlign: 'center', padding: 'var(--space-lg)', background: 'rgba(99, 102, 241, 0.05)', borderRadius: 'var(--radius-md)', border: '1px dashed var(--primary-400)' }}>
-             <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-md)' }}>Aún no tienes un plan de estudio activo para el examen.</p>
-             <Link to="/planner" className="btn btn-primary">✨ Configurar mi Planificador</Link>
-          </div>
-        )}
-      </div>
 
       {/* Recent Activity */}
       {stats?.recentActivity && (

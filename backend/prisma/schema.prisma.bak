@@ -1,0 +1,310 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Opposition {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(200)
+  description String?
+  category    String?  @db.VarChar(100)
+  icon        String?  @db.VarChar(50)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  creatorId   String?  @map("creator_id")
+  creator     User?    @relation("UserCreator", fields: [creatorId], references: [id])
+  topics      Topic[]
+  users       User[]   @relation("EnrolledOppositions")
+
+  @@map("oppositions")
+}
+
+model User {
+  id                 String            @id @default(uuid())
+  name               String            @db.VarChar(100)
+  email              String            @unique @db.VarChar(255)
+  passwordHash       String            @map("password_hash")
+  role               Role              @default(USER)
+  examDate           DateTime?         @map("exam_date")
+  dailyGoal          Int               @default(20) @map("daily_goal")
+  darkMode           Boolean           @default(false) @map("dark_mode")
+  notifications      Boolean           @default(true)
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+  bookmarks          Bookmark[]
+  mistakes           Mistake[]
+  createdOppositions Opposition[]      @relation("UserCreator")
+  sessions           Session[]
+  streak             Streak?
+  studyPlans         StudyPlan[]
+  testAnswers        TestAnswer[]
+  tests              Test[]
+  createdTopics      Topic[]           @relation("TopicCreator")
+  achievements       UserAchievement[]
+  progress           UserProgress[]
+  oppositions        Opposition[]      @relation("EnrolledOppositions")
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  refreshToken String   @unique @map("refresh_token")
+  userAgent    String?  @map("user_agent") @db.VarChar(500)
+  ipAddress    String?  @map("ip_address") @db.VarChar(45)
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Topic {
+  id           String      @id @default(uuid())
+  title        String      @db.VarChar(200)
+  description  String?
+  order        Int         @default(0)
+  icon         String?     @db.VarChar(50)
+  color        String?     @db.VarChar(7)
+  isActive     Boolean     @default(true) @map("is_active")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+  oppositionId String?     @map("opposition_id")
+  creatorId    String?     @map("creator_id")
+  questions    Question[]
+  subtopics    Subtopic[]
+  creator      User?       @relation("TopicCreator", fields: [creatorId], references: [id])
+  opposition   Opposition? @relation(fields: [oppositionId], references: [id], onDelete: Cascade)
+
+  @@index([oppositionId])
+  @@index([creatorId])
+  @@map("topics")
+}
+
+model Question {
+  id           String         @id @default(uuid())
+  topicId      String         @map("topic_id")
+  questionText String         @map("question_text")
+  options      Json
+  correctIndex Int            @map("correct_index")
+  explanation  String?
+  difficulty   Difficulty     @default(MEDIUM)
+  isActive     Boolean        @default(true) @map("is_active")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  subtopicId   String?        @map("subtopic_id")
+  bookmarks    Bookmark[]
+  mistakes     Mistake[]
+  topic        Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  subtopic     Subtopic?      @relation(fields: [subtopicId], references: [id], onDelete: SetNull)
+  testAnswers  TestAnswer[]
+  progress     UserProgress[]
+
+  @@index([topicId])
+  @@index([subtopicId])
+  @@index([difficulty])
+  @@map("questions")
+}
+
+model Subtopic {
+  id        String     @id @default(uuid())
+  title     String     @db.VarChar(200)
+  order     Int        @default(0)
+  topicId   String     @map("topic_id")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  questions Question[]
+  topic     Topic      @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@index([topicId])
+  @@map("subtopics")
+}
+
+model UserProgress {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  questionId   String    @map("question_id")
+  isCorrect    Boolean   @map("is_correct")
+  attempts     Int       @default(1)
+  lastAttempt  DateTime  @default(now()) @map("last_attempt")
+  isMastered   Boolean   @default(false) @map("is_mastered")
+  responseTime Int?      @map("response_time")
+  nextReview   DateTime? @map("next_review")
+  easeFactor   Float     @default(2.5) @map("ease_factor")
+  interval     Int       @default(1)
+  question     Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@index([userId])
+  @@index([nextReview])
+  @@map("user_progress")
+}
+
+model Mistake {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  questionId   String   @map("question_id")
+  mistakeCount Int      @default(1) @map("mistake_count")
+  lastMistake  DateTime @default(now()) @map("last_mistake")
+  isResolved   Boolean  @default(false) @map("is_resolved")
+  question     Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@index([userId])
+  @@map("mistakes")
+}
+
+model Test {
+  id             String       @id @default(uuid())
+  userId         String       @map("user_id")
+  type           TestType     @default(QUICK)
+  score          Float        @default(0)
+  totalQuestions Int          @map("total_questions")
+  correctAnswers Int          @default(0) @map("correct_answers")
+  timeSpent      Int          @default(0) @map("time_spent")
+  timeLimit      Int?         @map("time_limit")
+  penalizeErrors Boolean      @default(false) @map("penalize_errors")
+  isCompleted    Boolean      @default(false) @map("is_completed")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  completedAt    DateTime?    @map("completed_at")
+  answers        TestAnswer[]
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("tests")
+}
+
+model TestAnswer {
+  id            String    @id @default(uuid())
+  testId        String    @map("test_id")
+  userId        String    @map("user_id")
+  questionId    String    @map("question_id")
+  selectedIndex Int?      @map("selected_index")
+  isCorrect     Boolean?  @map("is_correct")
+  responseTime  Int?      @map("response_time")
+  answeredAt    DateTime? @map("answered_at")
+  question      Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  test          Test      @relation(fields: [testId], references: [id], onDelete: Cascade)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([testId, questionId])
+  @@index([testId])
+  @@map("test_answers")
+}
+
+model Streak {
+  id            String    @id @default(uuid())
+  userId        String    @unique @map("user_id")
+  currentStreak Int       @default(0) @map("current_streak")
+  maxStreak     Int       @default(0) @map("max_streak")
+  lastStudyDate DateTime? @map("last_study_date")
+  currentNoFail Int       @default(0) @map("current_no_fail")
+  maxNoFail     Int       @default(0) @map("max_no_fail")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("streaks")
+}
+
+model StudyPlan {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  date        DateTime @db.Date
+  topicIds    Json     @map("topic_ids")
+  description String?
+  isCompleted Boolean  @default(false) @map("is_completed")
+  createdAt   DateTime @default(now()) @map("created_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@map("study_plans")
+}
+
+model Achievement {
+  id          String            @id @default(uuid())
+  code        String            @unique @db.VarChar(50)
+  name        String            @db.VarChar(100)
+  description String
+  icon        String            @db.VarChar(50)
+  type        AchievementType
+  threshold   Int
+  isActive    Boolean           @default(true) @map("is_active")
+  users       UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String      @id @default(uuid())
+  userId        String      @map("user_id")
+  achievementId String      @map("achievement_id")
+  unlockedAt    DateTime    @default(now()) @map("unlocked_at")
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model Bookmark {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  questionId String   @map("question_id")
+  note       String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@index([userId])
+  @@map("bookmarks")
+}
+
+model AICache {
+  hashKey        String   @id @map("hash_key")
+  questionId     String?  @map("question_id")
+  content        String   @db.Text
+  modelUsed      String?  @map("model_used")
+  difficulty     String?  @map("difficulty")
+  type           String   @default("explanation") // explanation, strategy, chat
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("ai_cache")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum TestType {
+  QUICK
+  TOPIC
+  EXAM_SIMULATION
+  ERROR_REVIEW
+  CUSTOM
+}
+
+enum AchievementType {
+  STREAK
+  ACCURACY
+  VOLUME
+  MASTERY
+  SPEED
+}
