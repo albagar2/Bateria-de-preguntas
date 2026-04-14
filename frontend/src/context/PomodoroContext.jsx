@@ -19,6 +19,7 @@ export const PomodoroProvider = ({ children }) => {
   const [muted, setMuted] = useState(false); // ¿Silenciar notificaciones sonoras?
   
   const toast = useToast();
+  const timerRef = useRef(null);
 
   // EFECO: Maneja el tic-tac del reloj
   useEffect(() => {
