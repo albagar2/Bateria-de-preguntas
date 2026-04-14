@@ -14,8 +14,8 @@
 ### 🤖 Tutor IA con Memoria (Gemini Integrated)
 Ya no necesitas buscar en el BOE. Nuestra IA integrada explica cada pregunta, resuelve dudas legales y **recuerda tus conversaciones anteriores**. El historial persistente te permite retomar tus dudas donde las dejaste.
 
-### ⏳ Modo Pomodoro de Alto Rendimiento
-Optimiza tu tiempo con ciclos de estudio y descanso automatizados (25/5). Una herramienta integrada para mantener la concentración máxima sin quemarte.
+### ⏳ Modo Pomodoro 2.0 (Deep Focus)
+Optimiza tu tiempo con ciclos de estudio y descanso automatizados. Esta versión incluye el **Modo Sin Distracciones** (bloquea navbars/asistentes) e integra **Tests Rápidos de 10 preguntas** que puedes realizar mientras el temporizador sigue corriendo, maximizando la retención inmediata.
 
 ### 📅 Planificador Mensual Estratégico
 Visualiza tu éxito a **30 días vista**. Un calendario dinámico que organiza tus temas, sincroniza tareas con tu Dashboard y ajusta la carga de trabajo según tu fecha de examen.

@@ -76,8 +76,16 @@ export default function PomodoroStickyBar() {
           <Link to="/pomodoro" className="btn-icon btn-sm" style={{ background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'inherit' }} title="Ir a Pomodoro">
             <Maximize2 size={18} />
           </Link>
-          {/* Cerrar barra / Desactivar enfoque */}
-          <button onClick={() => setIsFocusMode(false)} className="btn-icon btn-sm" style={{ background: 'transparent' }} title="Cerrar/Salir de Enfoque">
+          {/* Cerrar barra / Finalizar sesión rápida */}
+          <button 
+            onClick={() => {
+                setIsFocusMode(false);
+                if (isActive) toggleTimer();
+            }} 
+            className="btn-icon btn-sm" 
+            style={{ background: 'transparent' }} 
+            title="Finalizar sesión y salir"
+          >
             <X size={18} />
           </button>
         </div>

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { useToast } from './ToastContext';
 
 /**
  * CONTEXTO DE POMODORO Y ENFOQUE
@@ -17,8 +18,7 @@ export const PomodoroProvider = ({ children }) => {
   const [isFocusMode, setIsFocusMode] = useState(false); // ¿Está activo el modo sin distracciones?
   const [muted, setMuted] = useState(false); // ¿Silenciar notificaciones sonoras?
   
-  // Referencia para el intervalo (para poder limpiarlo correctamente)
-  const timerRef = useRef(null);
+  const toast = useToast();
 
   // EFECO: Maneja el tic-tac del reloj
   useEffect(() => {
@@ -56,6 +56,7 @@ export const PomodoroProvider = ({ children }) => {
     if (mode === 'study') {
       const newSessions = sessions + 1;
       setSessions(newSessions);
+      toast.success('🎯 ¡Sesión de estudio terminada! Toca un descanso.');
       // Cada 4 sesiones, damos un descanso largo (15 min), si no, corto (5 min)
       if (newSessions % 4 === 0) {
         setMode('break');
@@ -68,6 +69,7 @@ export const PomodoroProvider = ({ children }) => {
       // Volver a fase de estudio
       setMode('study');
       setMinutes(25);
+      toast.info('📚 ¡Descanso terminado! Volviendo al modo estudio.');
     }
     setSeconds(0);
   };

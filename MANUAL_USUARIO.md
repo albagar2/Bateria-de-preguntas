@@ -35,6 +35,15 @@ Si tienes dudas tras una respuesta, pulsa en **"Explicación IA"**. El sistema a
 
 ---
 
+## 4. Método Pomodoro y Deep Focus ⏳
+
+Hemos integrado una herramienta de productividad de élite para maximizar tus horas de estudio:
+- **Ciclos Automatizados**: El sistema alterna 25 minutos de estudio con 5 de descanso corto (y 15 de descanso largo cada 4 ciclos) automáticamente.
+- **Modo Sin Distracciones (Deep Focus)**: Al activar este modo, la interfaz se simplifica al máximo, ocultando menús, pies de página y asistentes de IA para que solo estéis tú y tu material de estudio.
+- **Tests Integrados**: Puedes lanzar un "Test Rápido" desde la pantalla de Pomodoro. Un cronómetro persistente aparecerá en la parte inferior mientras haces el test para que nunca pierdas de vista tu tiempo de foco.
+
+---
+
 ## 4. Gestión para Administradores 🛡️
 
 Si tienes privilegios de administrador, dispones de herramientas avanzadas en el **Centro de Control**:
