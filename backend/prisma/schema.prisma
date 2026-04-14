@@ -47,6 +47,7 @@ model User {
   createdTopics      Topic[]           @relation("TopicCreator")
   achievements       UserAchievement[]
   progress           UserProgress[]
+  chatMessages       ChatMessage[]
   oppositions        Opposition[]      @relation("EnrolledOppositions")
 
   @@map("users")
@@ -280,6 +281,18 @@ model AICache {
   createdAt      DateTime @default(now()) @map("created_at")
 
   @@map("ai_cache")
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  role      String   // 'user' or 'assistant'
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("chat_messages")
 }
 
 enum Role {

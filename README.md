@@ -11,8 +11,11 @@
 
 ## 💎 Características Premium (v2.0)
 
-### 🤖 Tutor IA 24/7 (Gemini Integrated)
-Ya no necesitas buscar en el BOE. Nuestra IA integrada explica cada pregunta, resuelve dudas legales y genera estrategias de estudio personalizadas basadas en tu ritmo real.
+### 🤖 Tutor IA con Memoria (Gemini Integrated)
+Ya no necesitas buscar en el BOE. Nuestra IA integrada explica cada pregunta, resuelve dudas legales y **recuerda tus conversaciones anteriores**. El historial persistente te permite retomar tus dudas donde las dejaste.
+
+### ⏳ Modo Pomodoro de Alto Rendimiento
+Optimiza tu tiempo con ciclos de estudio y descanso automatizados (25/5). Una herramienta integrada para mantener la concentración máxima sin quemarte.
 
 ### 📅 Planificador Mensual Estratégico
 Visualiza tu éxito a **30 días vista**. Un calendario dinámico que organiza tus temas, sincroniza tareas con tu Dashboard y ajusta la carga de trabajo según tu fecha de examen.

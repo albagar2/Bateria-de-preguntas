@@ -52,8 +52,19 @@ async function run() {
         CONSTRAINT "user_achievements_achievement_id_fkey" FOREIGN KEY ("achievement_id") REFERENCES "achievements"("id") ON DELETE CASCADE ON UPDATE CASCADE
       );
       CREATE UNIQUE INDEX "user_achievements_user_id_achievement_id_key" ON "user_achievements"("user_id", "achievement_id");
+
+      CREATE TABLE IF NOT EXISTS "chat_messages" (
+        "id" TEXT NOT NULL,
+        "user_id" TEXT NOT NULL,
+        "role" TEXT NOT NULL,
+        "content" TEXT NOT NULL,
+        "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT "chat_messages_pkey" PRIMARY KEY ("id"),
+        CONSTRAINT "chat_messages_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE
+      );
+      CREATE INDEX IF NOT EXISTS "chat_messages_user_id_idx" ON "chat_messages"("user_id");
     `);
-    console.log('Tables achievements and user_achievements replaced successfully');
+    console.log('Tables achievements, user_achievements and chat_messages ready');
 
     console.log('Sync complete!');
   } catch (err) {

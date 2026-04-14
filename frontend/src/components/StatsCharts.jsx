@@ -6,9 +6,9 @@ import {
 
 export const ActivityChart = ({ data }) => {
   return (
-    <div style={{ width: '100%', height: 300 }}>
-      <ResponsiveContainer>
-        <AreaChart data={data}>
+    <div style={{ width: '100%', height: 300, minWidth: 0 }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data || []}>
           <defs>
             <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1}/>
@@ -69,8 +69,8 @@ export const AccuracyPieChart = ({ correct, total }) => {
   ];
 
   return (
-    <div style={{ width: '100%', height: 200 }}>
-      <ResponsiveContainer>
+    <div style={{ width: '100%', height: 200, minWidth: 0 }}>
+      <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
             data={data}

@@ -15,7 +15,27 @@ export default function AIChatAssistant() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isOpen]);
+
+  // Load chat history
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const res = await api.getAIChatHistory();
+        if (res.data && res.data.length > 0) {
+          // Map backend history to local format
+          const history = res.data.map(m => ({
+            role: m.role,
+            content: m.content
+          }));
+          setMessages(history);
+        }
+      } catch (err) {
+        console.error('Error loading chat history:', err);
+      }
+    };
+    loadHistory();
+  }, []);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -107,7 +127,12 @@ export default function AIChatAssistant() {
       </div>
 
       {/* Floating Button */}
-      <button className="ai-chat-trigger" onClick={() => setIsOpen(!isOpen)} title="Pregunta a la IA">
+      <button 
+        id="ai-chat-btn"
+        className="ai-chat-trigger" 
+        onClick={() => setIsOpen(!isOpen)} 
+        title="Pregunta a la IA"
+      >
         <span className="trigger-icon">{isOpen ? '💬' : '🤖'}</span>
         {!isOpen && <span className="trigger-badge">Tutor</span>}
       </button>

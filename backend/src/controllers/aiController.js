@@ -1,5 +1,6 @@
 const aiService = require('../services/aiService');
 const { ApiResponse } = require('../utils/ApiResponse');
+const { prisma } = require('../config/database');
 
 /**
  * Generates an explanation for a question using integrated Gemini AI.
@@ -32,18 +33,55 @@ exports.generateExplanation = async (req, res, next) => {
 exports.askQuestion = async (req, res, next) => {
   try {
     const { question, topic } = req.body;
+    const userId = req.user.id;
     
     console.log(`💬 Chat IA: Recibida pregunta de ${req.user.name}`);
 
+    // 1. Guardar pregunta del usuario
+    await prisma.chatMessage.create({
+      data: {
+        userId,
+        role: 'user',
+        content: question
+      }
+    });
+
+    // 2. Generar respuesta
     const result = await aiService.askQuestion({
       question,
       topic,
       name: req.user.name
     });
 
+    // 3. Guardar respuesta de la IA
+    await prisma.chatMessage.create({
+      data: {
+        userId,
+        role: 'assistant',
+        content: result.answer
+      }
+    });
+
     return ApiResponse.success(res, result);
   } catch (error) {
     console.error('❌ Error en Chat IA:', error);
+    next(error);
+  }
+};
+
+/**
+ * Retrieves the chat history for the current user.
+ */
+exports.getChatHistory = async (req, res, next) => {
+  try {
+    const history = await prisma.chatMessage.findMany({
+      where: { userId: req.user.id },
+      orderBy: { createdAt: 'asc' },
+      take: 50 // Limit to last 50 messages for performance
+    });
+
+    return ApiResponse.success(res, history);
+  } catch (error) {
     next(error);
   }
 };

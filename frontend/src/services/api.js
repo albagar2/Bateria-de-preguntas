@@ -159,6 +159,7 @@ class ApiService {
   // ─── AI Integration ──────────────────────
   askAIExplanation(data) { return this.request('POST', '/ai/explain', data); }
   askAIChat(question, topic = 'General') { return this.request('POST', '/ai/ask', { question, topic }); }
+  getAIChatHistory() { return this.request('GET', '/ai/history'); }
 
   // ─── Admin Integration ───────────────────
   getAdminStats() { return this.request('GET', '/admin/stats'); }
