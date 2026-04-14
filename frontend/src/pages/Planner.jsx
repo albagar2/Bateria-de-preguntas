@@ -20,13 +20,18 @@ export default function Planner() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [topicsRes, plansRes] = await Promise.all([
+        const [topicsRes, plansRes, profileRes] = await Promise.all([
           api.getTopics(),
           api.getPlans(),
+          api.getProfile(),
         ]);
         setTopics(topicsRes.data || []);
         setPlans(plansRes.data || []);
         setSelectedTopics(topicsRes.data?.map(t => t.id) || []);
+        
+        if (profileRes.data.examDate) {
+          setExamDate(profileRes.data.examDate.split('T')[0]);
+        }
       } catch (err) {
         console.error(err);
       } finally {
