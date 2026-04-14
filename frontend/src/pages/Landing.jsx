@@ -64,27 +64,43 @@ const Landing = () => {
 
           <div className="grid grid-3" style={{ gap: 'var(--space-2xl)' }}>
             {[
-              { icon: Brain, title: 'Tutor IA Personalizado', desc: 'Resuelve dudas al instante y genera estrategias de estudio personalizadas según tu progreso.' },
-              { icon: Zap, title: 'Repetición Espaciada', desc: 'Nuestro algoritmo te pregunta lo que más te cuesta justo cuando tu memoria lo necesita.' },
-              { icon: Target, title: 'Simulacros Oficiales', desc: 'Crea tests personalizados con miles de preguntas reales actualizadas.' },
-              { icon: Trophy, title: 'Sistema de Logros', desc: 'Mantén la racha y desbloquea medallas que certifican tu dominio de la materia.' },
-              { icon: Shield, title: 'Banco de Errores', desc: 'Tus preguntas falladas se guardan automáticamente para que nunca vuelvas a cometer el mismo error.' },
-              { icon: Rocket, title: 'Planificador Inteligente', desc: 'Una agenda dinámica que se adapta a tu ritmo y fecha de examen.' }
+              { icon: Brain, title: 'Tutor IA Personalizado', desc: 'Resuelve dudas al instante y genera estrategias de estudio personalizadas según tu progreso.', color: '#6366f1' },
+              { icon: Zap, title: 'Repetición Espaciada', desc: 'Nuestro algoritmo te pregunta lo que más te cuesta justo cuando tu memoria lo necesita.', color: '#f59e0b' },
+              { icon: Target, title: 'Simulacros Oficiales', desc: 'Crea tests personalizados con miles de preguntas reales actualizadas.', color: '#10b981' },
+              { icon: Trophy, title: 'Sistema de Logros', desc: 'Mantén la racha y desbloquea medallas que certifican tu dominio de la materia.', color: '#ec4899' },
+              { icon: Shield, title: 'Banco de Errores', desc: 'Tus preguntas falladas se guardan automáticamente para que nunca vuelvas a cometer el mismo error.', color: '#ef4444' },
+              { icon: Rocket, title: 'Planificador Inteligente', desc: 'Una agenda dinámica que se adapta a tu ritmo y fecha de examen.', color: '#3b82f6' }
             ].map((f, i) => (
               <motion.div 
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.05)' }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 className="card" 
-                style={{ padding: 'var(--space-2xl)', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)' }}
+                style={{ 
+                  padding: 'var(--space-2xl)', 
+                  background: 'rgba(255,255,255,0.02)', 
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  transition: 'all 0.3s ease'
+                }}
               >
-                <div style={{ width: '48px', height: '48px', background: 'rgba(79, 70, 225, 0.15)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 'var(--space-xl)' }}>
-                  <f.icon color="var(--primary)" size={24} />
+                <div style={{ 
+                  width: '56px', 
+                  height: '56px', 
+                  background: `${f.color}15`, 
+                  borderRadius: '16px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  marginBottom: 'var(--space-xl)',
+                  border: `1px solid ${f.color}30`
+                }}>
+                  <f.icon color={f.color} size={28} />
                 </div>
-                <h3 style={{ color: 'white', marginBottom: 'var(--space-md)' }}>{f.title}</h3>
-                <p style={{ color: 'rgba(255,255,255,0.8)', lineHeight: 1.6 }}>{f.desc}</p>
+                <h3 style={{ color: 'white', marginBottom: 'var(--space-md)', fontSize: '1.25rem' }}>{f.title}</h3>
+                <p style={{ color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, fontSize: '0.95rem' }}>{f.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -94,33 +110,80 @@ const Landing = () => {
       {/* Social Proof */}
       <section style={{ padding: 'var(--space-3xl) var(--space-xl)', background: 'linear-gradient(to bottom, #020617, #0f172a)' }}>
         <div className="container" style={{ textAlign: 'center', color: 'white' }}>
-          <h2 style={{ marginBottom: 'var(--space-2xl)' }}>¿Por qué elegir BateriaQ?</h2>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-3xl)', flexWrap: 'wrap' }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800 }}>+50k</div>
-              <div style={{ color: 'rgba(255,255,255,0.6)' }}>Preguntas Base</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800 }}>98%</div>
-              <div style={{ color: 'rgba(255,255,255,0.6)' }}>Satisfacción</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800 }}>+12</div>
-              <div style={{ color: 'rgba(255,255,255,0.6)' }}>Oposiciones Soportadas</div>
-            </div>
+          <h2 style={{ marginBottom: 'var(--space-3xl)', fontSize: '2rem' }}>¿Por qué confiar su futuro a BateriaQ?</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-2xl)' }}>
+            {[
+              { val: '+50k', label: 'Preguntas Base', icon: BookOpen, color: '#6366f1' },
+              { val: '98%', label: 'Satisfacción', icon: CheckCircle, color: '#10b981' },
+              { val: '+12', label: 'Oposiciones', icon: Shield, color: '#f59e0b' }
+            ].map((s, i) => (
+              <motion.div 
+                key={i}
+                whileHover={{ y: -10 }}
+                style={{ 
+                  padding: 'var(--space-2xl)', 
+                  background: 'rgba(255,255,255,0.03)', 
+                  borderRadius: '24px',
+                  border: '1px solid rgba(255,255,255,0.05)'
+                }}
+              >
+                <s.icon size={32} color={s.color} style={{ marginBottom: 'var(--space-md)', opacity: 0.8 }} />
+                <div style={{ fontSize: '3.5rem', fontWeight: 900, letterSpacing: '-2px', marginBottom: '4px', background: `linear-gradient(to bottom, #fff, ${s.color} )`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  {s.val}
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '2px', fontWeight: 600 }}>
+                  {s.label}
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
       <section style={{ padding: 'var(--space-3xl) var(--space-xl)', textAlign: 'center' }}>
-        <div className="card" style={{ maxWidth: '800px', margin: '0 auto', padding: 'var(--space-3xl)', background: 'var(--gradient-primary)', color: 'white', border: 'none' }}>
-          <h2 style={{ color: 'white' }}>Consigue tu plaza este año.</h2>
-          <p style={{ marginBottom: 'var(--space-2xl)', opacity: 0.9 }}>Únete a los estudiantes que ya están optimizando su tiempo con BateriaQ.</p>
-          <Link to="/register" className="btn btn-lg" style={{ background: 'white', color: 'var(--primary)', fontWeight: 700 }}>
-            Registrarme Ahora
+        <motion.div 
+          whileHover={{ scale: 1.01 }}
+          className="card" 
+          style={{ 
+            maxWidth: '1000px', 
+            margin: '0 auto', 
+            padding: 'var(--space-3xl)', 
+            background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)', 
+            color: 'white', 
+            border: 'none',
+            borderRadius: '40px',
+            boxShadow: '0 25px 60px -15px rgba(79, 70, 229, 0.4)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          {/* Decorative circle */}
+          <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '200px', height: '200px', background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }} />
+          
+          <h2 style={{ color: 'white', fontSize: '2.5rem', marginBottom: 'var(--space-md)', position: 'relative' }}>¿Preparado para conseguir tu plaza?</h2>
+          <p style={{ marginBottom: 'var(--space-2xl)', opacity: 0.9, fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto var(--space-2xl)' }}>
+            Únete a miles de opositores que ya están optimizando su tiempo con el ecosistema BateriaQ.
+          </p>
+          <Link 
+            to="/register" 
+            className="btn btn-lg" 
+            style={{ 
+              background: 'white', 
+              color: '#4f46e5', 
+              fontWeight: 800, 
+              padding: '20px 48px',
+              fontSize: '1.2rem',
+              borderRadius: '100px',
+              boxShadow: '0 10px 20px rgba(0,0,0,0.1)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}
+          >
+            Empieza ahora gratis <ArrowRight size={20} />
           </Link>
-        </div>
+        </motion.div>
       </section>
     </div>
   );
