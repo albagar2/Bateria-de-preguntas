@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Zap, Brain, Trophy, ArrowRight, Shield, 
-  Target, Rocket, CheckCircle 
+  Target, Rocket, CheckCircle, BookOpen
 } from 'lucide-react';
 
 const Landing = () => {
