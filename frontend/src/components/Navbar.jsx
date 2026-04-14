@@ -14,6 +14,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // IMPORTANTE: Si estamos en Modo Enfoque, ocultamos la barra de navegación completamente
   if (isFocusMode) return null;
 
   const handleLogout = async () => {

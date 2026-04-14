@@ -1,18 +1,26 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 
+/**
+ * CONTEXTO DE POMODORO Y ENFOQUE
+ * Este context gestiona el cronómetro y el estado de "Modo Sin Distracciones" de forma global.
+ * Al estar aquí, el tiempo no se detiene si cambias de página.
+ */
 const PomodoroContext = createContext();
 
 export const PomodoroProvider = ({ children }) => {
+  // --- ESTADOS DEL TEMPORIZADOR ---
   const [minutes, setMinutes] = useState(25);
   const [seconds, setSeconds] = useState(0);
-  const [isActive, setIsActive] = useState(false);
-  const [mode, setMode] = useState('study'); // 'study' or 'break'
-  const [sessions, setSessions] = useState(0);
-  const [isFocusMode, setIsFocusMode] = useState(false);
-  const [muted, setMuted] = useState(false);
+  const [isActive, setIsActive] = useState(false); // ¿Está corriendo el tiempo?
+  const [mode, setMode] = useState('study'); // 'study' (concentración) o 'break' (descanso)
+  const [sessions, setSessions] = useState(0); // Contador de sesiones completadas
+  const [isFocusMode, setIsFocusMode] = useState(false); // ¿Está activo el modo sin distracciones?
+  const [muted, setMuted] = useState(false); // ¿Silenciar notificaciones sonoras?
   
+  // Referencia para el intervalo (para poder limpiarlo correctamente)
   const timerRef = useRef(null);
 
+  // EFECO: Maneja el tic-tac del reloj
   useEffect(() => {
     if (isActive) {
       timerRef.current = setInterval(() => {
@@ -22,7 +30,7 @@ export const PomodoroProvider = ({ children }) => {
           setMinutes(m => m - 1);
           setSeconds(59);
         } else {
-          handleTimerEnd();
+          handleTimerEnd(); // Si llega a 00:00, termina la fase
         }
       }, 1000);
     } else {
@@ -31,10 +39,15 @@ export const PomodoroProvider = ({ children }) => {
     return () => clearInterval(timerRef.current);
   }, [isActive, minutes, seconds]);
 
+  /**
+   * MANEJO DE FIN DE TIEMPO
+   * Decide si toca pasar a descanso corto, descanso largo o volver a estudiar.
+   */
   const handleTimerEnd = () => {
     setIsActive(false);
     clearInterval(timerRef.current);
     
+    // Reproducir sonido si no está silenciado
     if (!muted) {
       const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
       audio.play().catch(() => {});
@@ -43,6 +56,7 @@ export const PomodoroProvider = ({ children }) => {
     if (mode === 'study') {
       const newSessions = sessions + 1;
       setSessions(newSessions);
+      // Cada 4 sesiones, damos un descanso largo (15 min), si no, corto (5 min)
       if (newSessions % 4 === 0) {
         setMode('break');
         setMinutes(15);
@@ -51,12 +65,14 @@ export const PomodoroProvider = ({ children }) => {
         setMinutes(5);
       }
     } else {
+      // Volver a fase de estudio
       setMode('study');
       setMinutes(25);
     }
     setSeconds(0);
   };
 
+  // --- ACCIONES DEL CRONÓMETRO ---
   const toggleTimer = () => setIsActive(!isActive);
   
   const resetTimer = () => {
@@ -69,6 +85,8 @@ export const PomodoroProvider = ({ children }) => {
     setIsFocusMode(!isFocusMode);
   };
 
+  // EFECTO: Cuando cambia el modo enfoque, añade una clase al body
+  // para que los estilos globales (CSS) puedan ocultar el navbar/footer.
   useEffect(() => {
     if (isFocusMode) {
       document.body.classList.add('focus-mode-active');
@@ -77,6 +95,7 @@ export const PomodoroProvider = ({ children }) => {
     }
   }, [isFocusMode]);
 
+  // Valores que estarán disponibles para cualquier componente que use el hook usePomodoro()
   const value = {
     minutes, setMinutes,
     seconds, setSeconds,
@@ -97,10 +116,13 @@ export const PomodoroProvider = ({ children }) => {
   );
 };
 
+/**
+ * Hook personalizado para acceder fácilmente a los datos de Pomodoro
+ */
 export const usePomodoro = () => {
   const context = useContext(PomodoroContext);
   if (!context) {
-    throw new Error('usePomodoro must be used within a PomodoroProvider');
+    throw new Error('usePomodoro debe usarse dentro de un PomodoroProvider');
   }
   return context;
 };
