@@ -1,187 +1,259 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Play, Pause, RotateCcw, Coffee, BookOpen, 
-  Settings, Bell, BellOff, Volume2 
+  Settings, Bell, BellOff, Volume2, Shield,
+  Zap, Brain, Target, ArrowRight
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { usePomodoro } from '../context/PomodoroContext';
+import api from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const Pomodoro = () => {
   const toast = useToast();
-  const [minutes, setMinutes] = useState(25);
-  const [seconds, setSeconds] = useState(0);
-  const [isActive, setIsActive] = useState(false);
-  const [mode, setMode] = useState('study'); // 'study' or 'break'
-  const [sessions, setSessions] = useState(0);
-  const [muted, setMuted] = useState(false);
-  
-  const timerRef = useRef(null);
+  const navigate = useNavigate();
+  const { 
+    minutes, setMinutes, 
+    seconds, setSeconds, 
+    isActive, setIsActive, 
+    mode, setMode, 
+    sessions, setSessions,
+    isFocusMode, setIsFocusMode,
+    toggleTimer, resetTimer,
+    muted, setMuted 
+  } = usePomodoro();
+
+  const [topics, setTopics] = useState([]);
+  const [selectedTopic, setSelectedTopic] = useState(null);
 
   useEffect(() => {
-    if (isActive) {
-      timerRef.current = setInterval(() => {
-        if (seconds > 0) {
-          setSeconds(s => s - 1);
-        } else if (minutes > 0) {
-          setMinutes(m => m - 1);
-          setSeconds(59);
-        } else {
-          handleTimerEnd();
-        }
-      }, 1000);
-    } else {
-      clearInterval(timerRef.current);
-    }
-    return () => clearInterval(timerRef.current);
-  }, [isActive, minutes, seconds]);
+    api.getTopics().then(res => setTopics(res.data)).catch(console.error);
+  }, []);
 
-  const handleTimerEnd = () => {
-    setIsActive(false);
-    clearInterval(timerRef.current);
-    
-    if (!muted) {
-      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-      audio.play().catch(() => {});
+  const totalTime = mode === 'study' ? 25 : (sessions > 0 && sessions % 4 === 0 ? 15 : 5);
+  const remainingSeconds = minutes * 60 + seconds;
+  const totalSeconds = totalTime * 60;
+  const progressPercent = ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
+  
+  // Circular progress math
+  const radius = 120;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progressPercent / 100) * circumference;
+
+  const handleStartTest = async () => {
+    if (!selectedTopic && topics.length > 0) {
+        toast.info("Selecciona un tema o elige 'Test Rápido'");
+        return;
     }
 
-    if (mode === 'study') {
-      const newSessions = sessions + 1;
-      setSessions(newSessions);
-      toast.success('🎯 ¡Sesión terminada! Toca un descanso.');
-      // Long break every 4 sessions
-      if (newSessions % 4 === 0) {
-        setMode('break');
-        setMinutes(15);
-      } else {
-        setMode('break');
-        setMinutes(5);
-      }
-    } else {
-      setMode('study');
-      setMinutes(25);
-      toast.info('📚 ¡A estudiar! Concentración máxima.');
+    try {
+        const testData = {
+            type: selectedTopic ? 'TOPIC' : 'QUICK',
+            topicIds: selectedTopic ? [selectedTopic] : [],
+            totalQuestions: 10,
+            timeLimit: null
+        };
+        const res = await api.createTest(testData);
+        setIsFocusMode(true);
+        if (!isActive) toggleTimer(); // Start timer if not running
+        navigate(`/tests/${res.data.id}/play`);
+    } catch (err) {
+        toast.error("No se pudo iniciar el test");
     }
-    setSeconds(0);
   };
-
-  const toggleTimer = () => setIsActive(!isActive);
-
-  const resetTimer = () => {
-    setIsActive(false);
-    setMinutes(mode === 'study' ? 25 : 5);
-    setSeconds(0);
-  };
-
-  const progress = ((mode === 'study' ? 25 : (sessions % 4 === 0 ? 15 : 5)) * 60 - (minutes * 60 + seconds)) / 
-                   ((mode === 'study' ? 25 : (sessions % 4 === 0 ? 15 : 5)) * 60) * 100;
 
   return (
-    <div className="container animate-slide-up" style={{ maxWidth: '600px', textAlign: 'center' }}>
-      <div className="page-header">
+    <div className="container animate-slide-up" style={{ maxWidth: '900px' }}>
+      <div className="page-header" style={{ textAlign: 'center' }}>
         <h1 className="page-title">⏳ Modo Concentración</h1>
-        <p className="page-subtitle">Método Pomodoro para maximizar tu retención</p>
+        <p className="page-subtitle">Personaliza tu sesión de profundidad y evita distracciones</p>
       </div>
 
-      <div className="card" style={{ padding: 'var(--space-3xl)', position: 'relative', overflow: 'hidden' }}>
-        {/* Glow Background */}
-        <div style={{ 
-          position: 'absolute', 
-          top: '-50%', 
-          left: '-50%', 
-          width: '200%', 
-          height: '200%', 
-          background: mode === 'study' ? 'radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 70%)',
-          zIndex: 0 
-        }} />
-
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-md)', marginBottom: 'var(--space-xl)' }}>
-            <span className={`badge ${mode === 'study' ? 'badge-primary' : 'badge-success'}`}>
-              {mode === 'study' ? <BookOpen size={14} /> : <Coffee size={14} />}
-              {mode === 'study' ? ' ESTUDIANDO' : ' DESCANSO'}
-            </span>
-            <span className="badge" style={{ background: 'var(--bg-soft)' }}> SESIÓN {sessions + 1}</span>
-          </div>
-
-          <div style={{ 
-            fontSize: '8rem', 
-            fontWeight: 800, 
-            lineHeight: 1, 
-            letterSpacing: '-4px',
-            color: 'white',
-            marginBottom: 'var(--space-xl)',
-            fontVariantNumeric: 'tabular-nums'
-          }}>
-            {String(minutes).padStart(2, '0')}:
-            <span style={{ color: mode === 'study' ? 'var(--primary-400)' : 'var(--success-400)' }}>
-              {String(seconds).padStart(2, '0')}
-            </span>
-          </div>
-
-          {/* Progress Circle Visual */}
-          <div style={{ 
-            width: '100%', 
-            height: '4px', 
-            background: 'var(--bg-soft)', 
-            borderRadius: '2px', 
-            marginBottom: 'var(--space-2xl)',
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2xl)', alignItems: 'start' }}>
+        
+        {/* Left Col: Timer UI */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xl)' }}>
+          <div className="card" style={{ 
+            padding: 'var(--space-2xl)', 
+            textAlign: 'center',
+            background: 'var(--bg-elevated)',
+            position: 'relative',
             overflow: 'hidden'
           }}>
-            <motion.div 
-              style={{ 
-                height: '100%', 
-                background: mode === 'study' ? 'var(--gradient-primary)' : 'var(--gradient-success)',
-                width: `${progress}%`
-              }} 
-            />
+            {/* Visual background element */}
+            <div style={{
+                position: 'absolute',
+                top: -100,
+                right: -100,
+                width: 300,
+                height: 300,
+                background: mode === 'study' ? 'radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%)',
+                zIndex: 0
+            }} />
+
+            <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: 'var(--space-lg)' }}>
+                    <span className={`badge ${mode === 'study' ? 'badge-primary' : 'badge-success'}`}>
+                        {mode === 'study' ? <BookOpen size={14} /> : <Coffee size={14} />}
+                        {mode === 'study' ? ' ESTUDIANDO' : ' DESCANSO'}
+                    </span>
+                    <span className="badge" style={{ background: 'var(--bg-soft)' }}>S{sessions + 1}</span>
+                </div>
+
+                {/* SVG Progress Circle */}
+                <div style={{ position: 'relative', width: '280px', height: '280px', margin: '0 auto var(--space-xl)' }}>
+                    <svg width="280" height="280" style={{ transform: 'rotate(-90deg)' }}>
+                        {/* Track */}
+                        <circle 
+                            cx="140" cy="140" r={radius}
+                            fill="transparent" 
+                            stroke="var(--bg-soft)" 
+                            strokeWidth="12" 
+                        />
+                        {/* Progress */}
+                        <motion.circle 
+                            cx="140" cy="140" r={radius}
+                            fill="transparent" 
+                            stroke={mode === 'study' ? 'var(--primary-500)' : 'var(--success-500)'}
+                            strokeWidth="12" 
+                            strokeLinecap="round"
+                            strokeDasharray={circumference}
+                            animate={{ strokeDashoffset: offset }}
+                            transition={{ duration: 0.5, ease: "linear" }}
+                        />
+                    </svg>
+                    
+                    <div style={{ 
+                        position: 'absolute', 
+                        top: '50%', left: '50%', 
+                        transform: 'translate(-50%, -50%)',
+                        fontSize: '4.5rem',
+                        fontWeight: 900,
+                        letterSpacing: '-2px',
+                        fontVariantNumeric: 'tabular-nums'
+                    }}>
+                        {String(minutes).padStart(2, '0')}:
+                        <span style={{ color: mode === 'study' ? 'var(--primary-400)' : 'var(--success-400)' }}>
+                            {String(seconds).padStart(2, '0')}
+                        </span>
+                    </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-xl)', alignItems: 'center' }}>
+                    <button onClick={resetTimer} className="btn-icon" style={{ background: 'var(--bg-soft)', width: '50px', height: '50px' }}>
+                        <RotateCcw size={22} />
+                    </button>
+                    
+                    <motion.button 
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={toggleTimer} 
+                        className="btn" 
+                        style={{ 
+                            width: '90px', 
+                            height: '90px', 
+                            borderRadius: '50%', 
+                            background: mode === 'study' ? 'var(--primary-500)' : 'var(--success-500)',
+                            boxShadow: mode === 'study' ? 'var(--shadow-glow)' : 'var(--shadow-glow-success)'
+                        }}
+                    >
+                        {isActive ? <Pause size={36} fill='white' /> : <Play size={36} fill='white' style={{ marginLeft: '6px' }} />}
+                    </motion.button>
+
+                    <button onClick={() => setMuted(!muted)} className="btn-icon" style={{ background: 'var(--bg-soft)', width: '50px', height: '50px' }}>
+                        {muted ? <BellOff size={22} /> : <Bell size={22} />}
+                    </button>
+                </div>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-xl)', alignItems: 'center' }}>
-            <button onClick={resetTimer} className="btn-icon" style={{ padding: '16px', background: 'var(--bg-soft)' }}>
-              <RotateCcw size={24} />
-            </button>
-            <motion.button 
-              whileTap={{ scale: 0.9 }}
-              onClick={toggleTimer} 
-              className="btn" 
-              style={{ 
-                width: '80px', 
-                height: '80px', 
-                borderRadius: '50%', 
-                background: mode === 'study' ? 'var(--primary)' : 'var(--success)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: `0 10px 25px ${mode === 'study' ? 'rgba(99, 102, 241, 0.4)' : 'rgba(16, 185, 129, 0.4)'}`
-              }}
-            >
-              {isActive ? <Pause size={32} /> : <Play size={32} style={{ marginLeft: '4px' }} />}
-            </motion.button>
-            <button onClick={() => setMuted(!muted)} className="btn-icon" style={{ padding: '16px', background: 'var(--bg-soft)' }}>
-              {muted ? <BellOff size={24} /> : <Bell size={24} />}
-            </button>
+          <div className="card" style={{ padding: 'var(--space-md)', background: isFocusMode ? 'rgba(99, 102, 241, 0.1)' : 'var(--bg-elevated)', border: isFocusMode ? '1px solid var(--primary-500)' : '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+                      <div style={{ 
+                          width: '40px', 
+                          height: '40px', 
+                          borderRadius: '10px', 
+                          background: isFocusMode ? 'var(--primary-500)' : 'var(--bg-soft)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                      }}>
+                          <Shield size={20} color={isFocusMode ? 'white' : 'var(--text-secondary)'} />
+                      </div>
+                      <div>
+                          <h4 style={{ margin: 0 }}>Modo Sin Distracciones</h4>
+                          <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>Oculta menús y notificaciones</p>
+                      </div>
+                  </div>
+                  <label className="switch">
+                      <input 
+                        type="checkbox" 
+                        checked={isFocusMode}
+                        onChange={() => setIsFocusMode(!isFocusMode)}
+                      />
+                      <span className="slider"></span>
+                  </label>
+              </div>
           </div>
         </div>
+
+        {/* Right Col: Test Integration */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xl)' }}>
+            <div className="card" style={{ border: '1px solid var(--primary-300)', position: 'relative' }}>
+                <div style={{ marginBottom: 'var(--space-lg)' }}>
+                    <h3 style={{ marginBottom: 'var(--space-xs)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Zap size={20} color="var(--primary-400)" /> Potencia tu estudio
+                    </h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Combina el tiempo de concentración con una batería rápida de preguntas.</p>
+                </div>
+
+                <div className="input-group" style={{ marginBottom: 'var(--space-lg)' }}>
+                    <label className="input-label">Elegir tema (opcional)</label>
+                    <select 
+                        className="input" 
+                        value={selectedTopic || ''} 
+                        onChange={(e) => setSelectedTopic(e.target.value)}
+                        style={{ background: 'var(--bg-soft)' }}
+                    >
+                        <option value="">⚡ Test Rápido (Aleatorio)</option>
+                        {topics.map(t => (
+                            <option key={t.id} value={t.id}>{t.icon} {t.title}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', marginBottom: 'var(--space-xl)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', fontSize: '0.85rem' }}>
+                        <Brain size={16} color="var(--primary-400)" />
+                        <span>10 preguntas seleccionadas por IA</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', fontSize: '0.85rem' }}>
+                        <Target size={16} color="var(--primary-400)" />
+                        <span>Foco en tus áreas débiles</span>
+                    </div>
+                </div>
+
+                <button 
+                    onClick={handleStartTest}
+                    className="btn btn-primary btn-lg btn-full"
+                    style={{ gap: '12px' }}
+                >
+                    Comenzar Test <ArrowRight size={20} />
+                </button>
+            </div>
+
+            <div className="card-glass" style={{ padding: 'var(--space-lg)', border: '1px dashed var(--border-color)' }}>
+                <h4 style={{ margin: '0 0 var(--space-sm) 0', color: 'var(--primary-300)' }}>💡 Pro-Tip</h4>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    Realizar un test inmediatamente después de estudiar aumenta un 70% la retención a largo plazo. El cronómetro seguirá corriendo mientras haces el test.
+                </p>
+            </div>
+        </div>
+
       </div>
 
-      <div style={{ marginTop: 'var(--space-2xl)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
-        <div className="card" style={{ padding: 'var(--space-md)', textAlign: 'left', fontSize: 'var(--font-xs)' }}>
-          <h4 style={{ margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Settings size={14} /> ¿Cómo funciona?
-          </h4>
-          <p style={{ margin: 0, color: 'var(--text-muted)' }}>
-            25 min de foco profundo seguidos de 5 min de descanso mental.
-          </p>
-        </div>
-        <div className="card" style={{ padding: 'var(--space-md)', textAlign: 'left', fontSize: 'var(--font-xs)' }}>
-          <h4 style={{ margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Volume2 size={14} /> ¡Atención!
-          </h4>
-          <p style={{ margin: 0, color: 'var(--text-muted)' }}>
-            Recibirás una notificación sonora al terminar cada fase.
-          </p>
-        </div>
-      </div>
     </div>
   );
 };

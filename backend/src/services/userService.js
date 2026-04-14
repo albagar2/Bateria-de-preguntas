@@ -12,7 +12,7 @@
 //   adminService opera sobre cualquier usuario por su ID (solo para ADMINs).
 // ============================================
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { prisma } = require('../config/database');
 const { AppError } = require('../utils/AppError');
 

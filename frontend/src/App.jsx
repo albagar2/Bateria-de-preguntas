@@ -5,9 +5,11 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { PomodoroProvider } from './context/PomodoroContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AIChatAssistant from './components/AIChatAssistant';
+import PomodoroStickyBar from './components/PomodoroStickyBar';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -73,6 +75,7 @@ function AppRoutes() {
     <>
       {user && <Navbar />}
       {user && <AIChatAssistant />}
+      {user && <PomodoroStickyBar />}
       <main className="page">
         <Routes>
           {/* Public/Guest Routes */}
@@ -110,7 +113,9 @@ export default function App() {
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <ToastProvider>
-          <AppRoutes />
+          <PomodoroProvider>
+            <AppRoutes />
+          </PomodoroProvider>
         </ToastProvider>
       </AuthProvider>
     </BrowserRouter>

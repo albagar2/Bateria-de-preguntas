@@ -21,7 +21,7 @@
 //   - Se mantienen máximo 5 sesiones activas por usuario (limpieza automática).
 // ============================================
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { prisma } = require('../config/database');
 const { env } = require('../config/env');

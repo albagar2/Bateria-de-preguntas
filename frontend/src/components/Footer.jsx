@@ -1,8 +1,12 @@
 import React from 'react';
 import { ShieldCheck, Heart } from 'lucide-react';
+import { usePomodoro } from '../context/PomodoroContext';
 
 const Footer = () => {
+  const { isFocusMode } = usePomodoro();
   const currentYear = new Date().getFullYear();
+
+  if (isFocusMode) return null;
 
   return (
     <footer style={{ 

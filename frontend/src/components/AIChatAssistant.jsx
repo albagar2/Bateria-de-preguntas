@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import api from '../services/api';
+import { usePomodoro } from '../context/PomodoroContext';
 import './AIChatAssistant.css';
 
 export default function AIChatAssistant() {
+  const { isFocusMode } = usePomodoro();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     { role: 'assistant', content: '¡Hola! Soy tu Tutor IA. ¿Tienes alguna duda sobre el temario o alguna pregunta que no comprendas? ¡Pregúntame lo que quieras!' }
@@ -10,6 +12,8 @@ export default function AIChatAssistant() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
+
+  if (isFocusMode) return null;
 
   useEffect(() => {
     if (scrollRef.current) {

@@ -4,13 +4,17 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { usePomodoro } from '../context/PomodoroContext';
 import './Navbar.css';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { isFocusMode } = usePomodoro();
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  if (isFocusMode) return null;
 
   const handleLogout = async () => {
     await logout();
