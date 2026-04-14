@@ -39,7 +39,7 @@ const Landing = () => {
           <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4.5rem)', fontWeight: 800, color: 'white', lineHeight: 1.1, maxWidth: '900px', margin: '0 auto var(--space-xl)' }}>
             Supera tu <span style={{ color: 'var(--primary)' }}>Oposición</span> con Inteligencia Real.
           </h1>
-          <p style={{ fontSize: 'clamp(1rem, 4vw, 1.25rem)', color: 'rgba(255,255,255,0.7)', maxWidth: '600px', margin: '0 auto var(--space-2xl)' }}>
+          <p style={{ fontSize: 'clamp(1rem, 4vw, 1.25rem)', color: 'rgba(255,255,255,0.9)', maxWidth: '600px', margin: '0 auto var(--space-2xl)' }}>
             BateriaQ combina el método de Repetición Espaciada con un Tutor IA 24/7 y analíticas avanzadas para que no solo estudies, sino que domines cada tema.
           </p>
           
@@ -47,7 +47,7 @@ const Landing = () => {
             <Link to="/register" className="btn btn-primary btn-lg" style={{ padding: '16px 32px', fontSize: '1.1rem' }}>
               Empieza Gratis <ArrowRight style={{ marginLeft: '12px' }} />
             </Link>
-            <Link to="/login" className="btn btn-outline btn-lg" style={{ color: 'white', borderColor: 'rgba(255,255,255,0.2)' }}>
+            <Link to="/login" className="btn btn-outline btn-lg" style={{ color: 'white', borderColor: 'rgba(255,255,255,0.4)' }}>
               Identificarse
             </Link>
           </div>
@@ -84,7 +84,7 @@ const Landing = () => {
                   <f.icon color="var(--primary)" size={24} />
                 </div>
                 <h3 style={{ color: 'white', marginBottom: 'var(--space-md)' }}>{f.title}</h3>
-                <p style={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>{f.desc}</p>
+                <p style={{ color: 'rgba(255,255,255,0.8)', lineHeight: 1.6 }}>{f.desc}</p>
               </motion.div>
             ))}
           </div>
