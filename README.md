@@ -69,9 +69,11 @@ cd frontend && npm run dev
 
 ---
 
-## 📜 Propiedad Intelectual
-© 2026 **BateriaQ Study Ecosystem**. Todos los derechos reservados.
-Desarrollado con pasión para ayudar a opositores imparables a conseguir su plaza.
+## 📜 Propiedad Intelectual e Identidad
+Este proyecto ha sido concebido, diseñado y desarrollado íntegramente por **Alba García López**.
+
+© 2026 **BateriaQ Study Ecosystem** — Todos los derechos reservados.
+Desarrollado con pasión para ayudar a opositores imparables a conseguir su plaza. 🚀
 
 ---
 *BateriaQ: Estudia menos, domina más.*
