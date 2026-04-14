@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario | BateriaQ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #a855f7;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #10b981;
+            --border: rgba(148, 163, 184, 0.1);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-size: 42px;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .version {
+            font-size: 12px;
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: var(--primary);
+            margin: 40px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 18px;
+            color: #22d3ee;
+            margin: 25px 0 15px;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: var(--text-muted);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .feature-icon {
+            font-size: 30px;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .tip {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 30px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            font-size: 14px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            padding-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="version">VERSIÓN 2.0 - PREMIUM</div>
+            <div class="logo">BateriaQ</div>
+            <h1>Manual del Estudiante Élite</h1>
+            <p>Domina tu oposición con las herramientas de inteligencia artificial más potentes.</p>
+        </header>
+
+        <section id="estudio">
+            <h2>🧠 Métodos de Entrenamiento</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧪</div>
+                    <h3>Modo Clásico</h3>
+                    <p>Tests configurables por temas con cronómetro oficial.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔁</div>
+                    <h3>Modo Sin Fallos</h3>
+                    <p>Entrenamiento de resistencia: preguntas hasta que falles.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎴</div>
+                    <h3>Modo Flashcards</h3>
+                    <p>Memorización activa con cartas 3D para repasar conceptos.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="IA">
+            <h2>🤖 Tutor IA Integrado</h2>
+            <p>Usa el botón flotante de chat en cualquier pantalla para consultar dudas legales o estratégicas.</p>
+            <ul>
+                <li><strong>Explicaciones Contextuales</strong>: Al terminar un test, solicita a la IA que te explique tus fallos basándose en la ley vigente.</li>
+                <li><strong>Generador de Estrategias</strong>: En el planificador, pide consejo sobre qué temas priorizar según tu nivel.</li>
+            </ul>
+        </section>
+
+        <section id="analitica">
+            <h2>📈 Analítica y Gamificación</h2>
+            <p>Tu progreso ahora es visual y gratificante. Accede a la sección de <strong>Mis Logros</strong> para:</p>
+            <ul>
+                <li><strong>Gráficos de 30 días</strong>: Observa cómo sube tu ritmo de aciertos día tras día.</li>
+                <li><strong>Sistema de Medallas</strong>: Gana trofeos como "Búho Nocturno" o "Relámpago" por tu esfuerzo.</li>
+                <li><strong>Informes PDF</strong>: Genera y descarga un informe profesional de tu estado para guardarlo offline.</li>
+            </ul>
+        </section>
+
+        <section id="planificacion">
+            <h2>📅 Planificación Mensual (30 días)</h2>
+            <p>Visualiza el mes completo en tu calendario estratégico. Marca tareas como "Completadas" para sincronizar tu dashboard principal.</p>
+            <div class="tip">
+                <strong>Consejo:</strong> Introduce tu fecha de examen en el Perfil para que el calendario ajuste automáticamente la carga de estudio.
+            </div>
+        </section>
+
+        <div class="footer">
+            <p>&copy; 2026 BateriaQ Study Platform. Todos los derechos reservados.</p>
+            <p>Impulsando a la próxima generación de funcionarios.</p>
+        </div>
+    </div>
+</body>
+</html>

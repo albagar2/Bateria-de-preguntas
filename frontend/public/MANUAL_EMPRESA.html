@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Technical Docs | BateriaQ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #a855f7;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #22d3ee;
+            --border: rgba(148, 163, 184, 0.15);
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            padding: 60px;
+            border-radius: 32px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: var(--primary);
+            margin: 50px 0 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .card-stat {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-val {
+            font-size: 32px;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        th, td {
+            padding: 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--primary);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">Architecture V2.0</div>
+            <div class="logo">BateriaQ Business</div>
+            <h1>Especificaciones del Ecosistema</h1>
+            <p>Infraestructura Integrada para el Éxito Formativo</p>
+        </header>
+
+        <section>
+            <h2>📊 Eficiencia Operativa Superior</h2>
+            <div class="tech-grid">
+                <div class="card-stat">
+                    <div class="stat-val">Full Stack</div>
+                    <h3>Arquitectura</h3>
+                    <p style="color: var(--text-muted); font-size: 14px;">Despliegue unificado en Vercel. Eliminación de microservicios externos para latencia < 200ms.</p>
+                </div>
+                <div class="card-stat">
+                    <div class="stat-val">PostgreSQL</div>
+                    <h3>Persistence</h3>
+                    <p style="color: var(--text-muted); font-size: 14px;">Base de datos en Supabase con AICache integrado para optimizar costes de API.</p>
+                </div>
+                <div class="card-stat">
+                    <div class="stat-val">Gemini AI</div>
+                    <h3>Inteligencia</h3>
+                    <p style="color: var(--text-muted); font-size: 14px;">Integración directa con Google Generative AI (Modelos 1.5 Flash/Pro) con fallback dinámico.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>🛡️ Capas de Innovación</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Modulo</th>
+                        <th>Tecnología</th>
+                        <th>Ventaja Competitiva</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: 600">Analytics</td>
+                        <td>Recharts + PDFLib</td>
+                        <td>Visualización de datos masivos y generación de reportes on-the-fly.</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600">UX/UI</td>
+                        <td>Framer Motion</td>
+                        <td>Micro-interacciones de alta calidad que mejoran la retención del usuario.</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600">Gamification</td>
+                        <td>Prisma Logic</td>
+                        <td>Lógica de medallas y logros desacoplada del frontend para máxima seguridad.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>🧠 Lógica Adaptativa (Repetición Espaciada)</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">BateriaQ utiliza algoritmos inspirados en SuperMemo para optimizar los intervalos de repaso, garantizando que el usuario alcance el 100% de dominio en el menor tiempo posible.</p>
+        </section>
+
+        <div class="footer">
+            <p>Propiedad Intelectual de **BateriaQ Study Ecosystem**.</p>
+            <p>&copy; 2026 Reservados todos los derechos técnicos y de diseño.</p>
+        </div>
+    </div>
+</body>
+</html>

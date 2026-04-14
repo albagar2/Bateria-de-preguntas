@@ -1,26 +1,30 @@
-# 🎯 BateriaQ — Plataforma de Oposiciones de Élite
+# 🎯 BateriaQ — La Plataforma de Oposiciones Definitiva
 
 ![BateriaQ Banner](https://img.shields.io/badge/AESTHETICS-PREMIUM-indigo?style=for-the-badge)
-![Status](https://img.shields.io/badge/STATUS-PRODUCTION--READY-brightgreen?style=for-the-badge)
-![Tech Stack](https://img.shields.io/badge/STACK-FULLSTACK-blue?style=for-the-badge)
+![Status](https://img.shields.io/badge/STATUS-PRODUCTION--READY-10b981?style=for-the-badge)
+![IA](https://img.shields.io/badge/IA-INTEGRATED-blue?style=for-the-badge)
+![Gamificación](https://img.shields.io/badge/METODO-GAMIFIED-f59e0b?style=for-the-badge)
 
-**BateriaQ** es un ecosistema de estudio revolucionario diseñado para opositores que buscan maximizar su rendimiento. Utiliza algoritmos de planificación inteligente e Inteligencia Artificial para transformar el tedioso estudio de leyes en un proceso dinámico y visual.
+**BateriaQ** es un ecosistema de estudio de alto rendimiento diseñado para opositores. No es solo un banco de preguntas; es una herramienta de precisión que combina Inteligencia Artificial, Repetición Espaciada y Gamificación para convertir el estudio en un proceso adictivo y eficiente.
 
 ---
 
-## 🚀 Características Destacadas
+## 💎 Características Premium (v2.0)
 
-### 📅 Planificador Estratégico IA
-Un calendario visual basado en una cuadrícula semanal que organiza automáticamente tus temas en base a la fecha de tu examen.
-*   **IA Tutor**: Consejos tácticos personalizados para abordar tu semana de estudio.
-*   **Gestión One-Touch**: Marca y desmarca tareas directamente en el calendario o Dashboard.
+### 🤖 Tutor IA 24/7 (Gemini Integrated)
+Ya no necesitas buscar en el BOE. Nuestra IA integrada explica cada pregunta, resuelve dudas legales y genera estrategias de estudio personalizadas basadas en tu ritmo real.
 
-### 🧪 Entrenamiento de Alto Rendimiento
-*   **Modo Sin Fallos**: Un reto infinito donde una sola respuesta incorrecta termina la racha. Ideal para perfeccionar la precisión.
-*   **Tests Personalizados**: Filtra por temas, subtemas y dificultad.
+### 📅 Planificador Mensual Estratégico
+Visualiza tu éxito a **30 días vista**. Un calendario dinámico que organiza tus temas, sincroniza tareas con tu Dashboard y ajusta la carga de trabajo según tu fecha de examen.
 
-### 🤖 Soporte Legal con IA
-¿Dudas con un artículo? Nuestra IA integrada explica cada pregunta basándose en la normativa vigente, ahorrándote horas de búsqueda en el BOE.
+### 🏆 Gamificación y Logros
+Mantente motivado con nuestro sistema de medallas. Gana trofeos como *"Búho Nocturno"*, *"Relámpago"* o *"Constancia"* mientras completas tus objetivos diarios.
+
+### 📉 Analítica Avanzada y Exportación PDF
+Dashboard visual con gráficos de rendimiento de los últimos 30 días. Analiza tus puntos ciegos y genera **informes de progreso en PDF** para llevar un control profesional de tu evolución.
+
+### 🎴 Modo Flashcards 3D
+Entrena tu memoria activa con nuestro sistema de cartas interactivas. Ideal para repasar conceptos, definiciones y plazos legales de forma rápida y visual.
 
 ---
 
@@ -28,53 +32,46 @@ Un calendario visual basado en una cuadrícula semanal que organiza automáticam
 
 | Capa | Tecnologías |
 | :--- | :--- |
-| **Frontend** | React (Vite), CSS3 Premium, Context API |
+| **Frontend** | React, Recharts (Gráficos), Framer Motion (Animaciones), Lucide Icons |
 | **Backend** | Node.js, Express, Prisma ORM |
-| **BBDD** | PostgreSQL (Supabase) |
-| **IA** | Microservicio dedicado con LLM |
-| **Despliegue** | Vercel (Frontend/Backend) & Supabase |
+| **BBDD** | PostgreSQL (Supabase) con sistema de **AICache** |
+| **Inteligencia Artificial** | Google Generative AI (Gemini 1.5 Flash/Pro) |
+| **Arquitectura** | Monolito Unificado (Optimizado para Vercel Serverless) |
 
 ---
 
-## 📦 Instalación y Despliegue
+## 🚀 Instalación y Despliegue
 
 ### Requisitos Previos
 - Node.js (v18+)
-- Cuenta en Supabase y Vercel
+- Cuenta en Supabase (PostgreSQL)
+- Google AI Studio API Key (Gemini)
 
-### Paso a paso
-1. **Clonar y descargar dependencias**:
-   ```bash
-   git clone https://github.com/albagar2/Bateria-de-preguntas
-   cd bateria-preguntas
-   npm install
-   ```
+### Configuración de Variables de Entorno (.env)
+```env
+DATABASE_URL="postgresql://user:pass@host:6543/postgres?pgbouncer=true"
+JWT_SECRET="tu-clave-secreta"
+GEMINI_API_KEY="tu-clave-de-google-ai-studio"
+FRONTEND_URL="http://localhost:5173"
+```
 
-2. **Configurar Base de Datos**:
-   - Crea un proyecto en Supabase.
-   - Ejecuta el script `supabase_schema.sql` en el SQL Editor.
+### Comandos de Inicio
+```bash
+# Sincronizar Base de Datos
+npx prisma db push
 
-3. **Variables de Entorno (.env)**:
-   ```env
-   DATABASE_URL="tu-url-de-supabase"
-   JWT_SECRET="tu-clave-secreta"
-   AI_SERVICE_URL="tu-url-de-ia"
-   ```
+# Iniciar Backend
+cd backend && npm run dev
 
-4. **Lanzar en local**:
-   ```bash
-   # En terminales separadas
-   npm run dev:backend
-   npm run dev:frontend
-   ```
+# Iniciar Frontend
+cd frontend && npm run dev
+```
 
 ---
 
-## 📜 Derechos y Propiedad Intelectual
-
-© 2026 **BateriaQ Study Platform**. Todos los derechos reservados.
-Queda prohibida la reproducción total o parcial del código, diseño o algoritmos de planificación sin autorización expresa del autor.
+## 📜 Propiedad Intelectual
+© 2026 **BateriaQ Study Ecosystem**. Todos los derechos reservados.
+Desarrollado con pasión para ayudar a opositores imparables a conseguir su plaza.
 
 ---
-
-*Desarrollado con ❤️ para opositores imparables.*
+*BateriaQ: Estudia menos, domina más.*
