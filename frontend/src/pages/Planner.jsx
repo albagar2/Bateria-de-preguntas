@@ -95,10 +95,10 @@ export default function Planner() {
     return acc;
   }, {});
 
-  // Generate calendar days for the next 2 weeks
+  // Generate calendar days for the next month
   const calendarDays = [];
   const startDay = new Date();
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 30; i++) {
     const d = new Date(startDay);
     d.setDate(d.getDate() + i);
     calendarDays.push(d);
@@ -150,7 +150,7 @@ export default function Planner() {
         {/* Right Column: Interactive Grid */}
         <div className="card" style={{ padding: 'var(--space-xl)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-xl)' }}>
-            <h3 style={{ margin: 0 }}>📋 Próximas 2 Semanas</h3>
+            <h3 style={{ margin: 0 }}>📋 Próximo Mes</h3>
             <div className="badge badge-success">Sincronizado</div>
           </div>
 

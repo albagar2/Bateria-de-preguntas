@@ -6,9 +6,9 @@ const { prisma } = require('../config/database');
 const crypto = require('crypto');
 
 const MODEL_POOL = [
-  'gemini-2.0-flash',
   'gemini-1.5-flash',
-  'gemini-pro',
+  'gemini-1.5-flash-8b',
+  'gemini-1.5-pro',
 ];
 
 /**
@@ -27,6 +27,7 @@ async function callGeminiWithFallback(prompt) {
     throw new Error('GEMINI_API_KEY no configurada en las variables de entorno.');
   }
 
+  let lastError = null;
   let retryCount = 0;
   let backoffDelay = 2000;
 
@@ -42,7 +43,8 @@ async function callGeminiWithFallback(prompt) {
 
       return { text, modelUsed: modelName };
     } catch (error) {
-      console.warn(`[AI Service] Error con modelo ${modelName}:`, error.message);
+      lastError = error;
+      console.error(`[AI Service] Error CRÍTICO con modelo ${modelName}:`, error.message);
       
       const isOverloaded = error.status === 503 || error.status === 429;
       if (isOverloaded && retryCount < 2) {
@@ -57,7 +59,7 @@ async function callGeminiWithFallback(prompt) {
       backoffDelay = 2000;
     }
   }
-  throw new Error('No se pudo obtener respuesta de la IA tras intentar con varios modelos.');
+  throw new Error(`No se pudo obtener respuesta de la IA tras intentar con varios modelos. Último error: ${lastError?.message || 'Desconocido'}`);
 }
 
 /**
