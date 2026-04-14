@@ -6,7 +6,7 @@ import {
   HelpCircle, Zap, BookOpen, Trophy
 } from 'lucide-react';
 import api from '../services/api';
-import useToast from '../hooks/useToast';
+import { useToast } from '../context/ToastContext';
 
 const Flashcards = () => {
   const { topicId } = useParams();
