@@ -219,7 +219,7 @@ CREATE INDEX "_EnrolledOppositions_B_index" ON "_EnrolledOppositions"("B");
 -- 4. DATA INJECTION
 INSERT INTO "users" (id, name, email, password_hash, role) VALUES ('2ca7bcd3-e9df-4098-a482-31409baae9e7', 'Administrador', 'admin@bateriapreguntas.com', '$2b$12$SxwFzd5qhfPafOM3O7i12epKhGU3ZN6Jj7aXZf9n2Vd4F5ArRZhkG', 'ADMIN');
 INSERT INTO "users" (id, name, email, password_hash, role) VALUES ('58a80d7d-4849-4cf8-87e1-b795d0bda8ba', 'Estudiante Demo', 'demo@bateriapreguntas.com', '$2b$12$1ijiRRfll5vsfDmq7/YBhOnLd2RMwh4qIJn3xp/LE07bvu5JMcYBa', 'USER');
-INSERT INTO "users" (id, name, email, password_hash, role) VALUES ('0be3e901-6e72-49dd-9f15-942e93f39045', 'Alba Garcia', 'alba@gmail.com', '$2b$12$W8qvuFeZL/y76ONBGV5ew.0BmlgLoqa.QATfgqWtCkRIcpFHzMRKG', 'USER');
+INSERT INTO "users" (id, name, email, password_hash, role) VALUES ('0be3e901-6e72-49dd-9f15-942e93f39045', 'Usuario VIP', 'test-user@bateriapreguntas.com', '$2b$12$W8qvuFeZL/y76ONBGV5ew.0BmlgLoqa.QATfgqWtCkRIcpFHzMRKG', 'USER');
 
 INSERT INTO "oppositions" (id, name, description, icon, category) VALUES ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Administrativo del Estado', 'Cuerpo General Administrativo de la Administración del Estado', '🏛️', 'General');
 INSERT INTO "oppositions" (id, name, description, icon, category) VALUES ('b2c3d4e5-f6a7-8901-bcde-f1234567890a', 'Auxiliar Administrativo', 'Cuerpo Auxiliar de la Administración General del Estado', '📝', 'General');

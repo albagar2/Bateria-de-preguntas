@@ -1,5 +1,44 @@
+# Dependencies
 node_modules/
+
+# Build outputs
 dist/
-coverage/
+build/
+output/
+
+# Environment variables
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database/Backup files
+*.db
+*.sqlite
+*.sqlite3
+*.bak
+*.old
+*.dump
+# Exceptions (keep the master script but clean)
+!master_restore_all.sql
+
+# Test/Logs
+coverage/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.nyc_output
+
+# OS/IDEs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+.docker
+
