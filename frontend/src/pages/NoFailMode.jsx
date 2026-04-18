@@ -26,9 +26,23 @@ export default function NoFailMode() {
   const [streak, setStreak] = useState(0);
   const [maxReached, setMaxReached] = useState(0);
 
+  const [shuffledIndices, setShuffledIndices] = useState([]);
+
   useEffect(() => {
     loadQuestions();
   }, [topicId]);
+
+  useEffect(() => {
+    if (questions[currentIndex]?.options) {
+      const indices = questions[currentIndex].options.map((_, i) => i);
+      // Modern Durstenfeld shuffle (Fisher-Yates)
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      setShuffledIndices(indices);
+    }
+  }, [currentIndex, questions]);
 
   const loadQuestions = async () => {
     try {
@@ -230,28 +244,29 @@ export default function NoFailMode() {
           <h2 className="nofail-question-text">{question.questionText}</h2>
 
           <div className="nofail-options">
-            {question.options.map((option, idx) => {
+            {shuffledIndices.map((originalIdx, displayIdx) => {
+              const option = question.options[originalIdx];
               let optionClass = 'nofail-option';
               if (answered && result) {
-                if (idx === result.correctIndex) optionClass += ' correct';
-                else if (idx === selectedIndex && !result.isCorrect) optionClass += ' incorrect';
-              } else if (idx === selectedIndex) {
+                if (originalIdx === result.correctIndex) optionClass += ' correct';
+                else if (originalIdx === selectedIndex && !result.isCorrect) optionClass += ' incorrect';
+              } else if (originalIdx === selectedIndex) {
                 optionClass += ' selected';
               }
 
               return (
                 <button
-                  key={idx}
+                  key={originalIdx}
                   className={optionClass}
-                  onClick={() => !answered && setSelectedIndex(idx)}
+                  onClick={() => !answered && setSelectedIndex(originalIdx)}
                   disabled={answered}
                 >
                   <span className="nofail-option-letter">
-                    {String.fromCharCode(65 + idx)}
+                    {String.fromCharCode(65 + displayIdx)}
                   </span>
                   <span className="nofail-option-text">{option}</span>
-                  {answered && idx === result?.correctIndex && <span className="nofail-option-check">✓</span>}
-                  {answered && idx === selectedIndex && !result?.isCorrect && <span className="nofail-option-check">✗</span>}
+                  {answered && result && originalIdx === result.correctIndex && <span className="nofail-option-check">✓</span>}
+                  {answered && result && originalIdx === selectedIndex && !result.isCorrect && <span className="nofail-option-check">✗</span>}
                 </button>
               );
             })}

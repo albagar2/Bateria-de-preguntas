@@ -24,6 +24,20 @@ export default function TestPlay() {
   const [answers, setAnswers] = useState({});
   const [marked, setMarked] = useState(new Set());
 
+  const [shuffledIndices, setShuffledIndices] = useState([]);
+
+  useEffect(() => {
+    const question = test?.answers[currentIndex]?.question;
+    if (question?.options) {
+      const indices = question.options.map((_, i) => i);
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      setShuffledIndices(indices);
+    }
+  }, [currentIndex, test]);
+
   // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -34,9 +48,10 @@ export default function TestPlay() {
       
       const key = e.key.toLowerCase();
       if (['a', 'b', 'c', 'd'].includes(key)) {
-        const idx = key.charCodeAt(0) - 97;
-        if (test?.answers[currentIndex]?.question?.options[idx]) {
-          setSelectedIndex(idx);
+        const displayIdx = key.charCodeAt(0) - 97;
+        const originalIdx = shuffledIndices[displayIdx];
+        if (originalIdx !== undefined && test?.answers[currentIndex]?.question?.options[originalIdx]) {
+          setSelectedIndex(originalIdx);
         }
       }
       
@@ -51,7 +66,7 @@ export default function TestPlay() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [answered, selectedIndex, currentIndex, test]);
+  }, [answered, selectedIndex, currentIndex, test, shuffledIndices]);
 
   useEffect(() => {
     api.getTestResult(testId)
@@ -193,21 +208,22 @@ export default function TestPlay() {
             <h2 className="nofail-question-text">{question.questionText}</h2>
 
             <div className="nofail-options">
-              {question.options.map((option, idx) => {
+              {shuffledIndices.map((originalIdx, displayIdx) => {
+                const option = question.options[originalIdx];
                 let cls = 'nofail-option';
                 if (answered && result) {
-                  if (idx === result.correctIndex) cls += ' correct';
-                  else if (idx === selectedIndex && !result.isCorrect) cls += ' incorrect';
-                } else if (idx === selectedIndex) cls += ' selected';
+                  if (originalIdx === result.correctIndex) cls += ' correct';
+                  else if (originalIdx === selectedIndex && !result.isCorrect) cls += ' incorrect';
+                } else if (originalIdx === selectedIndex) cls += ' selected';
 
                 return (
                   <button
-                    key={idx}
+                    key={originalIdx}
                     className={cls}
-                    onClick={() => !answered && setSelectedIndex(idx)}
+                    onClick={() => !answered && setSelectedIndex(originalIdx)}
                     disabled={answered}
                   >
-                    <span className="nofail-option-letter">{String.fromCharCode(65 + idx)}</span>
+                    <span className="nofail-option-letter">{String.fromCharCode(65 + displayIdx)}</span>
                     <span className="nofail-option-text">{option}</span>
                   </button>
                 );
