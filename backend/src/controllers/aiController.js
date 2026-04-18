@@ -86,4 +86,25 @@ exports.getChatHistory = async (req, res, next) => {
   }
 };
 
+/**
+ * Scans a document (PDF/Image) and returns extracted questions.
+ */
+exports.scanDocument = async (req, res, next) => {
+  try {
+    const { fileBase64, mimeType, topicHint } = req.body;
+    if (!fileBase64) return ApiResponse.error(res, 'No se ha proporcionado el archivo.', 400);
+
+    const questions = await aiService.scanDocument({
+      fileBase64,
+      mimeType,
+      topicHint
+    });
+
+    return ApiResponse.success(res, { questions });
+  } catch (error) {
+    console.error('❌ Error en Escaneo IA:', error);
+    next(error);
+  }
+};
+
 

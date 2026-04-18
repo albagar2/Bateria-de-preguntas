@@ -38,6 +38,58 @@ export default function TestPlay() {
     }
   }, [currentIndex, test]);
 
+  const handleAnswer = useCallback(async () => {
+    if (selectedIndex === null || answered) return;
+    setChecking(true);
+    setAnswered(true);
+
+    const question = test.answers[currentIndex]?.question;
+    const responseTime = Date.now() - startTime;
+
+    try {
+      const res = await api.submitTestAnswer(testId, {
+        questionId: question.id,
+        selectedIndex,
+        responseTime,
+      });
+      setResult(res.data);
+      setAnswers((prev) => ({ ...prev, [question.id]: { selectedIndex, isCorrect: res.data.isCorrect } }));
+    } catch (err) {
+      toast.error(err.message);
+      setAnswered(false);
+    } finally {
+      setChecking(false);
+    }
+  }, [testId, selectedIndex, answered, currentIndex, test, startTime, toast]);
+
+  const handleNext = useCallback(() => {
+    if (currentIndex + 1 < test.answers.length) {
+      setCurrentIndex(currentIndex + 1);
+      setSelectedIndex(null);
+      setAnswered(false);
+      setResult(null);
+      setStartTime(Date.now());
+    }
+  }, [currentIndex, test]);
+
+  const handleComplete = useCallback(async () => {
+    try {
+      await api.completeTest(testId);
+      navigate(`/tests/${testId}/result`);
+    } catch (err) {
+      toast.error(err.message);
+    }
+  }, [testId, navigate, toast]);
+
+  const toggleMarked = useCallback(() => {
+    setMarked((prev) => {
+      const next = new Set(prev);
+      if (next.has(currentIndex)) next.delete(currentIndex);
+      else next.add(currentIndex);
+      return next;
+    });
+  }, [currentIndex]);
+
   // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -66,7 +118,7 @@ export default function TestPlay() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [answered, selectedIndex, currentIndex, test, shuffledIndices]);
+  }, [answered, selectedIndex, currentIndex, test, shuffledIndices, handleAnswer, handleNext, toggleMarked]);
 
   useEffect(() => {
     api.getTestResult(testId)
@@ -82,7 +134,7 @@ export default function TestPlay() {
         navigate('/tests');
       })
       .finally(() => setLoading(false));
-  }, [testId]);
+  }, [testId, navigate, toast]);
 
   // Timer
   useEffect(() => {
@@ -92,49 +144,6 @@ export default function TestPlay() {
     }, 1000);
     return () => clearInterval(timer);
   }, [test, startTime]);
-
-  const handleAnswer = async () => {
-    if (selectedIndex === null || answered) return;
-    setChecking(true);
-    setAnswered(true);
-
-    const question = test.answers[currentIndex]?.question;
-    const responseTime = Date.now() - startTime;
-
-    try {
-      const res = await api.submitTestAnswer(testId, {
-        questionId: question.id,
-        selectedIndex,
-        responseTime,
-      });
-      setResult(res.data);
-      setAnswers((prev) => ({ ...prev, [question.id]: { selectedIndex, isCorrect: res.data.isCorrect } }));
-    } catch (err) {
-      toast.error(err.message);
-      setAnswered(false);
-    } finally {
-      setChecking(false);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentIndex + 1 < test.answers.length) {
-      setCurrentIndex(currentIndex + 1);
-      setSelectedIndex(null);
-      setAnswered(false);
-      setResult(null);
-      setStartTime(Date.now());
-    }
-  };
-
-  const handleComplete = async () => {
-    try {
-      await api.completeTest(testId);
-      navigate(`/tests/${testId}/result`);
-    } catch (err) {
-      toast.error(err.message);
-    }
-  };
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -156,14 +165,6 @@ export default function TestPlay() {
     return <div className="loading-screen"><div className="spinner"></div><p>Finalizando test...</p></div>;
   }
 
-  const toggleMarked = () => {
-    setMarked((prev) => {
-      const next = new Set(prev);
-      if (next.has(currentIndex)) next.delete(currentIndex);
-      else next.add(currentIndex);
-      return next;
-    });
-  };
 
   return (
     <div className="container">

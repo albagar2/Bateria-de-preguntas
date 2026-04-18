@@ -2,8 +2,10 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const cache = require('../db/cache');
 
 const MODEL_POOL = [
-    'gemini-2.0-flash',
+    'gemini-1.5-flash',
     'gemini-flash-latest',
+    'gemini-2.0-flash',
+    'gemini-1.5-pro',
 ];
 
 // In a real environment, you might use 3.1 depending on API availability
@@ -44,11 +46,21 @@ async function callGeminiWithFallback(prompt) {
             };
 
         } catch (error) {
-            console.warn(`[AI Layer] El modelo ${modelName} falló:`, error.message);
+            const errorMessage = error.message || '';
+            console.warn(`[AI Layer] El modelo ${modelName} falló:`, errorMessage);
             
             // Check if it's a 503 or 429 (rate limit / server overloaded)
             const isOverloaded = error.status === 503 || error.status === 429;
-            
+            const isQuotaExceeded = errorMessage.toLowerCase().includes('quota') || errorMessage.includes('429');
+
+            // If quota exceeded, don't retry this model, move immediately to next
+            if (isQuotaExceeded) {
+                console.warn(`[AI Layer] Cuota excedida para ${modelName}. Saltando al siguiente modelo...`);
+                retryCount = 0;
+                backoffDelay = 2000;
+                continue;
+            }
+
             if (isOverloaded && retryCount < 2) {
                 // Retry same model with exponential backoff before falling back
                 console.log(`[AI Layer] Sobrecarga detectada. Esperando ${backoffDelay}ms...`);
@@ -192,9 +204,62 @@ async function generateStudyStrategy({ plan, user_progress, days_to_exam }) {
     };
 }
 
+async function scanDocument({ fileBase64, mimeType, topicHint }) {
+    if (!genAI) {
+        throw new Error('GEMINI_API_KEY no configurada.');
+    }
+
+    const modelName = 'gemini-1.5-flash'; 
+    const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1beta' });
+
+    const prompt = `
+        ROL: Extractor de datos experto en oposiciones.
+        TAREA: Analiza el documento adjunto y extrae todas las preguntas de tipo test que encuentres.
+        TEMA SUGERIDO: ${topicHint || 'Oposiciones'}
+        
+        REGLAS DE SALIDA:
+        1. Devuelve EXCLUSIVAMENTE un bloque de código JSON válido con este formato:
+           [
+             {
+               "questionText": "...",
+               "options": ["...", "...", "...", "..."],
+               "correctIndex": 0,
+               "explanation": "..."
+             }
+           ]
+        2. Si no hay 4 opciones, genera distractores realistas.
+        3. Si la respuesta correcta no está marcada, descúbrela por lógica.
+        4. No incluyas texto fuera del bloque JSON.
+    `.trim();
+
+    try {
+        console.log(`[AI Layer] Escaneando documento multimodal (${mimeType})...`);
+        
+        const result = await model.generateContent([
+            {
+                inlineData: {
+                    data: fileBase64,
+                    mimeType: mimeType || 'application/pdf'
+                }
+            },
+            prompt
+        ]);
+
+        const text = result.response.text();
+        
+        // Limpiar el JSON de posibles backticks de markdown
+        const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
+        return JSON.parse(cleanJson);
+    } catch (error) {
+        console.error('[AI Layer] Error en escaneo:', error.message);
+        throw new Error('Error al procesar el archivo con IA. Revisa que el documento sea legible.');
+    }
+}
+
 module.exports = {
     generateExplanation,
     callGeminiWithFallback,
     askQuestion,
-    generateStudyStrategy
+    generateStudyStrategy,
+    scanDocument
 };

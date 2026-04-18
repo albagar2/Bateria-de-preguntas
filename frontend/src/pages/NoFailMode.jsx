@@ -44,6 +44,33 @@ export default function NoFailMode() {
     }
   }, [currentIndex, questions]);
 
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (answered) {
+        if (e.key === 'Enter' && result?.isCorrect && !completed) handleNext();
+        if (e.key === 'Enter' && failed) handleRestart();
+        return;
+      }
+      
+      const key = e.key.toLowerCase();
+      if (['a', 'b', 'c', 'd'].includes(key)) {
+        const displayIdx = key.charCodeAt(0) - 97;
+        const originalIdx = shuffledIndices[displayIdx];
+        if (originalIdx !== undefined && questions[currentIndex]?.options[originalIdx]) {
+          setSelectedIndex(originalIdx);
+        }
+      }
+      
+      if (e.key === 'Enter' && selectedIndex !== null) {
+        handleAnswer();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [answered, selectedIndex, currentIndex, questions, shuffledIndices, result, failed, completed, handleAnswer, handleNext, handleRestart]);
+
   const loadQuestions = async () => {
     try {
       setLoading(true);
@@ -106,7 +133,7 @@ export default function NoFailMode() {
     }
   }, [selectedIndex, answered, currentIndex, questions, startTime, streak, maxReached, toast]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (currentIndex + 1 < questions.length) {
       setCurrentIndex(currentIndex + 1);
       setSelectedIndex(null);
@@ -114,9 +141,9 @@ export default function NoFailMode() {
       setResult(null);
       setStartTime(Date.now());
     }
-  };
+  }, [currentIndex, questions]);
 
-  const handleRestart = () => {
+  const handleRestart = useCallback(() => {
     setCurrentIndex(0);
     setStreak(0);
     setFailed(false);
@@ -125,7 +152,7 @@ export default function NoFailMode() {
     setSelectedIndex(null);
     setResult(null);
     setStartTime(Date.now());
-  };
+  }, []);
 
   if (loading) {
     return <div className="loading-screen"><div className="spinner"></div><p>Cargando preguntas...</p></div>;

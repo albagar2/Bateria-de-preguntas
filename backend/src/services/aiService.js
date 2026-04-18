@@ -6,8 +6,10 @@ const { prisma } = require('../config/database');
 const crypto = require('crypto');
 
 const MODEL_POOL = [
-  'gemini-2.0-flash',
+  'gemini-1.5-flash',
   'gemini-flash-latest',
+  'gemini-2.0-flash',
+  'gemini-1.5-pro',
 ];
 
 /**
@@ -35,7 +37,6 @@ async function callGeminiWithFallback(prompt) {
     try {
       console.log(`[AI Service] Intentando con modelo: ${modelName} (API v1beta)`);
       
-      // Replicamos la configuración exacta del microservicio que funcionaba:
       const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1beta' });
       
       const response = await model.generateContent(prompt);
@@ -46,9 +47,20 @@ async function callGeminiWithFallback(prompt) {
       return { text, modelUsed: modelName };
     } catch (error) {
       lastError = error;
-      console.error(`[AI Service] Error CRÍTICO con modelo ${modelName}:`, error.message);
+      const errorMessage = error.message || '';
+      console.error(`[AI Service] Error con modelo ${modelName}:`, errorMessage);
       
       const isOverloaded = error.status === 503 || error.status === 429;
+      const isQuotaExceeded = errorMessage.toLowerCase().includes('quota') || errorMessage.includes('429');
+
+      // If quota exceeded, don't retry this model, move immediately to next
+      if (isQuotaExceeded) {
+        console.warn(`[AI Service] Cuota excedida para ${modelName}. Saltando al siguiente modelo...`);
+        retryCount = 0;
+        backoffDelay = 2000;
+        continue;
+      }
+
       if (isOverloaded && retryCount < 2) {
         console.log(`[AI Service] Servidor sobrecargado. Reintentando en ${backoffDelay}ms...`);
         await delay(backoffDelay);
@@ -163,8 +175,57 @@ async function askQuestion({ question, topic, name }) {
   return { answer: text, modelUsed };
 }
 
+/**
+ * Scan document and extract questions using Gemini Multimodal
+ */
+async function scanDocument({ fileBase64, mimeType, topicHint }) {
+  if (!genAI) {
+    throw new Error('GEMINI_API_KEY no configurada.');
+  }
+
+  const modelName = 'gemini-1.5-flash'; 
+  const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1beta' });
+
+  const prompt = `
+    ROL: Extractor de datos pedagógicos experto.
+    TAREA: Analiza el documento adjunto y extrae todas las preguntas de tipo test (opción múltiple) que encuentres.
+    CONTEXTO DEL TEMA: ${topicHint || 'Oposiciones'}
+    
+    REGLAS DE ORO:
+    1. Devuelve EXCLUSIVAMENTE un bloque JSON válido (array de objetos).
+    2. Estructura: [{"questionText": "...", "options": ["...", "...", "...", "..."], "correctIndex": 0, "explanation": "..."}]
+    3. Todas las preguntas deben tener exactamente 4 opciones. Si faltan, invéntalas.
+    4. El "correctIndex" es el índice (0-3) de la opción verdadera.
+    5. "explanation" debe ser una breve frase justificando la respuesta.
+    6. NO incluyas explicaciones fuera del JSON.
+  `.trim();
+
+  try {
+    console.log(`[AI Service] Escaneando documento multimodal (Type: ${mimeType})...`);
+    
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          data: fileBase64,
+          mimeType: mimeType || 'application/pdf'
+        }
+      },
+      prompt
+    ]);
+
+    const text = result.response.text();
+    const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    
+    return JSON.parse(cleanJson);
+  } catch (error) {
+    console.error('[AI Service] Error en escaneo:', error.message);
+    throw new Error('Error al procesar el archivo. Asegúrate de que no esté protegido por contraseña y sea legible.');
+  }
+}
+
 module.exports = {
   generateExplanation,
   askQuestion,
   generateStudyStrategy,
+  scanDocument,
 };

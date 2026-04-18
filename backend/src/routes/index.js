@@ -115,6 +115,7 @@ router.patch('/study-plans/:id/complete', authenticate, studyPlanController.comp
 router.post('/ai/explain', authenticate, aiController.generateExplanation);
 router.post('/ai/ask', authenticate, aiController.askQuestion);
 router.get('/ai/history', authenticate, aiController.getChatHistory);
+router.post('/ai/scan', authenticate, authorize('ADMIN'), aiController.scanDocument);
 
 // ─── Admin Routes ───────────────────────────
 router.get('/admin/stats', authenticate, authorize('ADMIN'), adminController.getSystemStats);
