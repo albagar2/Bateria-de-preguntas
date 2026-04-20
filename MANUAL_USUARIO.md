@@ -27,39 +27,41 @@ Tu centro de mandos ha sido diseñado para maximizar tu productividad:
 
 ### Modos de Estudio
 - **Test por Temas**: Focaliza tu estudio en unidades concretas.
-- **Modo Sin Fallos**: Un reto de resistencia; si fallas una pregunta, vuelves al principio del tema.
-- **Repaso Inteligente**: El sistema usa **Repetición Espaciada** para preguntarte más a menudo lo que más te cuesta.
+### Entrenamiento Avanzado
+- **Modo Sin Fallos**: Un reto de resistencia; si fallas una sola pregunta, vuelves al principio del tema. Tu racha se reinicia, obligándote a alcanzar la perfección.
+- **Randomización de Opciones**: Para evitar que memorices que "la respuesta correcta es la B", el sistema baraja el orden de las opciones en cada intento. ¡Tendrás que leer de verdad!
 
-### Explicaciones con IA 🤖
-Si tienes dudas tras una respuesta, pulsa en **"Explicación IA"**. El sistema analizará la pregunta y te explicará los conceptos jurídicos o técnicos de forma sencilla y adaptada a tu progreso.
-
----
-
-## 4. Método Pomodoro y Deep Focus ⏳
-
-Hemos integrado una herramienta de productividad de élite para maximizar tus horas de estudio:
-- **Ciclos Automatizados**: El sistema alterna 25 minutos de estudio con 5 de descanso corto (y 15 de descanso largo cada 4 ciclos) automáticamente.
-- **Modo Sin Distracciones (Deep Focus)**: Al activar este modo, la interfaz se simplifica al máximo, ocultando menús, pies de página y asistentes de IA para que solo estéis tú y tu material de estudio.
-- **Tests Integrados**: Puedes lanzar un "Test Rápido" desde la pantalla de Pomodoro. Un cronómetro persistente aparecerá en la parte inferior mientras haces el test para que nunca pierdas de vista tu tiempo de foco.
+### Atajos de Teclado (Power User) ⚡
+Acelera tus repasos usando solo el teclado:
+- **Teclas A, B, C, D**: Seleccionan la opción correspondiente en pantalla.
+- **Tecla Enter**: Confirma tu respuesta. Si ya has respondido y has acertado, pulsa Enter otra vez para pasar a la siguiente pregunta rápidamente.
+- **Tecla M**: Marca o desmarca la pregunta actual para revisarla más tarde en tus estadísticas.
 
 ---
 
-## 4. Gestión para Administradores 🛡️
+## 4. Escaneo de Documentos con IA 🤖 (Admin)
 
-Si tienes privilegios de administrador, dispones de herramientas avanzadas en el **Centro de Control**:
-- **Carga Masiva Inteligente 🚀**: Olvídate de ir una a una. Puedes pegar bloques de texto y el sistema detectará automáticamente los enunciados, las opciones y las respuestas.
-- **Detección de Texto en Respuestas**: El importador es capaz de identificar la respuesta correcta incluso si pones el texto completo (ej: `R: Artículo 113`) en lugar de solo la letra.
-- **Subtemas Desplegables 🔽**: Organiza las preguntas en grupos lógicos. Tanto en la vista de estudio como en administración, puedes colapsar y expandir secciones para no abrumarte con temas largos.
-- **Buscador Global de Preguntas 🔍**: Una potente herramienta que te permite buscar cualquier enunciado en toda la base de datos simultáneamente, facilitando tareas de corrección o edición rápida.
-- **Prevención de Duplicados 🛡️**: El sistema audita automáticamente cada carga para asegurar que no se introduzca la misma pregunta dos veces en el mismo tema.
+Si eres administrador, puedes añadir cientos de preguntas en segundos sin teclear:
+1. Entra en el **Centro de Control** y selecciona un tema.
+2. Pulsa el botón **"🤖 Escaneo IA"**.
+3. Sube un archivo **PDF o una Imagen** (puedes hacer una foto a un test en papel).
+4. El sistema analizará el documento y te mostrará una **vista previa** de las preguntas extraídas.
+5. Revisa que todo sea correcto y pulsa **"Confirmar e Importar"**. ¡Listo!
 
 ---
 
-## 5. Experiencia de Usuario 💎
+## 5. Método Pomodoro y Deep Focus ⏳
 
-- **Diseño Premium**: Interfaz "Dark-First" con efectos de cristal (glassmorphism) para una experiencia de estudio state-of-the-art.
-- **Notificaciones Modernas**: Diálogos elegantes y claros para confirmar tus acciones.
-- **Modo Oscuro**: Optimizado para reducir la fatiga visual durante las sesiones nocturnas.
+Hemos integrado una herramienta de productividad de élite:
+- **Modo Deep Focus**: Oculta distracciones para concentrarte al 100%.
+- **Tests Integrados**: Realiza tests rápidos de 10 preguntas sin detener tu cronómetro Pomodoro.
+
+---
+
+## 6. Experiencia de Usuario 💎
+
+- **Diseño Premium**: Interfaz moderna con efectos de cristal y animaciones fluidas.
+- **Modo Oscuro Nativo**: Cuida tu vista durante las largas sesiones de estudio.
 
 ---
 

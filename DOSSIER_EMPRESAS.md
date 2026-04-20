@@ -17,24 +17,18 @@ Las academias de preparación para oposiciones y procesos selectivos se enfrenta
 ### 🏢 2.1. Arquitectura Multi-Oposición y Multi-Categoría (Multi-Tenant)
 La plataforma no está limitada a un único temario. Puede gestionar **decenas de oposiciones o cursos simultáneamente**. Cada alumno, al registrarse, se puede adscribir a **múltiples oposiciones de distintas categorías** con una experiencia de usuario totalmente parametrizada y aislada en los temas correspondientes a su selección activa. Podrá ofertar a sus clientes todo su catálogo de preparaciones desde un único panel centralizado.
 
-### 🧠 2.2. Algoritmo de Repetición Espaciada y Banco de Errores
-El principal valor pedagógico de la plataforma es su motor de aprendizaje inteligente.
-- El sistema detecta automáticamente los puntos débiles de cada estudiante (preguntas falladas, tiempos de respuesta lentos).
-- Genera un **Banco de Errores** dinámico personalizado.
-- Potencia la retención forzando la revisión de conceptos no dominados mediante tests generados específicamente para cubrir carencias.
-- **Microservicio de IA Integrado:** Incluye un motor de Inteligencia Artificial propio que provee explicaciones adaptativas para cada pregunta fallada (nivel básico, intermedio o avanzado), ahorrando cientos de horas de tutorización humana.
+### 🧠 2.2. Inteligencia Artificial Multimodal (OCR & Parser)
+Nuestra plataforma no solo responde dudas; **digitaliza su material**. Gracias a tecnologías de visión artificial, los administradores pueden fotografiar un libro de texto o subir un PDF y el sistema extraerá las preguntas de test automáticamente, ahorrando miles de horas en introducción de datos manual.
 
-### 📊 2.3. Analítica de Datos Integral (Métricas de Éxito)
-*Los datos no mienten.* La aplicación provee métricas clave tanto para el alumno como para facilitar el soporte académico de sus preparadores:
-- Precisión porcentual de aciertos y tiempo medio por pregunta.
-- Trazabilidad de progreso segmentada por temas.
-- Visualización de la constancia (rachas de estudio) y "heatmaps" de actividad semanal.
+### ⚡ 2.3. UX de Alto Rendimiento y Shortcuts
+Diseñada para opositores avanzados ("Power Users"). La aplicación permite el control total mediante atajos de teclado (`A, B, C, D`, `Enter`, `M`), permitiendo realizar simulacros a una velocidad superior y con mayor foco, emulando la tensión del examen real.
 
-### 🎮 2.4. Gamificación Integrada (Engagement)
-Sabemos que la motivación decae con el tiempo. Hemos implementado características de fidelización para que los alumnos integren el uso de la app en su rutina diaria:
-- **Racha Diaria (Streak)** para promover la constancia en el estudio.
-- **Logros desbloqueables** que premian la tenacidad computando volumetría, eficacia y velocidad.
-- Metas de estudio ("Planes del día").
+### 💀 2.4. Modos de Entrenamiento Disruptivos
+- **Modo Sin Fallos**: Fomenta la excelencia. Ideal para temarios críticos donde el error no está permitido.
+- **Randomización Total**: Evita la memorización por posición, garantizando que el alumno realmente comprenda la materia.
+
+### 🛡️ 2.5. Arquitectura de Alta Disponibilidad IA
+Disponemos de un **Pool de Modelos Inteligentes**. Si el servicio principal de Google experimenta saturación, el sistema conmuta automáticamente entre diferentes modelos y versiones en milisegundos, garantizando que el servicio de tutoría nunca se interrumpa.
 
 ---
 

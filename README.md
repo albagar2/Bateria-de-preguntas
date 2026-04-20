@@ -9,25 +9,25 @@
 
 ---
 
-## 💎 Características Premium (v2.0)
+## 💎 Características Premium (v2.1)
 
-### 🤖 Tutor IA con Memoria (Gemini Integrated)
-Ya no necesitas buscar en el BOE. Nuestra IA integrada explica cada pregunta, resuelve dudas legales y **recuerda tus conversaciones anteriores**. El historial persistente te permite retomar tus dudas donde las dejaste.
+### 🤖 Escaneo Inteligente de Documentos (NEW)
+¡Olvídate de transcribir! Sube un **PDF o una foto de un test** y nuestra IA multimodal (Gemini 1.5 Vision) extraerá automáticamente las preguntas, opciones, respuestas correctas y generará explicaciones didácticas en segundos.
 
-### ⏳ Modo Pomodoro 2.0 (Deep Focus)
-Optimiza tu tiempo con ciclos de estudio y descanso automatizados. Esta versión incluye el **Modo Sin Distracciones** (bloquea navbars/asistentes) e integra **Tests Rápidos de 10 preguntas** que puedes realizar mientras el temporizador sigue corriendo, maximizando la retención inmediata.
+### ⚡ Shortcuts para Opositores de Élite
+Diseñado para la velocidad. Controla toda la interfaz con el teclado:
+- **A, B, C, D**: Selecciona opciones instantáneamente.
+- **Enter**: Confirma respuesta o pasa a la siguiente pregunta.
+- **M**: Marca preguntas para revisión posterior.
 
-### 📅 Planificador Mensual Estratégico
-Visualiza tu éxito a **30 días vista**. Un calendario dinámico que organiza tus temas, sincroniza tareas con tu Dashboard y ajusta la carga de trabajo según tu fecha de examen.
+### 💀 Modo Sin Fallos (Hardcore Mode)
+El entrenamiento definitivo para la perfección. Una sola respuesta incorrecta y vuelves al inicio del tema. Ideal para memorizar leyes y conceptos críticos donde el error no es una opción.
 
-### 🏆 Gamificación y Logros
-Mantente motivado con nuestro sistema de medallas. Gana trofeos como *"Búho Nocturno"*, *"Relámpago"* o *"Constancia"* mientras completas tus objetivos diarios.
+### 🔄 Randomización Inteligente (Anti-Memorización)
+Las respuestas se barajan en cada intento. Evita la "memoria visual" de la posición (la respuesta A no siempre será la A), obligando al estudiante a leer y razonar en cada iteración.
 
-### 📉 Analítica Avanzada y Exportación PDF
-Dashboard visual con gráficos de rendimiento de los últimos 30 días. Analiza tus puntos ciegos y genera **informes de progreso en PDF** para llevar un control profesional de tu evolución.
-
-### 🎴 Modo Flashcards 3D
-Entrena tu memoria activa con nuestro sistema de cartas interactivas. Ideal para repasar conceptos, definiciones y plazos legales de forma rápida y visual.
+### 🧠 Pool de Modelos IA con Fallback
+Arquitectura de alta disponibilidad para la IA. Si un modelo alcanza su cuota, el sistema conmuta automáticamente entre **Gemini 1.5 Flash, 2.0 Flash y 1.5 Pro** en milisegundos, asegurando que nunca te quedes sin tutoría.
 
 ---
 
@@ -35,11 +35,11 @@ Entrena tu memoria activa con nuestro sistema de cartas interactivas. Ideal para
 
 | Capa | Tecnologías |
 | :--- | :--- |
-| **Frontend** | React, Recharts (Gráficos), Framer Motion (Animaciones), Lucide Icons |
-| **Backend** | Node.js, Express, Prisma ORM |
-| **BBDD** | PostgreSQL (Supabase) con sistema de **AICache** |
-| **Inteligencia Artificial** | Google Generative AI (Gemini 1.5 Flash/Pro) |
-| **Arquitectura** | Monolito Unificado (Optimizado para Vercel Serverless) |
+| **Frontend** | React 18, Vite, Framer Motion, Context API |
+| **Backend** | Node.js, Express, Prisma ORM, JWT |
+| **BBDD Cache** | SQLite (Better-SQLite3) + Redis-ready layers |
+| **IA Multimodal** | Google Generative AI (Vision + Text) |
+| **Arquitectura** | Microservicios de apoyo + Monolito Unificado |
 
 ---
 
