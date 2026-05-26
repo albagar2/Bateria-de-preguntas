@@ -1,5 +1,6 @@
 const aiService = require('../services/aiService');
 const { ApiResponse } = require('../utils/ApiResponse');
+const { AppError } = require('../utils/AppError');
 const { prisma } = require('../config/database');
 
 /**
@@ -91,13 +92,16 @@ exports.getChatHistory = async (req, res, next) => {
  */
 exports.scanDocument = async (req, res, next) => {
   try {
-    const { fileBase64, mimeType, topicHint } = req.body;
-    if (!fileBase64) return ApiResponse.error(res, 'No se ha proporcionado el archivo.', 400);
+    const { fileBase64, mimeType, topicHint, textContent } = req.body;
+    if (!fileBase64 && !textContent) {
+      throw new AppError('No se ha proporcionado contenido para analizar.', 400);
+    }
 
     const questions = await aiService.scanDocument({
       fileBase64,
       mimeType,
-      topicHint
+      topicHint,
+      textContent
     });
 
     return ApiResponse.success(res, { questions });

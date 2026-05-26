@@ -2,7 +2,7 @@
 // App — Root component with routing
 // ============================================
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { PomodoroProvider } from './context/PomodoroContext';
@@ -28,6 +28,7 @@ import Profile from './pages/Profile';
 import Support from './pages/Support';
 import AdminPanel from './pages/AdminPanel';
 import Pomodoro from './pages/Pomodoro';
+import './pages/Auth.css'; // For demo banner styles
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -60,7 +61,8 @@ function AdminRoute({ children }) {
 }
 
 function AppRoutes() {
-  const { user } = useAuth();
+  const { user, isDemo } = useAuth();
+  const [showDemoBanner, setShowDemoBanner] = useState(true);
 
   useEffect(() => {
     if (user) {
@@ -104,6 +106,12 @@ function AppRoutes() {
         </Routes>
       </main>
       <Footer />
+      {isDemo && showDemoBanner && (
+        <div className="demo-banner">
+          🚀 Modo Demo — Puedes explorar todo, pero los cambios no se guardarán
+          <button className="demo-banner-close" onClick={() => setShowDemoBanner(false)}>×</button>
+        </div>
+      )}
     </>
   );
 }

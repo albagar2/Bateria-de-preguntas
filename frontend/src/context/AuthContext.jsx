@@ -9,6 +9,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isDemo, setIsDemo] = useState(() => sessionStorage.getItem('isDemo') === 'true');
 
   // Check for existing session on mount
   useEffect(() => {
@@ -47,6 +48,8 @@ export function AuthProvider({ children }) {
       // Ignore logout errors
     }
     api.clearTokens();
+    sessionStorage.removeItem('isDemo');
+    setIsDemo(false);
     setUser(null);
   }, []);
 
@@ -55,7 +58,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser, isDemo }}>
       {children}
     </AuthContext.Provider>
   );

@@ -83,7 +83,7 @@ router.get('/questions/review', authenticate, questionController.getReviewQuesti
 router.get('/questions/no-fail/:topicId', authenticate, questionController.getNoFailMode);
 router.get('/questions/:id', authenticate, authorize('ADMIN'), questionController.getById);
 router.post('/questions', authenticate, validate(createQuestionSchema), questionController.create);
-router.post('/questions/bulk', authenticate, authorize('ADMIN'), questionController.bulkCreate);
+router.post('/questions/bulk', authenticate, questionController.bulkCreate);
 router.put('/questions/:id', authenticate, authorize('ADMIN'), validate(updateQuestionSchema), questionController.update);
 router.delete('/questions/:id', authenticate, authorize('ADMIN'), questionController.remove);
 router.post('/questions/answer', authenticate, validate(answerQuestionSchema), questionController.answer);
@@ -115,7 +115,7 @@ router.patch('/study-plans/:id/complete', authenticate, studyPlanController.comp
 router.post('/ai/explain', authenticate, aiController.generateExplanation);
 router.post('/ai/ask', authenticate, aiController.askQuestion);
 router.get('/ai/history', authenticate, aiController.getChatHistory);
-router.post('/ai/scan', authenticate, authorize('ADMIN'), aiController.scanDocument);
+router.post('/ai/scan', authenticate, aiController.scanDocument);
 
 // ─── Admin Routes ───────────────────────────
 router.get('/admin/stats', authenticate, authorize('ADMIN'), adminController.getSystemStats);

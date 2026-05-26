@@ -14,6 +14,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -40,6 +41,45 @@ export default function Login() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDemo = async () => {
+    if (demoLoading || loading) return;
+    setDemoLoading(true);
+    setErrors({});
+
+    const demoEmail = 'demo@bateriapreguntas.com';
+    const demoPassword = 'User@2024!';
+
+    // Animate typing the email
+    setForm({ email: '', password: '' });
+    await new Promise(r => setTimeout(r, 150));
+
+    for (let i = 1; i <= demoEmail.length; i++) {
+      setForm(prev => ({ ...prev, email: demoEmail.slice(0, i) }));
+      await new Promise(r => setTimeout(r, 25));
+    }
+
+    await new Promise(r => setTimeout(r, 200));
+
+    // Animate typing the password
+    for (let i = 1; i <= demoPassword.length; i++) {
+      setForm(prev => ({ ...prev, password: demoPassword.slice(0, i) }));
+      await new Promise(r => setTimeout(r, 25));
+    }
+
+    await new Promise(r => setTimeout(r, 300));
+
+    // Submit login as demo
+    try {
+      await login(demoEmail, demoPassword);
+      sessionStorage.setItem('isDemo', 'true');
+      toast.success('¡Bienvenido al modo demo!');
+    } catch (err) {
+      toast.error(err.message || 'Error al iniciar sesión demo');
+    } finally {
+      setDemoLoading(false);
     }
   };
 
@@ -110,7 +150,19 @@ export default function Login() {
         </div>
 
         <div className="auth-demo">
-          <p>Demo: <strong>demo@bateriapreguntas.com</strong> / <strong>User@2024!</strong></p>
+          <button
+            type="button"
+            className="btn-demo"
+            onClick={handleDemo}
+            disabled={demoLoading || loading}
+            id="demo-button"
+          >
+            {demoLoading ? (
+              <><span className="spinner spinner-sm"></span> Entrando en demo...</>
+            ) : (
+              <><span className="demo-icon">🚀</span> Probar Demo</>            )}
+          </button>
+          <p className="demo-hint">Explora la app sin registrarte</p>
         </div>
 
         <div className="copyright-footer">

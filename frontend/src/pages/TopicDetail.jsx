@@ -6,6 +6,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Zap } from 'lucide-react';
 import api from '../services/api';
 import swal from '../utils/swal';
+import BulkUploadModal from '../components/BulkUploadModal';
 import './Topics.css';
 
 export default function TopicDetail() {
@@ -14,6 +15,7 @@ export default function TopicDetail() {
   const [topic, setTopic] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedSubtopics, setExpandedSubtopics] = useState({}); // Tracking expanded subtopics in student view
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
 
   useEffect(() => {
     api.getTopic(id)
@@ -175,7 +177,12 @@ export default function TopicDetail() {
 
         <hr style={{ border: '0', borderTop: '1px solid var(--border-color)', margin: 'var(--space-xl) 0' }} />
 
-        <h3 className="section-title" style={{ fontSize: 'var(--font-lg)' }}>➕ Añadir Pregunta</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 className="section-title" style={{ fontSize: 'var(--font-lg)', margin: 0 }}>➕ Añadir Pregunta</h3>
+          <button className="btn btn-secondary btn-sm" onClick={() => setIsBulkModalOpen(true)}>
+            🚀 Carga Masiva IA
+          </button>
+        </div>
         <QuestionForm 
           topicId={topic.id} 
           subtopics={topic.subtopics || []}
@@ -184,6 +191,15 @@ export default function TopicDetail() {
           }} 
         />
       </div>
+
+      <BulkUploadModal 
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        defaultTopicId={topic.id}
+        onUploadSuccess={() => {
+          api.getTopic(id).then(res => setTopic(res.data));
+        }}
+      />
     </div>
   );
 }

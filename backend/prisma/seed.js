@@ -3,7 +3,7 @@
 // Populates initial data for development/demo
 // ============================================
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
@@ -557,23 +557,23 @@ async function main() {
 
   // ─── Create Achievements ──────────────────
   const achievementsData = [
-    { name: 'Primera respuesta', description: 'Has respondido tu primera pregunta', icon: '🎯', type: 'VOLUME', threshold: 1 },
-    { name: 'Principiante aplicado', description: 'Has respondido 50 preguntas', icon: '📖', type: 'VOLUME', threshold: 50 },
-    { name: 'Estudiante dedicado', description: 'Has respondido 200 preguntas', icon: '📚', type: 'VOLUME', threshold: 200 },
-    { name: 'Máquina de estudio', description: 'Has respondido 500 preguntas', icon: '🤖', type: 'VOLUME', threshold: 500 },
-    { name: 'Enciclopedia viviente', description: 'Has respondido 1000 preguntas', icon: '🧠', type: 'VOLUME', threshold: 1000 },
-    { name: 'Racha de 3 días', description: 'Has estudiado 3 días seguidos', icon: '🔥', type: 'STREAK', threshold: 3 },
-    { name: 'Racha de 7 días', description: 'Has estudiado una semana seguida', icon: '⚡', type: 'STREAK', threshold: 7 },
-    { name: 'Racha de 30 días', description: '¡Un mes sin parar!', icon: '🏆', type: 'STREAK', threshold: 30 },
-    { name: 'Sin errores x10', description: '10 preguntas seguidas sin fallar', icon: '✨', type: 'ACCURACY', threshold: 10 },
-    { name: 'Sin errores x25', description: '25 preguntas seguidas sin fallar', icon: '💫', type: 'ACCURACY', threshold: 25 },
-    { name: 'Sin errores x50', description: '50 preguntas seguidas perfectas', icon: '🌟', type: 'ACCURACY', threshold: 50 },
-    { name: 'Sin errores x100', description: '¡100 seguidas sin fallar! Eres un crack', icon: '👑', type: 'ACCURACY', threshold: 100 },
-    { name: 'Primer test', description: 'Has completado tu primer test', icon: '📝', type: 'SPEED', threshold: 1 },
-    { name: 'Experto en tests', description: 'Has completado 10 tests', icon: '🎓', type: 'SPEED', threshold: 10 },
-    { name: 'Maestro del examen', description: 'Has completado 50 tests', icon: '🏅', type: 'SPEED', threshold: 50 },
-    { name: '10 preguntas dominadas', description: 'Has dominado 10 preguntas completamente', icon: '💪', type: 'MASTERY', threshold: 10 },
-    { name: '50 preguntas dominadas', description: 'Has dominado 50 preguntas', icon: '🎖️', type: 'MASTERY', threshold: 50 },
+    { code: 'FIRST_ANS', name: 'Primera respuesta', description: 'Has respondido tu primera pregunta', icon: '🎯', type: 'VOLUME', threshold: 1 },
+    { code: 'ANS_50', name: 'Principiante aplicado', description: 'Has respondido 50 preguntas', icon: '📖', type: 'VOLUME', threshold: 50 },
+    { code: 'ANS_200', name: 'Estudiante dedicado', description: 'Has respondido 200 preguntas', icon: '📚', type: 'VOLUME', threshold: 200 },
+    { code: 'ANS_500', name: 'Máquina de estudio', description: 'Has respondido 500 preguntas', icon: '🤖', type: 'VOLUME', threshold: 500 },
+    { code: 'ANS_1000', name: 'Enciclopedia viviente', description: 'Has respondido 1000 preguntas', icon: '🧠', type: 'VOLUME', threshold: 1000 },
+    { code: 'STREAK_3', name: 'Racha de 3 días', description: 'Has estudiado 3 días seguidos', icon: '🔥', type: 'STREAK', threshold: 3 },
+    { code: 'STREAK_7', name: 'Racha de 7 días', description: 'Has estudiado una semana seguida', icon: '⚡', type: 'STREAK', threshold: 7 },
+    { code: 'STREAK_30', name: 'Racha de 30 días', description: '¡Un mes sin parar!', icon: '🏆', type: 'STREAK', threshold: 30 },
+    { code: 'ACC_10', name: 'Sin errores x10', description: '10 preguntas seguidas sin fallar', icon: '✨', type: 'ACCURACY', threshold: 10 },
+    { code: 'ACC_25', name: 'Sin errores x25', description: '25 preguntas seguidas sin fallar', icon: '💫', type: 'ACCURACY', threshold: 25 },
+    { code: 'ACC_50', name: 'Sin errores x50', description: '50 preguntas seguidas perfectas', icon: '🌟', type: 'ACCURACY', threshold: 50 },
+    { code: 'ACC_100', name: 'Sin errores x100', description: '¡100 seguidas sin fallar! Eres un crack', icon: '👑', type: 'ACCURACY', threshold: 100 },
+    { code: 'FIRST_TEST', name: 'Primer test', description: 'Has completado tu primer test', icon: '📝', type: 'SPEED', threshold: 1 },
+    { code: 'TEST_10', name: 'Experto en tests', description: 'Has completado 10 tests', icon: '🎓', type: 'SPEED', threshold: 10 },
+    { code: 'TEST_50', name: 'Maestro del examen', description: 'Has completado 50 tests', icon: '🏅', type: 'SPEED', threshold: 50 },
+    { code: 'MASTERY_10', name: '10 preguntas dominadas', description: 'Has dominado 10 preguntas completamente', icon: '💪', type: 'MASTERY', threshold: 10 },
+    { code: 'MASTERY_50', name: '50 preguntas dominadas', description: 'Has dominado 50 preguntas', icon: '🎖️', type: 'MASTERY', threshold: 50 },
   ];
 
   for (const data of achievementsData) {

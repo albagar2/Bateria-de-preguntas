@@ -1,7 +1,7 @@
 // ============================================
 // Toast Context — Global notification system
 // ============================================
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 const ToastContext = createContext(null);
 
@@ -27,6 +27,13 @@ export function ToastProvider({ children }) {
   const success = useCallback((msg) => addToast(msg, 'success'), [addToast]);
   const error = useCallback((msg) => addToast(msg, 'error'), [addToast]);
   const info = useCallback((msg) => addToast(msg, 'info'), [addToast]);
+
+  // Listen for demo-blocked events from the API interceptor
+  useEffect(() => {
+    const handler = (e) => addToast(e.detail.message, 'info');
+    window.addEventListener('demo-blocked', handler);
+    return () => window.removeEventListener('demo-blocked', handler);
+  }, [addToast]);
 
   return (
     <ToastContext.Provider value={{ success, error, info }}>

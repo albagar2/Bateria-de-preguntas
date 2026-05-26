@@ -4,12 +4,13 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { prisma } = require('../config/database');
 const crypto = require('crypto');
+const mammoth = require('mammoth');
 
 const MODEL_POOL = [
-  'gemini-1.5-flash',
-  'gemini-flash-latest',
-  'gemini-2.0-flash',
-  'gemini-1.5-pro',
+  'models/gemini-1.5-flash-latest',
+  'models/gemini-1.5-flash',
+  'models/gemini-1.5-pro-latest',
+  'models/gemini-1.5-pro',
 ];
 
 /**
@@ -35,9 +36,9 @@ async function callGeminiWithFallback(prompt) {
   for (let i = 0; i < MODEL_POOL.length; i++) {
     const modelName = MODEL_POOL[i];
     try {
-      console.log(`[AI Service] Intentando con modelo: ${modelName} (API v1beta)`);
+      console.log(`[AI Service] Intentando con modelo: ${modelName}`);
       
-      const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1beta' });
+      const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1' });
       
       const response = await model.generateContent(prompt);
       const text = response.response.text();
@@ -177,18 +178,16 @@ async function askQuestion({ question, topic, name }) {
 
 /**
  * Scan document and extract questions using Gemini Multimodal
+ * Supports: PDF, Images, Word (docx), and Plain Text
  */
-async function scanDocument({ fileBase64, mimeType, topicHint }) {
+async function scanDocument({ fileBase64, mimeType, topicHint, textContent }) {
   if (!genAI) {
     throw new Error('GEMINI_API_KEY no configurada.');
   }
 
-  const modelName = 'gemini-1.5-flash'; 
-  const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1beta' });
-
-  const prompt = `
+  let prompt = `
     ROL: Extractor de datos pedagógicos experto.
-    TAREA: Analiza el documento adjunto y extrae todas las preguntas de tipo test (opción múltiple) que encuentres.
+    TAREA: Analiza el contenido adjunto y extrae todas las preguntas de tipo test (opción múltiple) que encuentres.
     CONTEXTO DEL TEMA: ${topicHint || 'Oposiciones'}
     
     REGLAS DE ORO:
@@ -200,26 +199,83 @@ async function scanDocument({ fileBase64, mimeType, topicHint }) {
     6. NO incluyas explicaciones fuera del JSON.
   `.trim();
 
+  let aiContent = [];
   try {
-    console.log(`[AI Service] Escaneando documento multimodal (Type: ${mimeType})...`);
-    
-    const result = await model.generateContent([
-      {
-        inlineData: {
-          data: fileBase64,
-          mimeType: mimeType || 'application/pdf'
-        }
-      },
-      prompt
-    ]);
+    // Case 1: Plain Text provided directly
+    if (textContent) {
+      console.log('[AI Service] Usando texto plano proporcionado.');
+      prompt += `\n\nCONTENIDO A ANALIZAR:\n${textContent}`;
+      aiContent = [prompt];
+    } 
+    // Case 2: Word Document (docx)
+    else if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      console.log('[AI Service] Extrayendo texto de DOCX...');
+      const buffer = Buffer.from(fileBase64, 'base64');
+      const result = await mammoth.extractRawText({ buffer });
+      console.log(`[AI Service] Texto extraído (${result.value.length} caracteres)`);
+      prompt += `\n\nCONTENIDO EXTRAÍDO DEL WORD:\n${result.value}`;
+      aiContent = [prompt];
+    }
+    // Case 3: PDF or Image (Multimodal)
+    else if (fileBase64) {
+      console.log(`[AI Service] Preparando contenido multimodal (Type: ${mimeType})`);
+      aiContent = [
+        {
+          inlineData: {
+            data: fileBase64,
+            mimeType: mimeType || 'application/pdf'
+          }
+        },
+        prompt
+      ];
+    } else {
+      throw new Error('No se ha proporcionado contenido para escanear.');
+    }
 
-    const text = result.response.text();
+    // --- Resilient AI Call (Fallback Loop) ---
+    const testModels = [
+      { name: 'gemini-1.5-flash', v: 'v1' },
+      { name: 'gemini-1.5-flash', v: 'v1beta' },
+      { name: 'gemini-pro', v: 'v1' },
+      { name: 'gemini-1.5-flash-latest', v: 'v1beta' }
+    ];
+
+    let lastError = null;
+    let text = null;
+
+    for (const m of testModels) {
+      try {
+        console.log(`[AI Service] Intentando escaneo con: ${m.name} (${m.v})`);
+        const model = genAI.getGenerativeModel({ model: m.name }, { apiVersion: m.v });
+        const result = await model.generateContent(aiContent);
+        text = result.response.text();
+        if (text) break; 
+      } catch (err) {
+        console.warn(`[AI Service] Falló ${m.name} (${m.v}): ${err.message}`);
+        lastError = err;
+      }
+    }
+
+    if (!text) {
+      throw new Error(`Google Gemini no responde. Revisa que tu API Key tenga habilitada la 'Generative Language API'. Error original: ${lastError?.message}`);
+    }
+
+    console.log(`[AI Service] Respuesta recibida (${text.length} caracteres)`);
+    
+    // Clean JSON from potential markdown backticks
     const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
     
-    return JSON.parse(cleanJson);
+    try {
+      const parsed = JSON.parse(cleanJson);
+      console.log(`[AI Service] JSON parseado correctamente: ${parsed.length} preguntas extraídas.`);
+      return parsed;
+    } catch (parseError) {
+      console.error('[AI Service] Error al parsear JSON de la IA:', text);
+      throw new Error('La IA no devolvió un formato válido. Inténtalo de nuevo con menos texto o un formato más claro.');
+    }
   } catch (error) {
-    console.error('[AI Service] Error en escaneo:', error.message);
-    throw new Error('Error al procesar el archivo. Asegúrate de que no esté protegido por contraseña y sea legible.');
+    console.error('[AI Service] Error final en escaneo:', error.message);
+    throw new Error(error.message || 'Error al procesar el archivo. Asegúrate de que sea legible.');
   }
 }
 

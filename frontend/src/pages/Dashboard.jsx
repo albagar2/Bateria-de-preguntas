@@ -9,6 +9,7 @@ import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 import Modal from '../components/common/Modal';
 import Button from '../components/common/Button';
+import BulkUploadModal from '../components/BulkUploadModal';
 import swal from '../utils/swal';
 import './Dashboard.css';
 
@@ -29,6 +30,9 @@ export default function Dashboard() {
   const [newOppDesc, setNewOppDesc] = useState('');
   const [newOppIcon, setNewOppIcon] = useState('🎯');
   const [newOppCategory, setNewOppCategory] = useState('');
+
+  // Bulk Upload state
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -418,8 +422,21 @@ export default function Dashboard() {
             <span className="dashboard-action-label">Banco de errores</span>
             <span className="dashboard-action-desc">{overview.pendingErrors || 0} errores pendientes</span>
           </Link>
+          <div className="dashboard-action-card" onClick={() => setIsBulkModalOpen(true)} style={{ cursor: 'pointer' }}>
+            <span className="dashboard-action-icon">🚀</span>
+            <span className="dashboard-action-label">Carga Masiva</span>
+            <span className="dashboard-action-desc">Sube preguntas con IA</span>
+          </div>
         </div>
       </div>
+
+      <BulkUploadModal 
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        onUploadSuccess={() => {
+          // Optional: refresh stats or show success message
+        }}
+      />
 
 
       {/* Recent Activity */}

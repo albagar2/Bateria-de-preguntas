@@ -3,6 +3,7 @@ import api from '../services/api';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
+import BulkUploadModal from '../components/BulkUploadModal';
 import swal from '../utils/swal';
 import './Dashboard.css';
 
@@ -457,8 +458,7 @@ export default function AdminPanel() {
           <div style={{ marginBottom: 'var(--space-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-md)' }}>
             <Button size="sm" variant="ghost" onClick={() => setSelectedTopic(null)}>← Volver a Temas</Button>
             <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
-              <Button size="sm" variant="ghost" onClick={() => setIsAiScanModalOpen(true)}>🤖 Escaneo IA</Button>
-              <Button size="sm" variant="secondary" onClick={() => setIsBulkModalOpen(true)}>📤 Carga Masiva</Button>
+              <Button size="sm" variant="secondary" onClick={() => setIsBulkModalOpen(true)}>🚀 Carga Masiva IA</Button>
               <Button size="sm" onClick={handleCreateQuestion}>+ Nueva Pregunta</Button>
             </div>
           </div>
@@ -652,6 +652,8 @@ export default function AdminPanel() {
           </p>
         </Card>
       )}
+
+      {/* USERS TAB */}
       {activeTab === 'users' && !selectedTopic && (
         <Card title="Gestión de Usuarios">
             <div style={{ overflowX: 'auto' }}>
@@ -746,6 +748,16 @@ export default function AdminPanel() {
             </div>
         </Card>
       )}
+
+      {/* Bulk Upload Modal (Unified) */}
+      <BulkUploadModal 
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        defaultTopicId={selectedTopic?.id}
+        onUploadSuccess={() => {
+          if (selectedTopic) viewQuestions(selectedTopic);
+        }}
+      />
       {/* Edit Topic Modal */}
       <Modal 
         isOpen={isTopicModalOpen} 
@@ -931,139 +943,15 @@ export default function AdminPanel() {
         )}
       </Modal>
 
-      {/* Bulk Import Modal */}
-      <Modal 
-        isOpen={isBulkModalOpen} 
-        onClose={() => setIsBulkModalOpen(false)} 
-        title="Carga Masiva de Preguntas"
-        footer={(
-          <>
-            <Button variant="ghost" onClick={() => setIsBulkModalOpen(false)}>Cerrar</Button>
-            <Button variant="primary" onClick={handleBulkImport} disabled={loading}>
-              {loading ? <span className="spinner spinner-sm"></span> : 'Importar Todo'}
-            </Button>
-          </>
-        )}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-          <p style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>
-            Pega tus preguntas respetando el formato para que el sistema pueda procesarlas automáticamente.
-          </p>
-          <div className="input-group">
-            <label className="input-label">Asignar todas estas preguntas al Subtema:</label>
-            <select 
-              className="input"
-              value={bulkSubtopicId}
-              onChange={(e) => setBulkSubtopicId(e.target.value)}
-            >
-              <option value="">Ninguno (General)</option>
-              {subtopics.map(sub => (
-                <option key={sub.id} value={sub.id}>{sub.title}</option>
-              ))}
-            </select>
-          </div>
-          <div className="card" style={{ padding: 'var(--space-sm)', background: 'rgba(99, 102, 241, 0.05)', fontSize: 'var(--font-xs)', border: '1px dashed var(--primary-300)' }}>
-            <strong>Ejemplo de formato:</strong><br/>
-            P: ¿Cuál es el órgano legislativo?<br/>
-            a) Gobierno<br/>
-            b) Cortes Generales<br/>
-            c) Jueces<br/>
-            d) Rey<br/>
-            R: b<br/>
-            --- (Separador entre preguntas)
-          </div>
-          <textarea 
-            className="input" 
-            rows="12"
-            placeholder="Pega aquí tu lista de preguntas..."
-            value={bulkText}
-            onChange={(e) => setBulkText(e.target.value)}
-            style={{ fontFamily: 'monospace', fontSize: 'var(--font-sm)' }}
-            spellCheck={false}
-            data-gramm={false}
-          />
-        </div>
-      </Modal>
-
-      {/* AI Scanner Modal */}
-      <Modal
-        isOpen={isAiScanModalOpen}
-        onClose={() => setIsAiScanModalOpen(false)}
-        title="Escaneo Inteligente de Documentos"
-        footer={(
-          <>
-            <Button variant="ghost" onClick={() => setIsAiScanModalOpen(false)}>Cancelar</Button>
-            <Button 
-                variant="primary" 
-                onClick={handleImportScanned} 
-                disabled={isScanning || scannedQuestions.length === 0}
-            >
-              Confirmar e Importar {scannedQuestions.length > 0 ? `(${scannedQuestions.length})` : ''}
-            </Button>
-          </>
-        )}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
-          <div className="card" style={{ padding: 'var(--space-md)', background: 'var(--primary-900)', border: '1px solid var(--primary-700)' }}>
-             <p style={{ fontSize: 'var(--font-sm)', margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
-               <span>🤖</span>
-               <span>Sube un PDF o imagen de un test y la IA extraerá las preguntas por ti.</span>
-             </p>
-          </div>
-
-          <div className="input-group">
-            <label className="input-label">Destino (Subtema):</label>
-            <select 
-              className="input"
-              value={bulkSubtopicId}
-              onChange={(e) => setBulkSubtopicId(e.target.value)}
-            >
-              <option value="">Ninguno (General)</option>
-              {subtopics.map(sub => (
-                <option key={sub.id} value={sub.id}>{sub.title}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="input-group">
-            <label className="input-label">Seleccionar Documento (PDF o Imagen)</label>
-            <input 
-                type="file" 
-                className="input" 
-                accept=".pdf,image/*" 
-                onChange={handleFileScan}
-                disabled={isScanning}
-            />
-          </div>
-
-          {isScanning && (
-            <div style={{ textAlign: 'center', padding: 'var(--space-xl)' }}>
-              <div className="spinner" style={{ margin: '0 auto var(--space-md)' }}></div>
-              <p style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Analizando documento con IA de última generación...</p>
-            </div>
-          )}
-
-          {!isScanning && scannedQuestions.length > 0 && (
-            <div style={{ maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-                <h4 style={{ fontSize: 'var(--font-sm)', borderBottom: '1px solid var(--border-color)', paddingBottom: 'var(--space-xs)' }}>
-                    Vista Previa ({scannedQuestions.length} detectadas)
-                </h4>
-                {scannedQuestions.map((q, i) => (
-                    <div key={i} style={{ padding: 'var(--space-sm)', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
-                        <p style={{ fontSize: 'var(--font-xs)', fontWeight: 600, marginBottom: 'var(--space-xs)' }}>{i+1}. {q.questionText}</p>
-                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                            {q.options.map((opt, j) => (
-                                <li key={j} style={{ fontSize: 'var(--font-xxs)', color: q.correctIndex === j ? 'var(--success-400)' : 'var(--text-muted)' }}>
-                                    {q.correctIndex === j ? '✅' : '⚪'} {opt}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ))}
-            </div>
-          )}
-        </div>
-      </Modal>
+      {/* Unified Bulk Upload Modal */}
+      <BulkUploadModal 
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        defaultTopicId={selectedTopic?.id}
+        onUploadSuccess={() => {
+          if (selectedTopic) viewQuestions(selectedTopic);
+        }}
+      />
     </div>
   );
 }

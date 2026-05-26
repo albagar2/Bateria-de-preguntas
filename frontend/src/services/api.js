@@ -3,6 +3,34 @@
 // ============================================
 const API_BASE = import.meta.env.VITE_API_URL || '/api/v1';
 
+// ─── Demo Mode Helpers ──────────────────────
+// Endpoints that are allowed to go through even in demo mode.
+// Auth is needed for login/logout. Question answers are the core UX.
+const DEMO_ALLOWED_WRITE_PATTERNS = [
+  '/auth/login',
+  '/auth/logout',
+  '/auth/refresh',
+  '/questions/answer',
+  /^\/tests\/[^/]+\/answer$/,
+  /^\/tests\/[^/]+\/complete$/,
+  '/tests',               // creating a test (needed to play)
+  '/stats/achievements/check',
+];
+
+function isDemoAllowedWrite(endpoint) {
+  return DEMO_ALLOWED_WRITE_PATTERNS.some(pattern => {
+    if (pattern instanceof RegExp) return pattern.test(endpoint);
+    return endpoint === pattern;
+  });
+}
+
+function showDemoToast() {
+  // Fire a custom event that ToastContext can pick up
+  window.dispatchEvent(new CustomEvent('demo-blocked', {
+    detail: { message: 'Modo demo: los cambios no se guardan' }
+  }));
+}
+
 class ApiService {
   constructor() {
     this.accessToken = localStorage.getItem('accessToken');
@@ -34,6 +62,18 @@ class ApiService {
     const config = { method, headers };
     if (body && method !== 'GET') {
       config.body = JSON.stringify(body);
+    }
+
+    // ─── Demo Mode Interceptor ─────────────
+    const isDemo = sessionStorage.getItem('isDemo') === 'true';
+    if (isDemo && method !== 'GET' && !isDemoAllowedWrite(endpoint)) {
+      showDemoToast();
+      // Return a fake success response so the UI doesn't break
+      return {
+        success: true,
+        message: 'Modo demo',
+        data: {},
+      };
     }
 
     const response = await fetch(`${API_BASE}${endpoint}`, config);
